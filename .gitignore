@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### no more api keys ###
+.env
