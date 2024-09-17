@@ -9,3 +9,15 @@
 
 ### Setup Instructions for Frontend
 1. Enjoy
+
+### Current List of Dependencies
+1. Spring Web
+2. Spring DevTools
+3. Lombok (added 180924)
+
+### How to Update Dependencies
+1. Go to the Maven Central Repository
+2. Copy the <dependency> block
+3. Paste it into pom.xml
+4. `./mvnw clean install`
+5. Check the logs to see if your dependency is there
