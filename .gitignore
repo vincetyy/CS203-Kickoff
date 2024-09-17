@@ -34,3 +34,4 @@ build/
 
 ### no more api keys ###
 .env
+.DS_Store
