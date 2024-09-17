@@ -8,7 +8,7 @@ package com.crashcourse.kickoff.tms.tournament;
 public class TournamentService {
     // Create
     public Tournament createTournament() {
-
+        return null;
     }
 
     // Read (All)
@@ -19,12 +19,12 @@ public class TournamentService {
 
     // Update
     public Tournament updateTournament() {
-
+        return null;
     }
 
     // Delete
     public void deleteTournament() {
-
+        return;
     }
 
     // Exists
