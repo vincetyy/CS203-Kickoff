@@ -5,7 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Embedded;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class Tournament {
     // Time / Place
     private LocalDateTime start;
     private LocalDateTime end;
-    @Embedded
+    @ManyToOne //many tournaments to one location
     private Location location;
 
     // Format
