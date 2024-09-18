@@ -20,7 +20,7 @@ public class TournamentService {
 
     // Create
     public Tournament createTournament(String name, LocalDateTime start, LocalDateTime end, 
-                                       Location location, int maxTeams, ClubFormat clubFormat, 
+                                       Location location, int maxTeams, TournamentFormat clubFormat, 
                                        KnockoutFormat knockoutFormat, ArrayList<Float> prizePool,
                                        int minRank, int maxRank) {
 

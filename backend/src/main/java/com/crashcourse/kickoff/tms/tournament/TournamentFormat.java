@@ -6,14 +6,14 @@ package com.crashcourse.kickoff.tms.tournament;
  * Maximum number of substitutes (KIV)
  */
 
-public enum ClubFormat {
+public enum TournamentFormat {
     FIVE_SIDE(5),
     SEVEN_SIDE(7),
     ELEVEN_SIDE(11);
     
     private final int clubSize;
 
-    ClubFormat(int clubSize) {
+    TournamentFormat(int clubSize) {
         this.clubSize = clubSize;
     }
 

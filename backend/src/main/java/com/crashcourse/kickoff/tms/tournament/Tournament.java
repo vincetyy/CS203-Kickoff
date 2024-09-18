@@ -35,7 +35,7 @@ public class Tournament {
 
     // Format
     final private int maxTeams;
-    final private ClubFormat clubFormat; 
+    final private TournamentFormat tournamentFormat; 
     final private KnockoutFormat knockoutFormat;
     private ArrayList<Float> prizePool;
 
@@ -47,7 +47,7 @@ public class Tournament {
     private ArrayList<Club> joinedClubs;
 
     public Tournament(Long id, String name, LocalDateTime start, LocalDateTime end, Location location,
-                      int maxTeams, ClubFormat clubFormat, KnockoutFormat knockoutFormat, 
+                      int maxTeams, TournamentFormat tournamentFormat, KnockoutFormat knockoutFormat, 
                       ArrayList<Float> prizePool, int minRank, int maxRank) {
         this.id = id;
         this.name = name;
@@ -55,7 +55,7 @@ public class Tournament {
         this.end = end;
         this.location = location;
         this.maxTeams = maxTeams;
-        this.clubFormat = clubFormat;
+        this.tournamentFormat = tournamentFormat;
         this.knockoutFormat = knockoutFormat;
         this.prizePool = prizePool;
         this.minRank = minRank;
@@ -63,8 +63,4 @@ public class Tournament {
         this.joinedClubs = new ArrayList<>();
     }
 
-    @Override
-    public String toString() {
-        return "im gonna end it";
-    }
 }
