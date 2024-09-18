@@ -1,5 +1,12 @@
 package com.crashcourse.kickoff.tms.tournament;
 
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Embedded;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import lombok.*;
@@ -9,17 +16,20 @@ import lombok.*;
  * based on provided data, not handling logic
  */
 
-
+@Entity
 @Data
 public class Tournament {
 
     // Basic Identifiers
-    final private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Automatically generates the ID value
+    private Long id;
     private String name;
 
     // Time / Place
     private LocalDateTime start;
     private LocalDateTime end;
+    @Embedded
     private Location location;
 
     // Format
@@ -50,5 +60,10 @@ public class Tournament {
         this.minRank = minRank;
         this.maxRank = maxRank;
         this.joinedClubs = new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        return "im gonna end it";
     }
 }

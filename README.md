@@ -14,6 +14,8 @@
 1. Spring Web
 2. Spring DevTools
 3. Lombok (added 180924)
+4. Starter Data JPA
+5. H2 Database
 
 ### How to Update Dependencies
 1. Go to the Maven Central Repository

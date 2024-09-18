@@ -1,5 +1,7 @@
 package com.crashcourse.kickoff.tms.tournament;
 
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.time.LocalDateTime;
 import lombok.*;
@@ -9,11 +11,12 @@ import lombok.*;
  * respect to tournaments in the service layer
  */
 
-
+@Service
 public class TournamentService {
 
     // @Autowired
     private TournamentRepository tournamentRepository;
+    private static long id = 0;
 
     // Create
     public Tournament createTournament(String name, LocalDateTime start, LocalDateTime end, 
@@ -21,21 +24,29 @@ public class TournamentService {
                                        KnockoutFormat knockoutFormat, ArrayList<Float> prizePool,
                                        int minRank, int maxRank) {
 
-        // decide id here
-        long val = 0;
-        Tournament tournament = new Tournament(val, name, start, end, location, maxTeams, clubFormat, 
+        Tournament tournament = new Tournament(id, name, start, end, location, maxTeams, clubFormat, 
                                                knockoutFormat, prizePool, minRank, maxRank);
+        id++;
         // return tournamentRepository.save(tournament);
+        return tournament;
+    }
+
+    // Read - All Tournaments
+    public Tournament findAllTournaments() {
         return null;
     }
 
-    // Read (All)
-
-    // Read (ID)
+    // Read - ID
     public Tournament findTournamentByID(int id) {
         return null;
     }
-    // Read by other forms? filtering system
+    
+    // Read - Location
+    public Tournament findTournamentByLocation(Location location) {
+        return null;
+    }
+
+    // Read - Any other things
 
     // Update
     public Tournament updateTournament() {
@@ -43,7 +54,7 @@ public class TournamentService {
     }
 
     // Delete
-    public void deleteTournament() {
+    public void deleteTournament(long id) {
         return;
     }
 
