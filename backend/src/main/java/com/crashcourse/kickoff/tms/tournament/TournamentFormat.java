@@ -11,10 +11,9 @@ public enum TournamentFormat {
     SEVEN_SIDE(7),
     ELEVEN_SIDE(11);
     
-    private final int clubSize;
+    private final int numberOfPlayers;
 
-    TournamentFormat(int clubSize) {
-        this.clubSize = clubSize;
+    TournamentFormat(int numberOfPlayers) {
+        this.numberOfPlayers = numberOfPlayers;
     }
-
 }
