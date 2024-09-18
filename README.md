@@ -1,23 +1,77 @@
 # CS203-Kickoff
 
-### Setup Instructions for Backend
-1. git clone im sure you know how to do this
-2. navigate to backend
-3. `chmod +x mvnw`
-4. `./mvnw spring-boot:run`
-5. `curl http://localhost:8080`
+## Project Overview
+Kickoff is a community-led tournament management system for football in Singapore, connecting clubs and players through various features including tournament hosting, player recruitment, and club management.
 
-### Setup Instructions for Frontend
-1. Enjoy
+## Project Structure
+- `/backend`: Spring Boot backend
+- `/frontend`: React/Vite frontend
 
-### Current List of Dependencies
+## Setup Instructions
+
+### Backend Setup
+1. Navigate to the backend directory:
+   ```
+   cd backend
+   ```
+2. Make the Maven wrapper executable:
+   ```
+   chmod +x mvnw
+   ```
+3. Run the Spring Boot application:
+   ```
+   ./mvnw spring-boot:run
+   ```
+4. Verify the backend is running:
+   ```
+   curl http://localhost:8080
+   ```
+
+### Frontend Setup
+1. Navigate to the frontend directory:
+   ```
+   cd frontend
+   ```
+2. Install dependencies:
+   ```
+   npm install
+   ```
+3. Start the development server:
+   ```
+   npm run dev
+   ```
+4. Open your browser and visit `http://localhost:5173` (or the port Vite specifies)
+
+## Current Dependencies
+
+### Backend
 1. Spring Web
 2. Spring DevTools
-3. Lombok (added 180924)
+3. Lombok
 
-### How to Update Dependencies
+### Frontend
+1. React
+2. Vite
+3. TypeScript
+4. Redux Toolkit
+5. React Router
+6. Axios
+7. Tailwind CSS
+
+## Updating Dependencies
+
+### Backend
 1. Go to the Maven Central Repository
 2. Copy the <dependency> block
 3. Paste it into pom.xml
-4. `./mvnw clean install`
-5. Check the logs to see if your dependency is there
+4. Run `./mvnw clean install`
+
+### Frontend
+1. Run `npm install [package-name]` for production dependencies
+2. Run `npm install -D [package-name]` for development dependencies
+
+## Contributing
+[Add contribution guidelines here]
+
+## License
+[Add license information here]
