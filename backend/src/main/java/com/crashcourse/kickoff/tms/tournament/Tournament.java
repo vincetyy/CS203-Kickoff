@@ -14,7 +14,7 @@ import lombok.*;
 public class Tournament {
 
     // Basic Identifiers
-    private Long id;
+    final private Long id;
     private String name;
 
     // Time / Place
@@ -23,9 +23,9 @@ public class Tournament {
     private Location location;
 
     // Format
-    private int maxTeams;
-    private ClubFormat clubFormat; 
-    private KnockoutFormat knockoutFormat;
+    final private int maxTeams;
+    final private ClubFormat clubFormat; 
+    final private KnockoutFormat knockoutFormat;
     private ArrayList<Float> prizePool;
 
     // Entry Requirements
@@ -35,4 +35,20 @@ public class Tournament {
     // List of Clubs (Joined or Looking)
     private ArrayList<Club> joinedClubs;
 
+    public Tournament(Long id, String name, LocalDateTime start, LocalDateTime end, Location location,
+                      int maxTeams, ClubFormat clubFormat, KnockoutFormat knockoutFormat, 
+                      ArrayList<Float> prizePool, int minRank, int maxRank) {
+        this.id = id;
+        this.name = name;
+        this.start = start;
+        this.end = end;
+        this.location = location;
+        this.maxTeams = maxTeams;
+        this.clubFormat = clubFormat;
+        this.knockoutFormat = knockoutFormat;
+        this.prizePool = prizePool;
+        this.minRank = minRank;
+        this.maxRank = maxRank;
+        this.joinedClubs = new ArrayList<>();
+    }
 }
