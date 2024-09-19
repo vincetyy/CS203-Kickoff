@@ -1,38 +1,42 @@
 package com.crashcourse.kickoff.tms.tournament;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import com.crashcourse.kickoff.tms.club.Club;
+
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.*;
 
 /*
  * Responsible for instantiating an object only
  * based on provided data, not handling logic
  */
-
-
+@Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Tournament {
 
-    // Basic Identifiers
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
 
-    // Time / Place
-    private LocalDateTime start;
-    private LocalDateTime end;
+    private String name;
+    private LocalDateTime startDateTime;
+    private LocalDateTime endDateTime;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Location location;
 
-    // Format
-    private int maxTeams;
-    private ClubFormat clubFormat; 
+    private int maxTeams = 0;
+    private TournamentFormat tournamentFormat;
     private KnockoutFormat knockoutFormat;
-    private ArrayList<Float> prizePool;
+    private List<Float> prizePool;
 
-    // Entry Requirements
     private int minRank;
     private int maxRank;
 
-    // List of Clubs (Joined or Looking)
-    private ArrayList<Club> joinedClubs;
-
+    @OneToMany
+    private List<Club> joinedClubs = new ArrayList<>();
 }
