@@ -39,7 +39,8 @@ import lombok.ToString;
 public class User implements UserDetails {
     private static final long serialVersionUID = 1L;
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull(message = "Username should not be null")
@@ -73,25 +74,29 @@ public class User implements UserDetails {
                 .map(role -> new SimpleGrantedAuthority(role.name()))
                 .collect(Collectors.toList());
     }
+    
+    // From in class exercise, not sure if will use
+    // /*
+    //  * The various is___Expired() methods return a boolean to indicate whether
+    //  * or not the user’s account is enabled or expired.
+    //  */
+    // @Override
+    // public boolean isAccountNonExpired() {
+    //     return true;
+    // }
 
-        /*
-    The various is___Expired() methods return a boolean to indicate whether
-    or not the user’s account is enabled or expired.
-    */
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    // @Override
+    // public boolean isAccountNonLocked() {
+    //     return true;
+    // }
+
+    // @Override
+    // public boolean isCredentialsNonExpired() {
+    //     return true;
+    // }
+
+    // @Override
+    // public boolean isEnabled() {
+    //     return true;
+    // }
 }

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -52,8 +53,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((authz) -> authz
+                        .requestMatchers(HttpMethod.GET, "/users/**").hasRole(Role.ROLE_ADMIN.name().substring(5))
                         .anyRequest().permitAll()
                         )
+                // a bunch of copy pasted code from lab, need to sieve out irrelevant functions
                 // ensure that the application won’t create any session in our stateless REST
                 // APIs
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
