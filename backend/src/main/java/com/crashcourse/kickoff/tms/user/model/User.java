@@ -1,4 +1,4 @@
-package com.crashcourse.kickoff.tms.user;
+package com.crashcourse.kickoff.tms.user.model;
 
 import java.util.Collection;
 import java.util.Set;
@@ -74,7 +74,7 @@ public class User implements UserDetails {
                 .map(role -> new SimpleGrantedAuthority(role.name()))
                 .collect(Collectors.toList());
     }
-    
+
     // From in class exercise, not sure if will use
     // /*
     //  * The various is___Expired() methods return a boolean to indicate whether

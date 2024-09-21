@@ -16,7 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.crashcourse.kickoff.tms.user.Role;
+import com.crashcourse.kickoff.tms.user.model.Role;
 
 @EnableWebSecurity
 @Configuration

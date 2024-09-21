@@ -1,4 +1,4 @@
-package com.crashcourse.kickoff.tms.user;
+package com.crashcourse.kickoff.tms.user.controller;
 
 import java.util.List;
 
@@ -6,6 +6,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
+import com.crashcourse.kickoff.tms.user.model.User;
+import com.crashcourse.kickoff.tms.user.service.UserService;
 
 import jakarta.validation.Valid;
 
@@ -29,7 +33,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/users")
-    public User addUser(@Valid @RequestBody UserDTO newUserDTO) {
+    public User addUser(@Valid @RequestBody NewUserDTO newUserDTO) {
         return userService.addUser(newUserDTO);
     }
 }

@@ -6,8 +6,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.crashcourse.kickoff.tms.security.SecurityConfig;
-import com.crashcourse.kickoff.tms.user.User;
-import com.crashcourse.kickoff.tms.user.UserRepository;
+import com.crashcourse.kickoff.tms.user.model.User;
+import com.crashcourse.kickoff.tms.user.repository.UserRepository;
 
 @SpringBootApplication
 public class KickoffTournamentManagementApplication {

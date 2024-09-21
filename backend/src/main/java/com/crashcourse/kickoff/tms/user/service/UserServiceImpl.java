@@ -1,10 +1,15 @@
-package com.crashcourse.kickoff.tms.user;
+package com.crashcourse.kickoff.tms.user.service;
 
 import java.util.List;
 import java.util.Set;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
+import com.crashcourse.kickoff.tms.user.model.Role;
+import com.crashcourse.kickoff.tms.user.model.User;
+import com.crashcourse.kickoff.tms.user.repository.UserRepository;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -21,7 +26,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User addUser(UserDTO newUserDTO) {
+    public User addUser(NewUserDTO newUserDTO) {
         User newUser = new User();
         newUser.setUsername(newUserDTO.getUsername());
         newUser.setPassword(encoder.encode(newUserDTO.getPassword()));
