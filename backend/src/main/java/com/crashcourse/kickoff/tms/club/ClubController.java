@@ -2,7 +2,7 @@ package com.crashcourse.kickoff.tms.club;
 
 import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.club.exception.*;
-import com.crashcourse.kickoff.tms.user.*;
+import com.crashcourse.kickoff.tms.user.model.*;
 import com.crashcourse.kickoff.tms.club.dto.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 

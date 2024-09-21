@@ -1,12 +1,12 @@
 package com.crashcourse.kickoff.tms.club.dto;
 
-import com.crashcourse.kickoff.tms.user.User;
+import com.crashcourse.kickoff.tms.user.model.*;
 
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @Getter
 @Setter

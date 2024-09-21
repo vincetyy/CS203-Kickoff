@@ -1,18 +1,15 @@
 package com.crashcourse.kickoff.tms.club;
 
-import com.crashcourse.kickoff.tms.club.Club;
-import com.crashcourse.kickoff.tms.club.exception.*;
-import com.crashcourse.kickoff.tms.user.User;
+import com.crashcourse.kickoff.tms.user.model.*;
 
-import main.java.com.crashcourse.kickoff.tms.club.exception.ClubNotFoundException;
-import main.java.com.crashcourse.kickoff.tms.club.exception.PlayerLimitExceededException;
-
-import com.crashcourse.kickoff.tms.tournament.*;
+import com.crashcourse.kickoff.tms.club.exception.ClubNotFoundException;
+import com.crashcourse.kickoff.tms.club.exception.PlayerLimitExceededException;
+import com.crashcourse.kickoff.tms.club.exception.ClubAlreadyExistsException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 

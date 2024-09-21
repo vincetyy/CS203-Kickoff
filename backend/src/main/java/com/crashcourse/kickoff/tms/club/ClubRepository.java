@@ -1,8 +1,5 @@
 package com.crashcourse.kickoff.tms.club;
 
-import com.crashcourse.kickoff.tms.club.exception.*;
-import com.crashcourse.kickoff.tms.club.exception.handler.*;
-
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;

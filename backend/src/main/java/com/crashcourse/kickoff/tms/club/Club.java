@@ -1,13 +1,12 @@
 package com.crashcourse.kickoff.tms.club;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import com.crashcourse.kickoff.tms.tournament.*;
-import com.crashcourse.kickoff.tms.user.*;
+import com.crashcourse.kickoff.tms.user.model.*;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
