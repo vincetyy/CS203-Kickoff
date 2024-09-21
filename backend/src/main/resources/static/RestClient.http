@@ -11,3 +11,10 @@ Content-Type: application/json
     "password" : "validpassword"
 }
 
+### Check authorization for get all users
+GET http://localhost:8080/users
+Authorization: Basic non_existent_acc password
+
+### Check authentication for get all users
+GET http://localhost:8080/users
+Authorization: Basic new_user@gmail.com validpassword
