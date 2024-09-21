@@ -52,7 +52,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((authz) -> authz
-                        .requestMatchers("/h2-console/**").permitAll())
+                        .anyRequest().permitAll()
+                        )
                 // ensure that the application won’t create any session in our stateless REST
                 // APIs
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
