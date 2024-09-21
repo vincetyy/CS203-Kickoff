@@ -39,8 +39,10 @@ public class ClubController {
     @GetMapping("/{clubId}")
     public ResponseEntity<?> getClubById(@PathVariable Long clubId) {
         Optional<Club> club = clubService.getClubById(clubId);
-        return club.map(ResponseEntity::ok)
-                   .orElseGet(() -> new ResponseEntity<>("Club not found", HttpStatus.NOT_FOUND));
+        if (club.isPresent()) {
+            return new ResponseEntity<>(club.get(), HttpStatus.OK);
+        }
+        return new ResponseEntity<String>("Club not found", HttpStatus.NOT_FOUND);
     }
 
     @PutMapping("/{clubId}")

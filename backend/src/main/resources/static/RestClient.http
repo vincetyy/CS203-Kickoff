@@ -18,3 +18,7 @@ Authorization: Basic non_existent_acc password
 ### Check authentication for get all users
 GET http://localhost:8080/users
 Authorization: Basic new_user@gmail.com validpassword
+
+### Check clubs
+GET http://localhost:8080/clubs
+Authorization: Basic admin password
