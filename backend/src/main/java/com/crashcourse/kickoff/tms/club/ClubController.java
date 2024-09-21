@@ -1,5 +1,6 @@
 package com.crashcourse.kickoff.tms.club;
 
+import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.club.exception.*;
 import com.crashcourse.kickoff.tms.user.*;
 
@@ -55,5 +56,35 @@ public class ClubController {
     public ResponseEntity<?> deleteClub(@PathVariable Long id) {
         clubService.deleteClub(id);
         return new ResponseEntity<>("Club deleted successfully", HttpStatus.OK);
+    }
+
+    @PostMapping("/{clubId}/transferCaptain")
+    public ResponseEntity<?> transferCaptaincy(@PathVariable Long clubId, @RequestBody User currentCaptain, @RequestBody User newCaptain) {
+        try {
+            Club updatedClub = clubService.transferCaptaincy(clubId, currentCaptain, newCaptain);
+            return new ResponseEntity<>(updatedClub, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/{clubId}/addPlayer")
+    public ResponseEntity<?> addPlayerToClub(@PathVariable Long clubId, @RequestBody User player) {
+        try {
+            Club updatedClub = clubService.addPlayerToClub(clubId, player);
+            return new ResponseEntity<>(updatedClub, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/{clubId}/removePlayer")
+    public ResponseEntity<?> removePlayerFromClub(@PathVariable Long clubId, @RequestBody User player) {
+        try {
+            Club updatedClub = clubService.removePlayerFromClub(clubId, player);
+            return new ResponseEntity<>(updatedClub, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 }
