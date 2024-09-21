@@ -29,7 +29,7 @@ public class Club {
     private Long id;
 
     @NotNull(message = "Club name cannot be null")
-    @Size(min = 1, max = MAX_CLUB_NAME_LENGTH, message = String.format("Club name must be 1 to %d characters", MAX_CLUB_NAME_LENGTH))
+    @Size(min = 1, max = MAX_CLUB_NAME_LENGTH, message = "Club name must be between 1 and " + MAX_CLUB_NAME_LENGTH + " characters")
     private String name;
 
     private double elo;
@@ -39,7 +39,7 @@ public class Club {
     private User captain;
 
     @OneToMany(mappedBy = "club", cascade = CascadeType.ALL)
-    @Size(max = MAX_PLAYERS_IN_CLUB, message = String.format("A club cannot have more than %d players", MAX_PLAYERS_IN_CLUB))
+    @Size(max = MAX_PLAYERS_IN_CLUB, message = "A club cannot have more than " +  MAX_PLAYERS_IN_CLUB + " players")
     private List<User> players = new ArrayList<>();
 
     @ManyToMany(mappedBy = "joinedClubs")
