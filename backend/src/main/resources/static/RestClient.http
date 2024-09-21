@@ -1,0 +1,20 @@
+###
+GET http://localhost:8080/users
+Authorization: Basic admin password
+
+### Creates new "normal" user (not admin)
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+    "username" : "new_user@gmail.com",
+    "password" : "validpassword"
+}
+
+### Check authorization for get all users
+GET http://localhost:8080/users
+Authorization: Basic non_existent_acc password
+
+### Check authentication for get all users
+GET http://localhost:8080/users
+Authorization: Basic new_user@gmail.com validpassword

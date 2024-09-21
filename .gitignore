@@ -32,6 +32,7 @@ build/
 
 ### VS Code ###
 .vscode/
+*.code-workspace
 
 # Frontend (React/Vite)
 # Logs

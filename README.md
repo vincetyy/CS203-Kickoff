@@ -50,6 +50,8 @@ Kickoff is a community-led tournament management system for football in Singapor
 3. Lombok
 4. Starter Data JPA
 5. H2 Database
+6. Spring Security
+7. Hibernate Validator
 
 ### Frontend
 1. React
