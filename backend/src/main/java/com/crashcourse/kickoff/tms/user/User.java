@@ -36,7 +36,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-@Table(name = "\"user\"") 
 public class User implements UserDetails {
     private static final long serialVersionUID = 1L;
 

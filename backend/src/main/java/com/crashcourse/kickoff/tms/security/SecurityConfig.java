@@ -1,5 +1,9 @@
 package com.crashcourse.kickoff.tms.security;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -11,13 +15,20 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.crashcourse.kickoff.tms.user.Role;
+
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
     private UserDetailsService userDetailsService;
 
-    public SecurityConfig(UserDetailsService userSvc){
+    public SecurityConfig(UserDetailsService userSvc) {
         this.userDetailsService = userSvc;
+    }
+
+    public static Set<Role> getAllRolesAsSet() {
+        return Arrays.stream(Role.values())
+                .collect(Collectors.toSet());
     }
 
     /**
