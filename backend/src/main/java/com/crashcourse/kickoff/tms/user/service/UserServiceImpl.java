@@ -1,12 +1,12 @@
 package com.crashcourse.kickoff.tms.user.service;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
+import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
 import com.crashcourse.kickoff.tms.user.model.Role;
 import com.crashcourse.kickoff.tms.user.model.User;
 import com.crashcourse.kickoff.tms.user.repository.UserRepository;
@@ -33,5 +33,18 @@ public class UserServiceImpl implements UserService {
         // defaults new users to "user" role
         newUser.setRoles(Set.of(Role.ROLE_USER));
         return users.save(newUser);
+    }
+
+    @Override
+    public PlayerProfile addPlayerProfile(Long userId, PlayerProfile playerProfile) {
+        Optional<User> userOpt = users.findById(userId);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setPlayerProfile(playerProfile);
+            playerProfile.setUser(user); // Maintain bidirectional relationship
+            users.save(user);  // Save the user to update profile in DB
+            return playerProfile;
+        }
+        return null;
     }
 }

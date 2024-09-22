@@ -1,0 +1,17 @@
+### Check current clubs
+GET http://localhost:8080/clubs
+Authorization: Basic admin password
+
+### Create new club with creatorId 1
+POST http://localhost:8080/clubs
+Authorization: Basic admin password
+Content-Type: application/json
+
+{
+    "club": {
+        "name": "test",
+        "elo": 1000,
+        "ratingDeviation": 1
+    },
+    "creatorId": 1 
+}

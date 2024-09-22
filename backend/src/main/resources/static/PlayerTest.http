@@ -1,0 +1,13 @@
+### Check admin user exists, and playerProfile is null
+GET http://localhost:8080/users
+Authorization: Basic admin password
+
+### Add player profile to admin
+POST http://localhost:8080/users/1/playerProfile
+Authorization: Basic admin password
+Content-Type: application/json
+
+{
+    "preferredPosition": "POSITION_FORWARD",
+    "profileDescription": "I love football!"
+}
