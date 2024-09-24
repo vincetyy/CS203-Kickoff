@@ -24,7 +24,7 @@ public class ClubController {
     @PostMapping
     public ResponseEntity<?> createClub(@Valid @RequestBody ClubCreationRequest clubRequest) {
         try {
-            Club createdClub = clubService.createClub(clubRequest.getClub(), clubRequest.getCreator());
+            Club createdClub = clubService.createClub(clubRequest.getClub(), clubRequest.getCreatorId());
             return new ResponseEntity<>(createdClub, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -64,7 +64,7 @@ public class ClubController {
     @PatchMapping("/{clubId}/transferCaptain")
     public ResponseEntity<?> transferCaptaincy(@PathVariable Long clubId, @RequestBody CaptainTransferRequest request) {
         try {
-            Club updatedClub = clubService.transferCaptaincy(clubId, request.getCurrentCaptain(), request.getNewCaptain());
+            Club updatedClub = clubService.transferCaptaincy(clubId, request.getCurrentCaptainId(), request.getNewCaptainId());
             return new ResponseEntity<>(updatedClub, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -72,9 +72,9 @@ public class ClubController {
     }
 
     @PatchMapping("/{clubId}/addPlayer")
-    public ResponseEntity<?> addPlayerToClub(@PathVariable Long clubId, @RequestBody User player) {
+    public ResponseEntity<?> addPlayerToClub(@PathVariable Long clubId, @RequestBody Long playerId) {
         try {
-            Club updatedClub = clubService.addPlayerToClub(clubId, player);
+            Club updatedClub = clubService.addPlayerToClub(clubId, playerId);
             return new ResponseEntity<>(updatedClub, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -82,9 +82,9 @@ public class ClubController {
     }
 
     @PatchMapping("/{clubId}/removePlayer")
-    public ResponseEntity<?> removePlayerFromClub(@PathVariable Long clubId, @RequestBody User player) {
+    public ResponseEntity<?> removePlayerFromClub(@PathVariable Long clubId, @RequestBody Long playerId) {
         try {
-            Club updatedClub = clubService.removePlayerFromClub(clubId, player);
+            Club updatedClub = clubService.removePlayerFromClub(clubId, playerId);
             return new ResponseEntity<>(updatedClub, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

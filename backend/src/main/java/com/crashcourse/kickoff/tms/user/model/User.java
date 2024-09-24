@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -22,6 +23,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -62,9 +64,10 @@ public class User implements UserDetails {
     @Column(name = "role")
     private Set<Role> roles;
 
-    @ManyToOne
-    @JoinColumn(name="club_id")
-    private Club club;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "player_profile_id")
+    private PlayerProfile playerProfile;
+
 
     public User(String username, String password, Set<Role> roles) {
         this.username = username;

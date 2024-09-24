@@ -1,7 +1,7 @@
 package com.crashcourse.kickoff.tms.club;
 
 import com.crashcourse.kickoff.tms.user.model.*;
-
+import com.crashcourse.kickoff.tms.user.repository.PlayerProfileRepository;
 import com.crashcourse.kickoff.tms.club.exception.ClubNotFoundException;
 import com.crashcourse.kickoff.tms.club.exception.PlayerLimitExceededException;
 import com.crashcourse.kickoff.tms.club.exception.ClubAlreadyExistsException;
@@ -19,8 +19,16 @@ public class ClubService {
     @Autowired
     private ClubRepository clubRepository;
 
+    @Autowired
+    private PlayerProfileRepository playerProfileRepository;
+
     // jparepository has automatically implemented crud methods
-    public Club createClub(@Valid Club club, User creator) {
+    public Club createClub(@Valid Club club, Long creatorId) {
+
+        // Find the PlayerProfile by ID
+        PlayerProfile creator = playerProfileRepository.findById(creatorId)
+        .orElseThrow(() -> new RuntimeException("PlayerProfile not found"));
+
         // club name not unique
         if (clubRepository.findByName(club.getName()).isPresent()) {
             throw new ClubAlreadyExistsException("Club name must be unique");
@@ -57,7 +65,13 @@ public class ClubService {
     }
 
     // to transfer captain status to another player in the club
-    public Club transferCaptaincy(Long clubId, User currentCaptain, User newCaptain) throws Exception {
+    public Club transferCaptaincy(Long clubId, Long currentCaptainId, Long newCaptainId) throws Exception {
+        PlayerProfile currentCaptain = playerProfileRepository.findById(currentCaptainId)
+        .orElseThrow(() -> new RuntimeException("currentCaptain not found"));
+
+        PlayerProfile newCaptain = playerProfileRepository.findById(newCaptainId)
+        .orElseThrow(() -> new RuntimeException("newCaptain not found"));
+        
         Club club = clubRepository.findById(clubId).orElseThrow(() -> 
             new ClubNotFoundException("Club with ID " + clubId + " not found"));
     
@@ -98,7 +112,10 @@ public class ClubService {
     }
 
     // add a player to club
-    public Club addPlayerToClub(Long clubId, User player) throws Exception {
+    public Club addPlayerToClub(Long clubId, Long playerId) throws Exception {
+        PlayerProfile player = playerProfileRepository.findById(playerId)
+        .orElseThrow(() -> new RuntimeException("PlayerProfile not found"));
+
         Club club = clubRepository.findById(clubId).orElseThrow(() -> 
             new ClubNotFoundException("Club with ID " + clubId + " not found"));
 
@@ -115,7 +132,10 @@ public class ClubService {
     }
 
     // remove a player from club
-    public Club removePlayerFromClub(Long clubId, User player) throws Exception {
+    public Club removePlayerFromClub(Long clubId, Long playerId) throws Exception {
+        PlayerProfile player = playerProfileRepository.findById(playerId)
+        .orElseThrow(() -> new RuntimeException("PlayerProfile not found"));
+        
         Club club = clubRepository.findById(clubId).orElseThrow(() -> 
             new ClubNotFoundException("Club with ID " + clubId + " not found"));
 

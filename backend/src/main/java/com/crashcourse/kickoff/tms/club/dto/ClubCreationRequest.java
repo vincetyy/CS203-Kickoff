@@ -19,5 +19,5 @@ public class ClubCreationRequest {
 
     @Valid
     @NotNull(message = "Creator details are required")
-    private User creator;
+    private Long creatorId;
 }

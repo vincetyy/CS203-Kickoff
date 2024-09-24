@@ -35,11 +35,11 @@ public class Club {
     private double ratingDeviation;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
-    private User captain;
+    private PlayerProfile captain;
 
     @OneToMany(mappedBy = "club", cascade = CascadeType.ALL)
     @Size(max = MAX_PLAYERS_IN_CLUB, message = "A club cannot have more than " +  MAX_PLAYERS_IN_CLUB + " players")
-    private List<User> players = new ArrayList<>();
+    private List<PlayerProfile> players = new ArrayList<>();
 
     @ManyToMany(mappedBy = "joinedClubs")
     private List<Tournament> tournaments = new ArrayList<>();
