@@ -28,8 +28,10 @@ public class PlayerProfile {
     @JsonIgnore
     @OneToOne(mappedBy = "playerProfile", cascade = CascadeType.ALL)
     private User user;
-
+    
     // storing one PlayerPosition for now, may change later
+    // Store enum as a string in the database
+    @Enumerated(EnumType.STRING)
     private PlayerPosition preferredPosition;
 
     private String profileDescription;
