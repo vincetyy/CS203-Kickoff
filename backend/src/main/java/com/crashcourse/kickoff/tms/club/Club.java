@@ -2,7 +2,7 @@ package com.crashcourse.kickoff.tms.club;
 
 import jakarta.persistence.*;
 
-import com.crashcourse.kickoff.tms.tournament.*;
+import com.crashcourse.kickoff.tms.tournament.model.*;
 import com.crashcourse.kickoff.tms.user.model.*;
 
 import jakarta.validation.constraints.NotNull;

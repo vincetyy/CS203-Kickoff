@@ -12,6 +12,16 @@ Content-Type: application/json
     "profileDescription": "I love football!"
 }
 
+### Add player profile to normal user
+POST http://localhost:8080/users/1/playerProfile
+Authorization: Basic admin password
+Content-Type: application/json
+
+{
+    "preferredPosition": "POSITION_DEFENDER",
+    "profileDescription": "I love football too!"
+}
+
 ### Update PlayerPostion
 PUT http://localhost:8080/players/1/position
 Authorization: Basic admin password

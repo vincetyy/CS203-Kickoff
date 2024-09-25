@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -39,4 +41,6 @@ public interface ClubService {
     Club removePlayerFromClub(Long clubId, Long playerId) throws Exception;
 
     void applyToClub(PlayerApplicationDTO applicationDTO) throws Exception;
+
+    List<Club> getClubsByIds(List<Long> clubIds);
 }

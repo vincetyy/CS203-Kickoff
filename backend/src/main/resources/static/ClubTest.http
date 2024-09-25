@@ -17,6 +17,21 @@ Content-Type: application/json
   "creatorId": 1  
 }
 
+### Create a new club, please add a PlayerProfile 
+### to normal user in PlayerTest.http first
+POST http://localhost:8080/clubs
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+  "club": {
+    "name": "My New Club 2",
+    "elo": 500,
+    "ratingDeviation": 25
+  },
+  "creatorId": 2
+}
+
 ### Get a specific club by ID
 GET http://localhost:8080/clubs/1
 Authorization: Basic admin:password
