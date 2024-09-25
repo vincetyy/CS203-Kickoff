@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -190,5 +192,13 @@ public class ClubService {
     
         // Save the application
         applicationRepository.save(application);
+    }
+
+    public List<Club> getClubsByIds(@Positive(message = "Club ID must be positive") List<Long> clubIds) {
+        List<Club> clubs = clubRepository.findAllById(clubIds);
+        if (clubs.size() != clubIds.size()) {
+            throw new ClubNotFoundException("One or more clubs not found for the provided IDs.");
+        }
+        return clubs;
     }
 }
