@@ -1,4 +1,4 @@
-package com.crashcourse.kickoff.tms.tournament;
+package com.crashcourse.kickoff.tms.tournament.model;
 
 import lombok.*;
 
@@ -9,6 +9,4 @@ import lombok.*;
 
 public enum KnockoutFormat {
     SINGLE_ELIM, DOUBLE_ELIM;
-
-    private String description;
 }

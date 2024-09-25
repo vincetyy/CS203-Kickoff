@@ -1,6 +1,7 @@
-package com.crashcourse.kickoff.tms.tournament;
+package com.crashcourse.kickoff.tms.tournament.model;
 
 import com.crashcourse.kickoff.tms.club.Club;
+import com.crashcourse.kickoff.tms.location.model.*;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,6 +24,8 @@ public class Tournament {
     private Long id;
 
     private String name;
+    private boolean isOver;
+
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
 
@@ -37,6 +40,11 @@ public class Tournament {
     private int minRank;
     private int maxRank;
 
-    @OneToMany
+    @ManyToMany
+    @JoinTable(
+        name = "tournament_club",
+        joinColumns = @JoinColumn(name = "tournament_id"),
+        inverseJoinColumns = @JoinColumn(name = "club_id")
+    )
     private List<Club> joinedClubs = new ArrayList<>();
 }

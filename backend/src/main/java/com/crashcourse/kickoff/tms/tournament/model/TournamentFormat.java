@@ -1,4 +1,4 @@
-package com.crashcourse.kickoff.tms.tournament;
+package com.crashcourse.kickoff.tms.tournament.model;
 
 /*
  * Stores Club format -
@@ -15,5 +15,9 @@ public enum TournamentFormat {
 
     TournamentFormat(int numberOfPlayers) {
         this.numberOfPlayers = numberOfPlayers;
+    }
+
+    public int getNumberOfPlayers() {
+        return numberOfPlayers;
     }
 }
