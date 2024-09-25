@@ -6,11 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
+import com.crashcourse.kickoff.tms.user.dto.PlayerPositionDTO;
+import com.crashcourse.kickoff.tms.user.model.PlayerPosition;
 import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
 import com.crashcourse.kickoff.tms.user.model.User;
 import com.crashcourse.kickoff.tms.user.service.UserService;
@@ -47,4 +50,16 @@ public class UserController {
         PlayerProfile createdProfile = userService.addPlayerProfile(userId, profile);
         return createdProfile != null ? ResponseEntity.ok(createdProfile) : ResponseEntity.notFound().build();
     }
+
+    // Add a new endpoint to update player position
+    @PutMapping("/{userId}/playerProfile/position")
+    public ResponseEntity<PlayerProfile> updatePlayerPosition(
+        @PathVariable Long userId, 
+        @RequestBody PlayerPositionDTO playerPositionDTO) {
+        
+        PlayerPosition preferredPosition = playerPositionDTO.getPreferredPosition();
+        PlayerProfile updatedProfile = userService.updatePlayerPosition(userId, preferredPosition);
+        return ResponseEntity.ok(updatedProfile);
+    }
+
 }

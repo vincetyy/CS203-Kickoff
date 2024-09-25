@@ -11,3 +11,12 @@ Content-Type: application/json
     "preferredPosition": "POSITION_FORWARD",
     "profileDescription": "I love football!"
 }
+
+### Update PlayerPostion
+PUT http://localhost:8080/users/1/playerProfile/position
+Authorization: Basic admin password
+Content-Type: application/json
+
+{
+    "preferredPosition": "POSITION_MIDFIELDER"
+}

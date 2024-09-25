@@ -1,9 +1,11 @@
-package com.crashcourse.kickoff.tms.club;
+package com.crashcourse.kickoff.tms.club.repository;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.crashcourse.kickoff.tms.club.Club;
 
 @Repository
 public interface ClubRepository extends JpaRepository<Club, Long> {

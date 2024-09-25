@@ -68,14 +68,20 @@ public class User implements UserDetails {
     @JoinColumn(name = "player_profile_id")
     private PlayerProfile playerProfile;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "host_profile_id")
+    private HostProfile hostProfile;
+
 
     public User(String username, String password, Set<Role> roles) {
         this.username = username;
         this.password = password;
         this.roles = roles;
+        this.playerProfile = playerProfile;
+        this.hostProfile = hostProfile;
     }
 
-    /*
+    /*x
      * Return a collection of authorities (roles) granted to the user.
      */
     @Override

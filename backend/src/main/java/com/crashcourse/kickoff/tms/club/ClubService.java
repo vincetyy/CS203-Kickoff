@@ -6,6 +6,13 @@ import com.crashcourse.kickoff.tms.club.exception.ClubNotFoundException;
 import com.crashcourse.kickoff.tms.club.exception.PlayerLimitExceededException;
 import com.crashcourse.kickoff.tms.club.exception.ClubAlreadyExistsException;
 
+import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
+import com.crashcourse.kickoff.tms.club.model.PlayerApplication;
+import com.crashcourse.kickoff.tms.club.model.ApplicationStatus;
+import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
+import com.crashcourse.kickoff.tms.club.repository.PlayerApplicationRepository;
+import com.crashcourse.kickoff.tms.club.exception.PlayerAlreadyAppliedException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +28,9 @@ public class ClubService {
 
     @Autowired
     private PlayerProfileRepository playerProfileRepository;
+
+    @Autowired
+    private PlayerApplicationRepository applicationRepository;
 
     // jparepository has automatically implemented crud methods
     public Club createClub(@Valid Club club, Long creatorId) {
@@ -145,5 +155,40 @@ public class ClubService {
         }
 
         return clubRepository.save(club);
+    }
+
+    public void applyToClub(PlayerApplicationDTO applicationDTO) throws Exception {
+        // Fetch the club by ID
+        Club club = clubRepository.findById(applicationDTO.getClubId())
+                .orElseThrow(() -> new ClubNotFoundException("Club with ID " + applicationDTO.getClubId() + " not found"));
+    
+        // Fetch the PlayerProfile by playerId
+        PlayerProfile playerProfile = playerProfileRepository.findById(applicationDTO.getPlayerId())
+                .orElseThrow(() -> new RuntimeException("PlayerProfile not found"));
+    
+        // Get the User from PlayerProfile
+        User user = playerProfile.getUser();
+    
+        // Check if the club is full
+        if (club.getPlayers().size() >= Club.MAX_PLAYERS_IN_CLUB) {
+            throw new PlayerLimitExceededException(
+                String.format("A club cannot have more than %d players", Club.MAX_PLAYERS_IN_CLUB)
+            );
+        }
+    
+        // Check if the user has already applied to this club
+        if (applicationRepository.existsByPlayerAndClub(user, club)) {  // Use 'User' instead of 'PlayerProfile'
+            throw new PlayerAlreadyAppliedException("Player has already applied to this club");
+        }
+    
+        // Create a new PlayerApplication
+        PlayerApplication application = new PlayerApplication();
+        application.setClub(club);
+        application.setPlayer(user);  // Set the User, not the PlayerProfile
+        application.setDesiredPosition(applicationDTO.getDesiredPosition());
+        application.setStatus(ApplicationStatus.PENDING);
+    
+        // Save the application
+        applicationRepository.save(application);
     }
 }
