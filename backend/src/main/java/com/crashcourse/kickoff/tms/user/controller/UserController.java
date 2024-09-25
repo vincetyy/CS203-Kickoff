@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
+import com.crashcourse.kickoff.tms.user.dto.PlayerPositionDTO;
 import com.crashcourse.kickoff.tms.user.model.PlayerPosition;
 import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
 import com.crashcourse.kickoff.tms.user.model.User;
@@ -52,12 +53,13 @@ public class UserController {
 
     // Add a new endpoint to update player position
     @PutMapping("/{userId}/playerProfile/position")
-    public ResponseEntity<?> updatePlayerPosition(
+    public ResponseEntity<PlayerProfile> updatePlayerPosition(
         @PathVariable Long userId, 
-        @RequestBody PlayerPosition preferredPosition) {
+        @RequestBody PlayerPositionDTO playerPositionDTO) {
         
-        userService.updatePlayerPosition(userId, preferredPosition);
-        return ResponseEntity.ok().build();
+        PlayerPosition preferredPosition = playerPositionDTO.getPreferredPosition();
+        PlayerProfile updatedProfile = userService.updatePlayerPosition(userId, preferredPosition);
+        return ResponseEntity.ok(updatedProfile);
     }
 
 }

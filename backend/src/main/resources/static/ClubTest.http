@@ -1,17 +1,31 @@
-### Check current clubs
+### Check all clubs
 GET http://localhost:8080/clubs
-Authorization: Basic admin password
+Authorization: Basic admin:password
 
-### Create new club with creatorId 1
+### Create a new club, please add a PlayerProfile 
+### to admin in PlayerTest.http first
 POST http://localhost:8080/clubs
-Authorization: Basic admin password
+Authorization: Basic admin:password
 Content-Type: application/json
 
 {
-    "club": {
-        "name": "test",
-        "elo": 1000,
-        "ratingDeviation": 1
-    },
-    "creatorId": 1 
+  "club": {
+    "name": "My New Club",
+    "elo": 1000,
+    "ratingDeviation": 50
+  },
+  "creatorId": 1  
+}
+
+### Get a specific club by ID
+GET http://localhost:8080/clubs/1
+Authorization: Basic admin:password
+
+### Apply to a club
+POST http://localhost:8080/clubs/1/apply
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+  "desiredPosition": "POSITION_FORWARD"
 }

@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updatePlayerPosition(Long userId, PlayerPosition preferredPosition) {
+    public PlayerProfile updatePlayerPosition(Long userId, PlayerPosition preferredPosition) {
         Optional<User> userOpt = users.findById(userId);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -58,6 +58,7 @@ public class UserServiceImpl implements UserService {
             if (playerProfile != null) {
                 playerProfile.setPreferredPosition(preferredPosition);
                 users.save(user);  // Save the user and the updated profile
+                return playerProfile;
             } else {
                 throw new IllegalArgumentException("Player profile not found for user with id " + userId);
             }

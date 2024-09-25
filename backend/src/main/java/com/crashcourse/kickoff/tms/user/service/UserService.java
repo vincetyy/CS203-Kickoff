@@ -13,5 +13,5 @@ public interface UserService {
     User addUser(NewUserDTO newUserDTO);
     PlayerProfile addPlayerProfile(Long userId, PlayerProfile playerProfile);
 
-    void updatePlayerPosition(Long userId, PlayerPosition preferredPosition);
+    PlayerProfile updatePlayerPosition(Long userId, PlayerPosition preferredPosition);
 }
