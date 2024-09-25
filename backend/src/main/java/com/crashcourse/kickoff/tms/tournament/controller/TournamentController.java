@@ -17,7 +17,7 @@ import java.util.List;
  * Provides endpoints to create, retrieve, update, delete, and list tournaments.
  */
 @RestController
-@RequestMapping("/api/tournaments")
+@RequestMapping("/tournaments")
 @RequiredArgsConstructor
 public class TournamentController {
 
