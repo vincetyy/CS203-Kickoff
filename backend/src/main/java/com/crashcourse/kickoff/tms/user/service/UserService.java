@@ -12,6 +12,4 @@ public interface UserService {
     public List<User> getUsers();
     User addUser(NewUserDTO newUserDTO);
     PlayerProfile addPlayerProfile(Long userId, PlayerProfile playerProfile);
-
-    PlayerProfile updatePlayerPosition(Long userId, PlayerPosition preferredPosition);
 }

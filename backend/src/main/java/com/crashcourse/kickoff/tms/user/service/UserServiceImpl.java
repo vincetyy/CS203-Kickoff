@@ -48,22 +48,4 @@ public class UserServiceImpl implements UserService {
         }
         return null;
     }
-
-    @Override
-    public PlayerProfile updatePlayerPosition(Long userId, PlayerPosition preferredPosition) {
-        Optional<User> userOpt = users.findById(userId);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            PlayerProfile playerProfile = user.getPlayerProfile();
-            if (playerProfile != null) {
-                playerProfile.setPreferredPosition(preferredPosition);
-                users.save(user);  // Save the user and the updated profile
-                return playerProfile;
-            } else {
-                throw new IllegalArgumentException("Player profile not found for user with id " + userId);
-            }
-        } else {
-            throw new IllegalArgumentException("User not found with id " + userId);
-        }
-    }
 }

@@ -22,7 +22,6 @@ public class PlayerProfile {
     @JoinColumn(name="club_id")
     private Club club;
 
-
     // prevents cyclical dependency
     // i don't know if this is the correct way to do it someone pls think this through
     @JsonIgnore

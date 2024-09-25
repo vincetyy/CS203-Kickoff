@@ -13,7 +13,7 @@ Content-Type: application/json
 }
 
 ### Update PlayerPostion
-PUT http://localhost:8080/users/1/playerProfile/position
+PUT http://localhost:8080/players/1/position
 Authorization: Basic admin password
 Content-Type: application/json
 
