@@ -3,6 +3,8 @@ package com.crashcourse.kickoff.tms.club.model;
 import com.crashcourse.kickoff.tms.user.model.User;
 import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.user.model.PlayerPosition;
+import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -13,8 +15,8 @@ public class PlayerApplication {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User player;  // Reference User
+    @JoinColumn(name = "player_profile_id", nullable = false)
+    private PlayerProfile playerProfile;  // Reference User
 
     @ManyToOne
     @JoinColumn(name = "club_id", nullable = false)
@@ -31,20 +33,20 @@ public class PlayerApplication {
     }
 
     // Parameterized constructor
-    public PlayerApplication(User player, Club club, PlayerPosition desiredPosition, ApplicationStatus status) {
-        this.player = player;
+    public PlayerApplication(PlayerProfile playerProfile, Club club, PlayerPosition desiredPosition, ApplicationStatus status) {
+        this.playerProfile = playerProfile;
         this.club = club;
         this.desiredPosition = desiredPosition;
         this.status = status;
     }
 
     // Getters and Setters
-    public User getPlayer() {
-        return player;
+    public PlayerProfile getPlayerProfile() {
+        return playerProfile;
     }
 
-    public void setPlayer(User player) {
-        this.player = player;
+    public void setPlayerProfile(PlayerProfile playerProfile) {
+        this.playerProfile = playerProfile;
     }
 
     public Club getClub() {

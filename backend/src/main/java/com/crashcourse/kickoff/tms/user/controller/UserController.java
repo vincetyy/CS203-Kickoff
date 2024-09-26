@@ -51,15 +51,4 @@ public class UserController {
         return createdProfile != null ? ResponseEntity.ok(createdProfile) : ResponseEntity.notFound().build();
     }
 
-    // Add a new endpoint to update player position
-    @PutMapping("/{userId}/playerProfile/position")
-    public ResponseEntity<PlayerProfile> updatePlayerPosition(
-        @PathVariable Long userId, 
-        @RequestBody PlayerPositionDTO playerPositionDTO) {
-        
-        PlayerPosition preferredPosition = playerPositionDTO.getPreferredPosition();
-        PlayerProfile updatedProfile = userService.updatePlayerPosition(userId, preferredPosition);
-        return ResponseEntity.ok(updatedProfile);
-    }
-
 }

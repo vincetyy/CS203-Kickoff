@@ -42,5 +42,6 @@ Authorization: Basic admin:password
 Content-Type: application/json
 
 {
+  "playerProfileId": 1,
   "desiredPosition": "POSITION_FORWARD"
 }

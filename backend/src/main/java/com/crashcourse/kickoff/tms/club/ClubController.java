@@ -19,7 +19,7 @@ import java.util.Optional;
 public class ClubController {
 
     @Autowired
-    private ClubService clubService;
+    private ClubServiceImpl clubService;
 
     @PostMapping
     public ResponseEntity<?> createClub(@Valid @RequestBody ClubCreationRequest clubRequest) {
@@ -94,6 +94,7 @@ public class ClubController {
     @PostMapping("/{clubId}/apply")
     public ResponseEntity<?> applyToClub(@PathVariable Long clubId, @RequestBody PlayerApplicationDTO applicationDTO) {
         try {
+            applicationDTO.setClubId(clubId);
             clubService.applyToClub(applicationDTO);
             return new ResponseEntity<>("Application submitted successfully", HttpStatus.OK);
         } catch (Exception e) {

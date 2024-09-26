@@ -34,7 +34,7 @@ public class ClubServiceTest {
     private PlayerApplicationRepository applicationRepository;
 
     @InjectMocks
-    private ClubService clubService;
+    private ClubServiceImpl clubService;
 
     public ClubServiceTest() {
         MockitoAnnotations.openMocks(this);
@@ -53,11 +53,11 @@ public class ClubServiceTest {
         
         when(clubRepository.findById(1L)).thenReturn(Optional.of(club));
         when(playerProfileRepository.findById(1L)).thenReturn(Optional.of(playerProfile));
-        when(applicationRepository.existsByPlayerAndClub(user, club)).thenReturn(false);
+        when(applicationRepository.existsByPlayerProfileAndClub(playerProfile, club)).thenReturn(false);
 
         PlayerApplicationDTO applicationDTO = new PlayerApplicationDTO();
         applicationDTO.setClubId(1L);
-        applicationDTO.setPlayerId(1L);
+        applicationDTO.setPlayerProfileId(1L);
         applicationDTO.setDesiredPosition(PlayerPosition.POSITION_FORWARD);
 
         // Act: Call the method under test
@@ -77,11 +77,11 @@ public class ClubServiceTest {
 
         when(clubRepository.findById(1L)).thenReturn(Optional.of(club));
         when(playerProfileRepository.findById(1L)).thenReturn(Optional.of(playerProfile));
-        when(applicationRepository.existsByPlayerAndClub(user, club)).thenReturn(true);  // Already applied
+        when(applicationRepository.existsByPlayerProfileAndClub(playerProfile, club)).thenReturn(true);  // Already applied
 
         PlayerApplicationDTO applicationDTO = new PlayerApplicationDTO();
         applicationDTO.setClubId(1L);
-        applicationDTO.setPlayerId(1L);
+        applicationDTO.setPlayerProfileId(1L);
 
         // Act & Assert
         assertThrows(PlayerAlreadyAppliedException.class, () -> {
