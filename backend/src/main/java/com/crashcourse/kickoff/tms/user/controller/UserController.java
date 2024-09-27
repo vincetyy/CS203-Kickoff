@@ -2,6 +2,7 @@ package com.crashcourse.kickoff.tms.user.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,4 +52,15 @@ public class UserController {
         return createdProfile != null ? ResponseEntity.ok(createdProfile) : ResponseEntity.notFound().build();
     }
 
+    // pls check this
+    @PostMapping("/signup")
+    public ResponseEntity<User> signup(@RequestBody NewUserDTO newUserDTO) {
+        try {
+            User newUser = userService.addUser(newUserDTO); // call the addUser method in the service
+            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();  
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 }

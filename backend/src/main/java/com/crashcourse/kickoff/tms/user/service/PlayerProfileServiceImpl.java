@@ -5,15 +5,15 @@ import org.springframework.stereotype.Service;
 import com.crashcourse.kickoff.tms.user.model.PlayerPosition;
 import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
 import com.crashcourse.kickoff.tms.user.model.User;
-import com.crashcourse.kickoff.tms.user.repository.PlayerProfileRepository;
+import com.crashcourse.kickoff.tms.user.repository.HostProfileRepository;
 
 import java.util.*;
 
 @Service
 public class PlayerProfileServiceImpl implements PlayerProfileService {
-    private PlayerProfileRepository playerProfiles;
+    private HostProfileRepository playerProfiles;
 
-    public PlayerProfileServiceImpl(PlayerProfileRepository playerProfiles) {
+    public PlayerProfileServiceImpl(HostProfileRepository playerProfiles) {
         this.playerProfiles = playerProfiles;
     }
 

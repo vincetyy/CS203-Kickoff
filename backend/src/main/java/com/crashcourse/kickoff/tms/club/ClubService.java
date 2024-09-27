@@ -1,7 +1,9 @@
 package com.crashcourse.kickoff.tms.club;
 
 import com.crashcourse.kickoff.tms.user.model.*;
+import com.crashcourse.kickoff.tms.user.repository.HostProfileRepository;
 import com.crashcourse.kickoff.tms.user.repository.PlayerProfileRepository;
+
 import com.crashcourse.kickoff.tms.club.exception.ClubNotFoundException;
 import com.crashcourse.kickoff.tms.club.exception.PlayerLimitExceededException;
 import com.crashcourse.kickoff.tms.club.exception.ClubAlreadyExistsException;

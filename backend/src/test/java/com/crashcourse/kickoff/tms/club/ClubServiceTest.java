@@ -10,7 +10,9 @@ import com.crashcourse.kickoff.tms.club.exception.PlayerAlreadyAppliedException;
 import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
 import com.crashcourse.kickoff.tms.user.model.User;
 import com.crashcourse.kickoff.tms.user.model.PlayerPosition;
+import com.crashcourse.kickoff.tms.user.repository.HostProfileRepository;
 import com.crashcourse.kickoff.tms.user.repository.PlayerProfileRepository;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
