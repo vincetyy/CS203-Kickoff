@@ -1,4 +1,7 @@
 import loginpageBackground from '@/assets/loginpage_background.png';
+import eyePassword from '@/assets/eyePassword.svg';
+import eyePasswordOff from '@/assets/eyePasswordOff.svg';
+
 import {
     Input,
     Switch,
@@ -6,9 +9,68 @@ import {
     Label
 } from "@headlessui/react";
 import React from "react";
+import axios from 'axios';
 
 const Login = () => {
+    const [email, setEmail] = React.useState('');
+    const [password, setPassword] = React.useState('');
+    const [showPassword, setShowPassword] = React.useState(false);
     const [rememberMe, setRememberMe] = React.useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+    
+        // Encode credentials for Basic Auth (username:password in Base64)
+        const credentials = btoa(`${email}:${password}`);
+    
+        try {
+          // Make the POST request with Basic Authentication
+          const response = await axios.get(
+            'http://localhost:8080/users', // Replace with your API URL
+            {
+              headers: {
+                'Authorization': `Basic ${credentials}`, // Basic Auth header
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+    
+          // Handle the response after successful authentication
+          if (response.status === 200) {
+            console.log('Login successful:', response.data);
+    
+            // Store credentials in localStorage or sessionStorage (use sessionStorage for temporary storage)
+            // localStorage.setItem('authToken', credentials); // Store Base64 encoded credentials
+    
+            // // Set axios defaults to include Basic Auth header in all requests
+            // axios.defaults.headers.common['Authorization'] = `Basic ${credentials}`;
+    
+            console.log("Success")!
+          }
+        } catch (error: unknown) {
+            // Handle unknown error type properly
+            if (axios.isAxiosError(error)) {
+              // Axios-specific error handling
+              if (error.response) {
+                console.error('Error response:', error.response.data);
+                console.error('Error status:', error.response.status);
+              } else if (error.request) {
+                console.error('Error request:', error.request);
+              } else {
+                console.error('Error message:', error.message);
+              }
+            } else if (error instanceof Error) {
+              // Generic error handling
+              console.error('Generic error:', error.message);
+            } else {
+              console.error('Unknown error:', error);
+            }
+          }
+      };
 
     return (
         <div className="flex h-screen">
@@ -41,16 +103,17 @@ const Login = () => {
                     </div>
 
                     {/* Login Form */}
-                    <form className="mt-8 space-y-6">
+                    <form className="mt-8 space-y-6" onSubmit={handleLogin}>
                         <div className="rounded-md shadow-sm bg space-y-4">
                             <Field className="max-w-md">
-                                <Label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                                <Label htmlFor="email" className="block text-sm font-medium text-gray-700 text-left mb-1">
                                     Username
                                 </Label>
                                 <Input
                                     id="email"
                                     name="email"
-                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     required
                                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                                     placeholder="Email or phone number"
@@ -60,38 +123,30 @@ const Login = () => {
                                 </label>
                             </Field>
                             <div>
-                                <label htmlFor="password" className="sr-only">
+                                <label htmlFor="password" className="block text-sm font-medium text-gray-700 text-left mb-1">
                                     Password
                                 </label>
                                 <div className="relative">
                                     <input
                                         id="password"
                                         name="password"
-                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        type={showPassword ? "text" : "password"}
                                         required
-                                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                                         placeholder="Enter password"
                                     />
-                                    <button
-                                        type="button"
-                                        className="absolute inset-y-0 right-0 flex items-center pr-3"
+                                    <div
+                                        className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600 cursor-pointer"
+                                        onClick={togglePasswordVisibility}
                                     >
-                                        {/* Icon for showing password */}
-                                        <svg
-                                            className="h-5 w-5 text-gray-400"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth="2"
-                                                d="M13.875 18.825A10.937 10.937 0 0112 21c-4.97 0-9-3.555-9-8s4.03-8 9-8c.607 0 1.203.051 1.785.15M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                            />
-                                        </svg>
-                                    </button>
+                                        <img
+                                            src={showPassword ? eyePasswordOff : eyePassword}
+                                            alt="Toggle password visibility"
+                                            className="h-5 w-5"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
