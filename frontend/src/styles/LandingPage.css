@@ -1,0 +1,81 @@
+.landing-page {
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    color: white;
+  }
+  
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .logo {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .about-us-btn {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid white;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+  
+  main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start; 
+    padding-left: 10%; 
+    text-align: left;
+  }
+  
+  .tagline {
+    font-size: 4rem;
+    font-weight: bold;
+    margin-bottom: 40px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .button-container {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .create-tournament-btn,
+  .join-tournament-btn {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .create-tournament-btn {
+    background: linear-gradient(90deg, #ffd700, #ffa500); /* Gradient for Create Tournament */
+    color: #000;
+  }
+  
+  .join-tournament-btn {
+    background: linear-gradient(90deg, #32cd32, #228b22); /* Gradient for Join Tournament */
+    color: white;
+  }
+  
+  @media (max-width: 768px) {
+    .tagline {
+      font-size: 3rem;
+    }
+  
+    .button-container {
+      flex-direction: column;
+    }
+  }
