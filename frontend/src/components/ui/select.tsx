@@ -73,5 +73,6 @@ export const SelectItem: React.FC<React.LiHTMLAttributes<HTMLLIElement> & { valu
 };
 
 export const SelectValue: React.FC<React.HTMLAttributes<HTMLSpanElement> & { placeholder?: string; value?: string }> = ({ value, placeholder }) => {
-  return <span>{value || placeholder}</span>;
+  const capitalizedValue = value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+  return <span>{capitalizedValue || placeholder}</span>;
 };
