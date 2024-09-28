@@ -89,7 +89,7 @@ const LandingPage: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6, duration: 0.5 }}
               >
-                <Link to="/get-started">
+                <Link to="/login">
                   <button 
                     className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-blue-700 transition-colors duration-300 glow-button"
                   >
