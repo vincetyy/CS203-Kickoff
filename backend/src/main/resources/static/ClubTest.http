@@ -45,3 +45,24 @@ Content-Type: application/json
   "playerProfileId": 1,
   "desiredPosition": "POSITION_FORWARD"
 }
+
+
+### Invite a Player to Club
+POST http://localhost:8080/clubs/1/invite
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+  "playerId": 2,
+  "captainId": 1
+}
+
+### Accept the invitation for player to join club 1
+POST http://localhost:8080/players/2/acceptInvitation
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+    "clubId": 1  
+}
+

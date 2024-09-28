@@ -2,6 +2,7 @@ package com.crashcourse.kickoff.tms.club;
 
 import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.club.exception.*;
+import com.crashcourse.kickoff.tms.user.dto.PlayerInviteRequest;
 import com.crashcourse.kickoff.tms.user.model.*;
 import com.crashcourse.kickoff.tms.club.dto.*;
 
@@ -97,6 +98,16 @@ public class ClubController {
             applicationDTO.setClubId(clubId);
             clubService.applyToClub(applicationDTO);
             return new ResponseEntity<>("Application submitted successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/{clubId}/invite")
+    public ResponseEntity<?> invitePlayerToClub(@PathVariable Long clubId, @RequestBody PlayerInviteRequest inviteRequest) {
+        try {
+            clubService.invitePlayerToClub(clubId, inviteRequest.getPlayerId(), inviteRequest.getCaptainId());
+            return new ResponseEntity<>("Invitation sent successfully", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

@@ -34,6 +34,10 @@ Content-Type: application/json
   "joinedClubIds": [1, 2]
 }
 
+### View All Tournaments
+GET http://localhost:8080/tournaments
+Authorization: Basic admin:password
+
 
 
 
