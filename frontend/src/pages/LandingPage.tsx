@@ -1,73 +1,108 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import videoSource from '../assets/Kickoff2.mp4';
+import aboutImage from '../assets/LandingPageWallpaper.jpg';
+import { Helmet } from 'react-helmet';
 
-export default function LandingPage() {
-  const [showVideo, setShowVideo] = useState(true);
+const LandingPage: React.FC = () => {
+  const [videoEnded, setVideoEnded] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowVideo(false);
-    }, 3000);
-
-    document.title = "Kickoff";
-
-    return () => {
-      clearTimeout(timer);
-    };
+    const video = videoRef.current;
+    if (video) {
+      video.addEventListener('ended', () => setVideoEnded(true));
+      return () => video.removeEventListener('ended', () => setVideoEnded(true));
+    }
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col w-full bg-gradient-to-br from-green-400 to-blue-500">
-      {showVideo ? (
+    <div className="min-h-screen flex flex-col bg-black text-white">
+      <Helmet>
+        <title>Kickoff</title>
+      </Helmet>
+      <header className="bg-black text-white p-4 flex justify-between items-center z-20 relative">
+        <h1 className="text-2xl font-bold">KICKOFF</h1>
+        <div 
+          className="relative"
+          onMouseEnter={() => setShowAbout(true)}
+          onMouseLeave={() => setShowAbout(false)}
+        >
+          <button className="px-4 py-2 bg-transparent border border-white rounded hover:bg-white hover:text-black transition-colors duration-300">
+            About Us
+          </button>
+          <AnimatePresence>
+            {showAbout && (
+              <motion.div
+                className="absolute right-0 mt-2 w-64 bg-black text-white rounded-lg shadow-lg p-4 text-sm"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <p className="mb-4 text-left">
+                Kickoff is the brainchild of a passionate team of CS203 students from SMU — Joel, Setlin, Sheen, Vince, Yekai, and Zane — on a mission to change how football tournaments are organized and played.
+                </p>
+                <img src={aboutImage} alt="Football field" className="w-full h-32 object-cover rounded" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </header>
+      <main className="flex-grow relative overflow-hidden">
         <video
+          ref={videoRef}
+          className="absolute inset-0 w-full h-full object-cover"
+          src={videoSource}
           autoPlay
           muted
-          className="w-full h-screen object-cover"
-          onEnded={() => setShowVideo(false)}
-        >
-          <source src="/goal-video.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-      ) : (
-        <div className="flex flex-col flex-grow w-full">
-          {/* Header */}
-          <header className="w-full flex justify-between items-center p-6 bg-opacity-80 bg-black">
-            <div className="text-3xl md:text-4xl font-bold text-white">Kickoff</div>
-            <Link
-              to="/about"
-              className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-semibold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105"
+          playsInline
+        />
+        <AnimatePresence>
+          {videoEnded && (
+            <motion.div 
+              className="absolute inset-y-0 right-0 w-1/2 flex flex-col justify-center items-start p-8 bg-black bg-opacity-50"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              transition={{ type: "spring", stiffness: 100, damping: 20 }}
             >
-              About Us
-            </Link>
-          </header>
-
-          {/* Main Content */}
-          <main className="flex-grow flex flex-col items-center justify-center text-center p-4 md:p-8 w-full">
-            <h1 className="text-4xl md:text-6xl font-bold mb-8 text-white">
-              Your passion, our game
-            </h1>
-            <div className="space-y-6 md:space-y-0 md:space-x-6 md:flex">
-              <Link
-                to="/create-tournament"
-                className="inline-block px-8 py-3 bg-yellow-400 text-gray-800 font-bold rounded-full transition duration-300 ease-in-out transform hover:scale-105 hover:bg-yellow-300 shadow-lg w-full md:w-auto"
+              <motion.h2 
+                className="text-3xl md:text-7xl font-bold mb-4 leading-tight"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
               >
-                Create a tournament
-              </Link>
-              <Link
-                to="/join-tournament"
-                className="inline-block px-8 py-3 bg-purple-600 text-white font-bold rounded-full transition duration-300 ease-in-out transform hover:scale-105 hover:bg-purple-500 shadow-lg w-full md:w-auto"
+                Your Game,<br />Our Passion
+              </motion.h2>
+              <motion.p
+                className="text-left text-xl md:text-2xl mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
               >
-                Join a tournament
-              </Link>
-            </div>
-          </main>
-
-          {/* Footer */}
-          <footer className="w-full text-center py-4 bg-black bg-opacity-70 text-white">
-            © {new Date().getFullYear()} Kickoff. All rights reserved.
-          </footer>
-        </div>
-      )}
+                Connecting Singapore's football clubs and players through seamless, community-driven tournament management.
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+              >
+                <Link to="/login">
+                  <button 
+                    className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-blue-700 transition-colors duration-300 glow-button"
+                  >
+                    Get Started
+                  </button>
+                </Link>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
     </div>
   );
-}
+};
+
+export default LandingPage;
