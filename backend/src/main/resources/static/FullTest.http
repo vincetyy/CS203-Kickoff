@@ -1,0 +1,105 @@
+### User
+### Check users
+GET http://localhost:8080/users
+Authorization: Basic admin password
+
+### Creates new "normal" user (not admin)
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+    "username" : "new_user@gmail.com",
+    "password" : "validpassword"
+}
+### Creates 2nd new "normal" user (not admin)
+POST http://localhost:8080/users
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+  "username": "player",
+  "password": "password123"
+}
+
+### PlayerProfile
+### Assign a PlayerProfile to the admin
+POST http://localhost:8080/users/1/playerProfile
+Authorization: Basic admin password
+Content-Type: application/json
+
+{
+    "preferredPosition": "POSITION_FORWARD",
+    "profileDescription": "I love football!"
+}
+
+### Assign a PlayerProfile to the normal user
+POST http://localhost:8080/users/1/playerProfile
+Authorization: Basic admin password
+Content-Type: application/json
+
+{
+    "preferredPosition": "POSITION_DEFENDER",
+    "profileDescription": "I love football too!"
+}
+
+### Assign a PlayerProfile to the 2nd normal user
+POST http://localhost:8080/users/3/playerProfile
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+    "preferredPosition": "POSITION_DEFENDER",  
+    "profileDescription": "I love playing as a defender!"
+}
+
+### Club
+### Check all clubs
+GET http://localhost:8080/clubs
+Authorization: Basic admin:password
+
+### Create a new club under admin
+POST http://localhost:8080/clubs
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+  "club": {
+    "name": "My New Club",
+    "elo": 1000,
+    "ratingDeviation": 50
+  },
+  "creatorId": 1  
+}
+
+### Create a new club under normal user
+POST http://localhost:8080/clubs
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+  "club": {
+    "name": "My New Club 2",
+    "elo": 500,
+    "ratingDeviation": 25
+  },
+  "creatorId": 2
+}
+
+### Invite a normal user 2 to club 1
+POST http://localhost:8080/clubs/1/invite
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+  "playerId": 3,
+  "captainId": 1
+}
+
+### Accept the invitation for normal player to join club 1
+POST http://localhost:8080/players/3/acceptInvitation
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+    "clubId": 1  
+}
