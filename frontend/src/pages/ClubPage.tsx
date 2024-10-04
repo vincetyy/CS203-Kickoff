@@ -25,6 +25,8 @@ enum PlayerPosition {
 
 export default function ClubPage() {
   const [clubs, setClubs] = useState<Club[]>([])
+  const [filteredClubs, setFilteredClubs] = useState<Club[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedClub, setSelectedClub] = useState<Club | null>(null)
@@ -45,6 +47,7 @@ export default function ClubPage() {
           }
         });
         setClubs(response.data);
+        setFilteredClubs(response.data);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching clubs:', err);
@@ -55,6 +58,18 @@ export default function ClubPage() {
 
     fetchClubs();
   }, []);
+
+  useEffect(() => {
+    const results = clubs.filter(club =>
+      club.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (club.description && club.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+    setFilteredClubs(results);
+  }, [searchTerm, clubs]);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
 
   const formatPosition = (position: string) => {
     return position.replace('POSITION_', '').charAt(0) + position.replace('POSITION_', '').slice(1).toLowerCase();
@@ -103,7 +118,13 @@ export default function ClubPage() {
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 space-y-4 lg:space-y-0">
         <div className="relative w-full lg:w-64">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-          <Input type="search" placeholder="Search" className="pl-8 bg-gray-800 border-gray-700 w-full" />
+          <Input
+            type="search"
+            placeholder="Search"
+            className="pl-8 bg-gray-800 border-gray-700 w-full"
+            value={searchTerm}
+            onChange={handleSearch}
+          />
         </div>
       </div>
 
@@ -115,7 +136,7 @@ export default function ClubPage() {
           </svg>
         </div>
         <div>
-          <h2 className="text-xl lg:text-2xl font-bold">{clubs.length} soccer clubs</h2>
+          <h2 className="text-xl lg:text-2xl font-bold">{filteredClubs.length} soccer clubs</h2>
           <p className="text-sm lg:text-base">waiting for you</p>
         </div>
       </div>
@@ -156,7 +177,7 @@ export default function ClubPage() {
 
       {/* Club cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-        {clubs.map((club) => (
+        {filteredClubs.map((club) => (
           <ClubCard
             key={club.id}
             name={club.name}
