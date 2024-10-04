@@ -7,11 +7,12 @@ interface ClubCardProps {
   members: number
   image: string
   applied: boolean
+  children?: React.ReactNode
 }
 
-export default function ClubCard({ name, description, members, image, applied }: ClubCardProps) {
+export default function ClubCard({ name, description, members, image, applied, children }: ClubCardProps) {
   return (
-    <Card className="bg-gray-800 border-gray-700">
+    <Card className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
       <CardContent className="p-0">
         <img src={image} alt={name} className="w-full h-48 object-cover rounded-t-lg" />
         <div className="p-4">
@@ -26,9 +27,7 @@ export default function ClubCard({ name, description, members, image, applied }:
           </svg>
           <span>{members} Members</span>
         </div>
-        <Button variant={applied ? "secondary" : "default"}>
-          {applied ? "Applied" : "Join"}
-        </Button>
+        {children}
       </CardFooter>
     </Card>
   )

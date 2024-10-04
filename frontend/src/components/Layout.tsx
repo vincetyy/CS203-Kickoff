@@ -10,9 +10,7 @@ export default function Layout() {
     <div className="flex flex-col min-h-screen bg-gray-900 text-white">
       <Header isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
       <div className="flex flex-1 overflow-hidden">
-        <div className="hidden lg:block">
-          <Sidebar />
-        </div>
+        <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
         <main className="flex-1 p-4 lg:p-6 overflow-auto w-full">
           <Outlet />
         </main>

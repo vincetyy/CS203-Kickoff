@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react'
 import { Search } from 'lucide-react'
 import { Input } from "../components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog"
+import { Button } from "../components/ui/button"
 import ClubCard from '../components/ClubCard'
 import axios from 'axios'
 
-// Define an interface for the Club data structure
 interface Club {
   id: number
   name: string
@@ -15,10 +16,20 @@ interface Club {
   ratingDeviation: number
 }
 
+enum PlayerPosition {
+  POSITION_FORWARD = "POSITION_FORWARD",
+  POSITION_MIDFIELDER = "POSITION_MIDFIELDER",
+  POSITION_DEFENDER = "POSITION_DEFENDER",
+  POSITION_GOALKEEPER = "POSITION_GOALKEEPER"
+}
+
 export default function ClubPage() {
   const [clubs, setClubs] = useState<Club[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedClub, setSelectedClub] = useState<Club | null>(null)
+  const [selectedPosition, setSelectedPosition] = useState<PlayerPosition | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   useEffect(() => {
     const fetchClubs = async () => {
@@ -44,6 +55,44 @@ export default function ClubPage() {
 
     fetchClubs();
   }, []);
+
+  const formatPosition = (position: string) => {
+    return position.replace('POSITION_', '').charAt(0) + position.replace('POSITION_', '').slice(1).toLowerCase();
+  }
+  const handleJoin = (club: Club) => {
+    setSelectedClub(club)
+    setIsDialogOpen(true)
+  }
+
+  const handleApply = async () => {
+    if (!selectedClub || !selectedPosition) return;
+
+    try {
+      await axios.post(`http://localhost:8080/clubs/${selectedClub.id}/apply`, 
+        { 
+          playerProfileId: 1, // Assuming a fixed player profile ID for now
+          desiredPosition: selectedPosition 
+        },
+        {
+          auth: {
+            username: 'admin',
+            password: 'password'
+          },
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          }
+        }
+      );
+      alert(`Successfully applied to ${selectedClub.name} as ${selectedPosition.replace('POSITION_', '')}`);
+      setIsDialogOpen(false);
+      setSelectedClub(null);
+      setSelectedPosition(null);
+    } catch (err) {
+      console.error('Error applying to club:', err);
+      alert(`Failed to apply to club: ${(err as any).response?.data || (err as Error).message}`);
+    }
+  };
 
   if (loading) return <div>Loading...</div>
   if (error) return <div>Error: {error}</div>
@@ -78,9 +127,9 @@ export default function ClubPage() {
             <SelectValue placeholder="Type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="casual">Casual</SelectItem>
-            <SelectItem value="competitive">Competitive</SelectItem>
-            <SelectItem value="friendly">Friendly</SelectItem>
+            <SelectItem value="Casual">Casual</SelectItem>
+            <SelectItem value="Competitive">Competitive</SelectItem>
+            <SelectItem value="Friendly">Friendly</SelectItem>
           </SelectContent>
         </Select>
         <Select>
@@ -88,9 +137,9 @@ export default function ClubPage() {
             <SelectValue placeholder="Location" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="singapore">Singapore</SelectItem>
-            <SelectItem value="malaysia">Malaysia</SelectItem>
-            <SelectItem value="indonesia">Indonesia</SelectItem>
+            <SelectItem value="Singapore">Singapore</SelectItem>
+            <SelectItem value="Malaysia">Malaysia</SelectItem>
+            <SelectItem value="Indonesia">Indonesia</SelectItem>
           </SelectContent>
         </Select>
         <Select>
@@ -98,9 +147,9 @@ export default function ClubPage() {
             <SelectValue placeholder="Skill Level" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="beginner">Beginner</SelectItem>
-            <SelectItem value="intermediate">Intermediate</SelectItem>
-            <SelectItem value="advanced">Advanced</SelectItem>
+            <SelectItem value="Beginner">Beginner</SelectItem>
+            <SelectItem value="Intermediate">Intermediate</SelectItem>
+            <SelectItem value="Advanced">Advanced</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -113,11 +162,53 @@ export default function ClubPage() {
             name={club.name}
             description={club.description || `ELO: ${club.elo.toFixed(0)}, RD: ${club.ratingDeviation.toFixed(0)}`}
             members={club.players.length}
-            image={`https://picsum.photos/seed/${club.id}/400/300`} // Using a placeholder image service
-            applied={false} // You might want to implement this logic based on user state
-          />
+            image={`https://picsum.photos/seed/${club.id}/400/300`}
+            applied={false}
+          >
+            <Button onClick={() => handleJoin(club)}>Join</Button>
+          </ClubCard>
         ))}
       </div>
+
+      {/* Position selection dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Apply to {selectedClub?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex flex-col justify-between">
+              <Select onValueChange={(value) => setSelectedPosition(value as PlayerPosition)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select your preferred position" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(PlayerPosition).map((position) => (
+                    <SelectItem key={position} value={position}>
+                      {formatPosition(position)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row justify-between mt-4 space-y-2 sm:space-y-0 sm:space-x-2">
+            <button 
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 w-full" 
+              onClick={() => setIsDialogOpen(false)}
+            >
+              Close
+            </button>
+            <button 
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full"
+              onClick={handleApply}
+              disabled={!selectedPosition}
+            >
+              Apply
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
