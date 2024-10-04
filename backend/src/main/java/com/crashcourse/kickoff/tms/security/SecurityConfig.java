@@ -18,6 +18,10 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import com.crashcourse.kickoff.tms.user.model.Role;
 
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
@@ -52,10 +56,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers(HttpMethod.GET, "/users/**").hasRole(Role.ROLE_ADMIN.name().substring(5))
                         .anyRequest().permitAll()
-                        )
+                )
                 // a bunch of copy pasted code from lab, need to sieve out irrelevant functions
                 // ensure that the application won’t create any session in our stateless REST
                 // APIs
@@ -67,6 +72,19 @@ public class SecurityConfig {
                                                      // APIs
                 .authenticationProvider(authenticationProvider());
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean

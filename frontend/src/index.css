@@ -28,10 +28,10 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  padding: 0;
   min-height: 100vh;
+  background-color: #111827; /* This is the same as bg-gray-900 */
+  color: white;
 }
 
 h1 {
@@ -69,4 +69,16 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
