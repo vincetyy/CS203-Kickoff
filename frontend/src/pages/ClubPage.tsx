@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react'
 import { Search } from 'lucide-react'
 import { Input } from "../components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog"
 import { Button } from "../components/ui/button"
 import ClubCard from '../components/ClubCard'
 import axios from 'axios'
+import { Toaster, toast } from 'react-hot-toast'
 
 interface Club {
   id: number
@@ -99,13 +100,19 @@ export default function ClubPage() {
           }
         }
       );
-      alert(`Successfully applied to ${selectedClub.name} as ${selectedPosition.replace('POSITION_', '')}`);
+      toast.success(`Successfully applied to ${selectedClub.name} as ${selectedPosition.replace('POSITION_', '')}`, {
+        duration: 3000,
+        position: 'top-center',
+      });
       setIsDialogOpen(false);
       setSelectedClub(null);
       setSelectedPosition(null);
     } catch (err) {
       console.error('Error applying to club:', err);
-      alert(`Failed to apply to club: ${(err as any).response?.data || (err as Error).message}`);
+      toast.error(`${(err as any).response?.data || (err as Error).message}`, {
+        duration: 4000,
+        position: 'top-center',
+      });
     }
   };
 
@@ -114,6 +121,7 @@ export default function ClubPage() {
 
   return (
     <>
+      <Toaster />
       {/* Search and actions */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 space-y-4 lg:space-y-0">
         <div className="relative w-full lg:w-64">
