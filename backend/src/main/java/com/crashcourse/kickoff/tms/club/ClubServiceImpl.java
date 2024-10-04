@@ -1,6 +1,7 @@
 package com.crashcourse.kickoff.tms.club;
 
 import com.crashcourse.kickoff.tms.user.model.*;
+import com.crashcourse.kickoff.tms.user.repository.*;
 import com.crashcourse.kickoff.tms.user.repository.PlayerProfileRepository;
 import com.crashcourse.kickoff.tms.club.exception.ClubNotFoundException;
 import com.crashcourse.kickoff.tms.club.exception.PlayerLimitExceededException;
@@ -9,6 +10,8 @@ import com.crashcourse.kickoff.tms.club.exception.ClubAlreadyExistsException;
 import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
 import com.crashcourse.kickoff.tms.club.model.PlayerApplication;
 import com.crashcourse.kickoff.tms.club.model.ApplicationStatus;
+import com.crashcourse.kickoff.tms.club.model.ClubInvitation;
+import com.crashcourse.kickoff.tms.club.repository.ClubInvitationRepository;
 import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
 import com.crashcourse.kickoff.tms.club.repository.PlayerApplicationRepository;
 import com.crashcourse.kickoff.tms.club.exception.PlayerAlreadyAppliedException;
@@ -21,6 +24,7 @@ import jakarta.validation.constraints.Positive;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 @Service
 public class ClubServiceImpl implements ClubService {
@@ -33,6 +37,9 @@ public class ClubServiceImpl implements ClubService {
 
     @Autowired
     private PlayerApplicationRepository applicationRepository;
+
+    @Autowired
+    private ClubInvitationRepository clubInvitationRepository;
 
     // jparepository has automatically implemented crud methods
     public Club createClub(@Valid Club club, Long creatorId) {
@@ -202,4 +209,62 @@ public class ClubServiceImpl implements ClubService {
         }
         return clubs;
     }
+
+    @Override
+    public boolean isCaptain(Long clubId, PlayerProfile player) {
+        Club club = clubRepository.findById(clubId).orElse(null);
+        return club != null && club.getCaptain().equals(player);
+    }
+
+    @Override
+    public Club invitePlayerToClub(Long clubId, Long playerId, Long captainId) throws Exception {
+        Club club = clubRepository.findById(clubId)
+                .orElseThrow(() -> new ClubNotFoundException("Club not found with ID: " + clubId));
+        
+        PlayerProfile captain = playerProfileRepository.findById(captainId)
+                .orElseThrow(() -> new Exception("Captain not found with ID: " + captainId));
+
+        if (!club.getCaptain().equals(captain)) {
+            throw new Exception("Only the club captain can invite players.");
+        }
+
+        PlayerProfile invitedPlayer = playerProfileRepository.findById(playerId)
+                .orElseThrow(() -> new Exception("Player not found with ID: " + playerId));
+
+        ClubInvitation invitation = new ClubInvitation();
+        invitation.setClub(club);
+        invitation.setPlayerProfile(invitedPlayer);
+        invitation.setStatus(ApplicationStatus.PENDING);
+        invitation.setInviteSentDate(LocalDateTime.now());
+
+        clubInvitationRepository.save(invitation);
+
+        return club;
+    }
+
+    public Club acceptInvite(Long playerId, Long clubId) throws Exception {
+        PlayerProfile player = playerProfileRepository.findById(playerId)
+            .orElseThrow(() -> new Exception("PlayerProfile not found with id: " + playerId));
+
+        Club club = clubRepository.findById(clubId)
+            .orElseThrow(() -> new Exception("Club not found with id: " + clubId));
+
+        if (club.getPlayers().size() >= Club.MAX_PLAYERS_IN_CLUB) {
+            throw new PlayerLimitExceededException(String.format("A club cannot have more than %d players", Club.MAX_PLAYERS_IN_CLUB));
+        }
+
+        club.getPlayers().add(player);
+        player.setClub(club);
+
+        clubRepository.save(club);
+        playerProfileRepository.save(player);
+
+        return club;
+    }
+
+    @Override
+    public List<ClubInvitation> getPlayerInvitations(Long playerId) throws Exception {
+        return clubInvitationRepository.findByPlayerProfileIdAndStatus(playerId, ApplicationStatus.PENDING);
+    }
+
 }

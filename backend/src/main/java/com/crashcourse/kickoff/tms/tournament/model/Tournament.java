@@ -47,4 +47,13 @@ public class Tournament {
         inverseJoinColumns = @JoinColumn(name = "club_id")
     )
     private List<Club> joinedClubs = new ArrayList<>();
+
+    public String getFormat() {
+        return tournamentFormat.toString();
+    }
+    
+    public String getLocationName() {
+        return location.getName();
+    }
+    
 }

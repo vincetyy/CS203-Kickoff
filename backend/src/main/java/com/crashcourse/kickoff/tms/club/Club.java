@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import com.crashcourse.kickoff.tms.tournament.model.*;
 import com.crashcourse.kickoff.tms.user.model.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -37,6 +38,7 @@ public class Club {
     @ManyToOne(cascade = CascadeType.PERSIST)
     private PlayerProfile captain;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "club", cascade = CascadeType.ALL)
     @Size(max = MAX_PLAYERS_IN_CLUB, message = "A club cannot have more than " +  MAX_PLAYERS_IN_CLUB + " players")
     private List<PlayerProfile> players = new ArrayList<>();
