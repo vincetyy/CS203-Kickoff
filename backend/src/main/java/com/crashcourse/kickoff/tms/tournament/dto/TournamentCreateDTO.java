@@ -48,8 +48,9 @@ public class TournamentCreateDTO {
      * Maximum number of teams that can participate.
      * Defaults to 0 if not specified.
      */
+    @NotNull(message = "Need a maximum number of teams")
     @Min(value = 0, message = "Maximum teams cannot be negative")
-    private int maxTeams = 0;
+    private Integer maxTeams = 0;
 
     /**
      * Format of the tournament (e.g., Round Robin, Single Elimination).
@@ -61,6 +62,7 @@ public class TournamentCreateDTO {
      * Format specifics if the tournament uses a knockout system.
      * This field is optional and can be null.
      */
+    @NotNull(message = "Knockout format is required")
     private KnockoutFormat knockoutFormat;
 
     /**
@@ -83,9 +85,4 @@ public class TournamentCreateDTO {
     @Min(value = 0, message = "Maximum rank cannot be negative")
     private Integer maxRank;
 
-    /**
-     * List of club identifiers that are joining the tournament at the start.
-     * This field is optional.
-     */
-    private List<@Positive(message = "Club ID must be positive") Long> joinedClubIds;
 }

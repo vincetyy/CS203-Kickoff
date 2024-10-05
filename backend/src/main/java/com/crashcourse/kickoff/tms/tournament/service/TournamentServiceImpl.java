@@ -6,6 +6,7 @@ import com.crashcourse.kickoff.tms.location.service.LocationService;
 import com.crashcourse.kickoff.tms.location.model.*;
 
 import com.crashcourse.kickoff.tms.tournament.dto.*;
+import com.crashcourse.kickoff.tms.tournament.exception.*;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.repository.TournamentRepository;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
@@ -70,12 +71,6 @@ public class TournamentServiceImpl implements TournamentService {
         existingTournament.setMinRank(dto.getMinRank());
         existingTournament.setMaxRank(dto.getMaxRank());
 
-        if (dto.getJoinedClubIds() != null) {
-            existingTournament.getJoinedClubs().clear();
-            List<Club> clubs = clubService.getClubsByIds(dto.getJoinedClubIds());
-            existingTournament.setJoinedClubs(clubs);
-        }
-
         Tournament updatedTournament = tournamentRepository.save(existingTournament);
         return mapToResponseDTO(updatedTournament);
     }
@@ -106,11 +101,6 @@ public class TournamentServiceImpl implements TournamentService {
         tournament.setPrizePool(dto.getPrizePool());
         tournament.setMinRank(dto.getMinRank());
         tournament.setMaxRank(dto.getMaxRank());
-
-        if (dto.getJoinedClubIds() != null) {
-            List<Club> clubs = clubService.getClubsByIds(dto.getJoinedClubIds());
-            tournament.setJoinedClubs(clubs);
-        }
 
         return tournament;
     }
@@ -147,5 +137,37 @@ public class TournamentServiceImpl implements TournamentService {
                 clubDTOs
         );
     }
+
+    /**
+     * Allows a club to join tournament
+     *
+     * @param TournamentJoinDTO dto
+     * @return TournamentResponseDTO
+     */
+    @Transactional
+    @Override
+    public TournamentResponseDTO joinTournamentAsClub(TournamentJoinDTO dto) {
+        Long tournamentId = dto.getTournamentId();
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + tournamentId));
+
+        Long clubId = dto.getClubId();
+        Club club = clubService.getClubById(clubId)
+                .orElseThrow(() -> new EntityNotFoundException("Club not found with id: " + clubId));
+        
+
+        if (tournament.getJoinedClubs() != null && tournament.getJoinedClubs().contains(club)) {
+            throw new ClubAlreadyJoinedException("Club has already joined the tournament.");
+        }
+        if (tournament.getJoinedClubs().size() >= tournament.getMaxTeams()) {
+            throw new TournamentFullException("Tournament is already full.");
+        }
+
+        tournament.getJoinedClubs().add(club);
+
+        Tournament updatedTournament = tournamentRepository.save(tournament);
+        return mapToResponseDTO(updatedTournament);
+    } 
+
     
 }
