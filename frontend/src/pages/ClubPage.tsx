@@ -188,9 +188,9 @@ export default function ClubPage() {
         {filteredClubs.map((club) => (
           <ClubCard
             key={club.id}
+            id={club.id}
             name={club.name}
             description={club.description || `ELO: ${club.elo.toFixed(0)}, RD: ${club.ratingDeviation.toFixed(0)}`}
-            members={club.players.length}
             image={`https://picsum.photos/seed/${club.id}/400/300`}
             applied={false}
           >
