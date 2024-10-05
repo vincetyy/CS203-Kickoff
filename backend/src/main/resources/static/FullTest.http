@@ -103,3 +103,7 @@ Content-Type: application/json
 {
     "clubId": 1  
 }
+
+### Get players from clubID
+GET http://localhost:8080/clubs/1/players
+Authorization: Basic admin:password
