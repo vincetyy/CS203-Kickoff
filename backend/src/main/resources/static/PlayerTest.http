@@ -2,6 +2,11 @@
 GET http://localhost:8080/users
 Authorization: Basic admin password
 
+### Get individual user to test userprofile frontend
+GET http://localhost:8080/users/1
+Authorization: Basic admin:password
+
+
 ### Add player profile to admin
 POST http://localhost:8080/users/1/playerProfile
 Authorization: Basic admin password
@@ -42,7 +47,7 @@ Content-Type: application/json
 }
 
 ### Assign a PlayerProfile to the user
-POST http://localhost:8080/users/3/playerProfile
+POST http://localhost:8080/users/2/playerProfile
 Authorization: Basic admin:password
 Content-Type: application/json
 
