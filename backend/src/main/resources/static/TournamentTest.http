@@ -36,7 +36,7 @@ Content-Type: application/json
 ### Create Tournament with Optional Missing
 POST http://localhost:8080/tournaments
 Authorization: Basic admin:password
-Content-Type: application/application/json
+Content-Type: application/json
 
 {
   "name": "Spring Championship",
@@ -55,11 +55,18 @@ Authorization: Basic admin:password
 ### Join Tournament as Club
 POST http://localhost:8080/tournaments/join
 Authorization: Basic admin:password
-Content-Type: application/application/json
+Content-Type: application/json
 {
     "clubId": 1,
     "tournamentId": 1
 }
 
+### View All Clubs in Tournament
+GET http://localhost:8080/tournaments/{id}/clubs
+Authorization: Basic admin:password
+Content-Type: application/json
+{
+    "tournamentId": 1
+}
 
 
