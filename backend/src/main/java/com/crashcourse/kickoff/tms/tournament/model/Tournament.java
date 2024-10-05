@@ -32,13 +32,13 @@ public class Tournament {
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Location location;
 
-    private int maxTeams = 0;
+    private Integer maxTeams = 0;
     private TournamentFormat tournamentFormat;
     private KnockoutFormat knockoutFormat;
     private List<Float> prizePool;
 
-    private int minRank;
-    private int maxRank;
+    private Integer minRank;
+    private Integer maxRank;
 
     @ManyToMany
     @JoinTable(
