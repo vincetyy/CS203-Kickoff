@@ -34,10 +34,33 @@ Content-Type: application/json
   "joinedClubIds": [1, 2]
 }
 
+### Create Tournament with Optional Missing
+POST http://localhost:8080/tournaments
+Authorization: Basic admin:password
+Content-Type: application/application/json
+
+{
+  "name": "Spring Championship",
+  "startDateTime": "2024-05-01T09:00:00",
+  "endDateTime": "2024-05-03T18:00:00",
+  "locationId": 1,
+  "maxTeams": 16,
+  "tournamentFormat": "FIVE_SIDE",
+  "knockoutFormat": "SINGLE_ELIM"
+}
+
 ### View All Tournaments
 GET http://localhost:8080/tournaments
 Authorization: Basic admin:password
 
+### Join Tournament as Club
+POST http://localhost:8080/tournaments/join
+Authorization: Basic admin:password
+Content-Type: application/application/json
+{
+    "clubId": 1,
+    "tournamentId": 1
+}
 
 
 

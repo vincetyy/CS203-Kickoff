@@ -1,7 +1,6 @@
 package com.crashcourse.kickoff.tms.tournament.controller;
 
-import com.crashcourse.kickoff.tms.tournament.dto.TournamentCreateDTO;
-import com.crashcourse.kickoff.tms.tournament.dto.TournamentResponseDTO;
+import com.crashcourse.kickoff.tms.tournament.dto.*;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
 
 import jakarta.validation.Valid;
@@ -84,5 +83,18 @@ public class TournamentController {
     public ResponseEntity<Void> deleteTournament(@PathVariable Long id) {
         tournamentService.deleteTournament(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Join a Tournament.
+     *
+     * @param tournamentJoinDTO DTO containing tournament creation data.
+     * @return ResponseEntity with the new Tournament data and HTTP status.
+     */
+    @PostMapping("/join")
+    public ResponseEntity<TournamentResponseDTO> joinTournamentAsClub(
+            @Valid @RequestBody TournamentJoinDTO tournamentJoinDTO) {
+        TournamentResponseDTO joinedTournament = tournamentService.joinTournamentAsClub(tournamentJoinDTO);
+        return new ResponseEntity<>(joinedTournament, HttpStatus.CREATED);
     }
 }
