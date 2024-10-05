@@ -1,5 +1,6 @@
 package com.crashcourse.kickoff.tms.tournament.service;
 
+import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.tournament.dto.*;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 
@@ -18,5 +19,7 @@ public interface TournamentService {
     void deleteTournament(Long id);
 
     TournamentResponseDTO joinTournamentAsClub(TournamentJoinDTO tournamentJoinDTO);
+
+    List<Club> getAllClubsInTournament(Long id);
 
 }

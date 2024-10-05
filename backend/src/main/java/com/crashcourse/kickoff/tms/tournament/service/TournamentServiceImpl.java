@@ -169,5 +169,16 @@ public class TournamentServiceImpl implements TournamentService {
         return mapToResponseDTO(updatedTournament);
     } 
 
+    /**
+     * @param id Tournament ID
+     * @return List of Club objects
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Club> getAllClubsInTournament(Long id) {
+        Tournament tournament = tournamentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + id));
+        return tournament.getJoinedClubs();
+    }
     
 }

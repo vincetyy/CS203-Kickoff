@@ -30,8 +30,7 @@ Content-Type: application/json
   "knockoutFormat": "SINGLE_ELIM",
   "prizePool": [5000.00],
   "minRank": 1,
-  "maxRank": 100,
-  "joinedClubIds": [1, 2]
+  "maxRank": 100
 }
 
 ### Create Tournament with Optional Missing
