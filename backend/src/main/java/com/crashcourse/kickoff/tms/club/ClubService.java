@@ -11,6 +11,7 @@ import com.crashcourse.kickoff.tms.club.exception.ClubAlreadyExistsException;
 import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
 import com.crashcourse.kickoff.tms.club.model.PlayerApplication;
 import com.crashcourse.kickoff.tms.club.model.ApplicationStatus;
+import com.crashcourse.kickoff.tms.club.model.ClubInvitation;
 import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
 import com.crashcourse.kickoff.tms.club.repository.PlayerApplicationRepository;
 import com.crashcourse.kickoff.tms.club.exception.PlayerAlreadyAppliedException;
@@ -42,7 +43,15 @@ public interface ClubService {
 
     Club removePlayerFromClub(Long clubId, Long playerId) throws Exception;
 
+    Club invitePlayerToClub(Long clubId, Long playerId, Long captainId) throws Exception;
+
+    Club acceptInvite(Long playerId, Long clubId) throws Exception;
+
     void applyToClub(PlayerApplicationDTO applicationDTO) throws Exception;
 
     List<Club> getClubsByIds(List<Long> clubIds);
+
+    List<ClubInvitation> getPlayerInvitations(Long playerId) throws Exception;
+
+    boolean isCaptain(Long clubId, PlayerProfile player);
 }

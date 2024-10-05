@@ -30,3 +30,25 @@ Content-Type: application/json
 {
     "preferredPosition": "POSITION_MIDFIELDER"
 }
+
+### Create a new user
+POST http://localhost:8080/users
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+  "username": "player",
+  "password": "password123"
+}
+
+### Assign a PlayerProfile to the user
+POST http://localhost:8080/users/3/playerProfile
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+    "preferredPosition": "POSITION_DEFENDER",  
+    "profileDescription": "I love playing as a defender!"
+}
+
+
