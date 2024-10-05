@@ -7,17 +7,15 @@ import lombok.*;
 import jakarta.persistence.*;
 
 @Entity
-@Getter
-@Setter
-@ToString
-@AllArgsConstructor
-@NoArgsConstructor
-@EqualsAndHashCode
+@Data
 public class PlayerProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnore
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @ManyToOne
     @JoinColumn(name="club_id")
     private Club club;
@@ -25,6 +23,8 @@ public class PlayerProfile {
     // prevents cyclical dependency
     // i don't know if this is the correct way to do it someone pls think this through
     @JsonIgnore
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @OneToOne(mappedBy = "playerProfile", cascade = CascadeType.ALL)
     private User user;
     

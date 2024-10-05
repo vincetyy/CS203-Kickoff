@@ -25,7 +25,7 @@ import java.util.Optional;
 
 public interface ClubService {
 
-    Club createClub(@Valid Club club, Long creatorId);
+    Club createClub(@Valid Club club, Long creatorId) throws Exception;
 
     List<Club> getAllClubs();
 
@@ -52,4 +52,6 @@ public interface ClubService {
     List<ClubInvitation> getPlayerInvitations(Long playerId) throws Exception;
 
     boolean isCaptain(Long clubId, PlayerProfile player);
+
+    List<PlayerProfile> getPlayers(Long clubId);
 }

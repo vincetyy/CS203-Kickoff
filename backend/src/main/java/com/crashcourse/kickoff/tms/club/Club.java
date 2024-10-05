@@ -43,6 +43,7 @@ public class Club {
     @Size(max = MAX_PLAYERS_IN_CLUB, message = "A club cannot have more than " +  MAX_PLAYERS_IN_CLUB + " players")
     private List<PlayerProfile> players = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "joinedClubs")
     private List<Tournament> tournaments = new ArrayList<>();
 }
