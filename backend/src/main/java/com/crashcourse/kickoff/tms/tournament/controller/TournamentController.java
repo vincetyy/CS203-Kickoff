@@ -1,5 +1,6 @@
 package com.crashcourse.kickoff.tms.tournament.controller;
 
+import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.tournament.dto.*;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
 
@@ -96,5 +97,16 @@ public class TournamentController {
             @Valid @RequestBody TournamentJoinDTO tournamentJoinDTO) {
         TournamentResponseDTO joinedTournament = tournamentService.joinTournamentAsClub(tournamentJoinDTO);
         return new ResponseEntity<>(joinedTournament, HttpStatus.CREATED);
+    }
+
+    /**
+     * Retrieve all Tournaments.
+     *
+     * @return ResponseEntity with the list of clubs for a given tournament.
+     */
+    @GetMapping("/{id}/clubs")
+    public ResponseEntity<List<Club>> getClubsInTournament(@PathVariable Long id) {
+        List<Club> clubs = tournamentService.getAllClubsInTournament(id);
+        return ResponseEntity.ok(clubs);
     }
 }
