@@ -6,14 +6,15 @@ import com.crashcourse.kickoff.tms.user.model.PlayerPosition;
 import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
 import com.crashcourse.kickoff.tms.user.model.User;
 import com.crashcourse.kickoff.tms.user.repository.HostProfileRepository;
+import com.crashcourse.kickoff.tms.user.repository.PlayerProfileRepository;
 
 import java.util.*;
 
 @Service
 public class PlayerProfileServiceImpl implements PlayerProfileService {
-    private HostProfileRepository playerProfiles;
+    private PlayerProfileRepository playerProfiles;
 
-    public PlayerProfileServiceImpl(HostProfileRepository playerProfiles) {
+    public PlayerProfileServiceImpl(PlayerProfileRepository playerProfiles) {
         this.playerProfiles = playerProfiles;
     }
 
