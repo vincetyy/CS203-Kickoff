@@ -1,12 +1,15 @@
-import { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchClubsAsync, applyToClubAsync } from '../store/clubSlice'
+import { AppDispatch, RootState } from '../store'
 import { Search } from 'lucide-react'
 import { Input } from "../components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog"
 import { Button } from "../components/ui/button"
 import ClubCard from '../components/ClubCard'
-import axios from 'axios'
 import { Toaster, toast } from 'react-hot-toast'
+import { Club } from '../types/club'
 
 interface Club {
   id: number
@@ -25,40 +28,17 @@ enum PlayerPosition {
 }
 
 export default function ClubPage() {
-  const [clubs, setClubs] = useState<Club[]>([])
+  const dispatch = useDispatch<AppDispatch>()
+  const { clubs, status, error } = useSelector((state: RootState) => state.clubs)
   const [filteredClubs, setFilteredClubs] = useState<Club[]>([])
   const [searchTerm, setSearchTerm] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [selectedClub, setSelectedClub] = useState<Club | null>(null)
   const [selectedPosition, setSelectedPosition] = useState<PlayerPosition | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   useEffect(() => {
-    const fetchClubs = async () => {
-      try {
-        const response = await axios.get('http://localhost:8080/clubs', {
-          auth: {
-            username: 'admin',
-            password: 'password'
-          },
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          }
-        });
-        setClubs(response.data);
-        setFilteredClubs(response.data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching clubs:', err);
-        setError('Failed to fetch clubs');
-        setLoading(false);
-      }
-    };
-
-    fetchClubs();
-  }, []);
+    dispatch(fetchClubsAsync())
+  }, [dispatch])
 
   useEffect(() => {
     const results = clubs.filter(club =>
@@ -84,22 +64,11 @@ export default function ClubPage() {
     if (!selectedClub || !selectedPosition) return;
 
     try {
-      await axios.post(`http://localhost:8080/clubs/${selectedClub.id}/apply`, 
-        { 
-          playerProfileId: 1, // Assuming a fixed player profile ID for now
-          desiredPosition: selectedPosition 
-        },
-        {
-          auth: {
-            username: 'admin',
-            password: 'password'
-          },
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          }
-        }
-      );
+      await dispatch(applyToClubAsync({
+        clubId: selectedClub.id,
+        playerProfileId: 1,
+        desiredPosition: selectedPosition
+      })).unwrap();
       toast.success(`Successfully applied to ${selectedClub.name} as ${selectedPosition.replace('POSITION_', '')}`, {
         duration: 3000,
         position: 'top-center',
@@ -109,7 +78,7 @@ export default function ClubPage() {
       setSelectedPosition(null);
     } catch (err) {
       console.error('Error applying to club:', err);
-      toast.error(`${(err as any).response?.data || (err as Error).message}`, {
+      toast.error(`${(err as any).message}`, {
         duration: 4000,
         position: 'top-center',
       });
@@ -120,8 +89,8 @@ export default function ClubPage() {
     setSelectedPosition(position as PlayerPosition);
   };
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>Error: {error}</div>
+  if (status === 'loading') return <div>Loading...</div>
+  if (status === 'failed') return <div>Error: {error}</div>
 
   return (
     <>

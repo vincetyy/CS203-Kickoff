@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchTournamentsAsync, joinTournamentAsync, createTournamentAsync } from '../store/tournamentSlice'
+import { AppDispatch, RootState } from '../store'
 import { Search } from 'lucide-react'
 import { Input } from "../components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
 import { Button } from "../components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog"
-import axios from 'axios'
 import { Toaster, toast } from 'react-hot-toast'
 import TournamentCard from '../components/TournamentCard'
 
@@ -29,13 +31,12 @@ interface Tournament {
 }
 
 export default function TournamentsPage() {
-  const [tournaments, setTournaments] = useState<Tournament[]>([])
+  const dispatch = useDispatch<AppDispatch>()
+  const { tournaments, status, error } = useSelector((state: RootState) => state.tournaments)
   const [filteredTournaments, setFilteredTournaments] = useState<Tournament[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [teamSizeFilter, setTeamSizeFilter] = useState<string | null>(null)
   const [knockoutFormatFilter, setKnockoutFormatFilter] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
@@ -51,31 +52,9 @@ export default function TournamentsPage() {
     maxRank: 0,
   })
 
-  const fetchTournaments = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/tournaments', {
-        auth: {
-          username: 'admin',
-          password: 'password'
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        }
-      });
-      setTournaments(response.data);
-      setFilteredTournaments(response.data);
-      setLoading(false);
-    } catch (err) {
-      console.error('Error fetching tournaments:', err);
-      setError('Failed to fetch tournaments');
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchTournaments();
-  }, []);
+    dispatch(fetchTournamentsAsync())
+  }, [dispatch])
 
   useEffect(() => {
     let results = tournaments.filter(tournament =>
@@ -114,33 +93,20 @@ export default function TournamentsPage() {
     if (!selectedTournament) return;
 
     try {
-      await axios.post('http://localhost:8080/tournaments/join', 
-        { 
-          clubId: 1, // Hardcoded club ID
-          tournamentId: selectedTournament.id 
-        },
-        {
-          auth: {
-            username: 'admin',
-            password: 'password'
-          },
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          }
-        }
-      );
+      await dispatch(joinTournamentAsync({ 
+        clubId: 1, // Hardcoded club ID
+        tournamentId: selectedTournament.id 
+      })).unwrap();
       toast.success(`Successfully joined ${selectedTournament.name}`, {
         duration: 3000,
         position: 'top-center',
       });
       setIsDialogOpen(false);
       setSelectedTournament(null);
-      // Reload tournaments after joining
-      await fetchTournaments();
+      dispatch(fetchTournamentsAsync()); // Refresh tournaments after joining
     } catch (err) {
       console.error('Error joining tournament:', err);
-      toast.error(`${(err as any).response?.data?.message || (err as Error).message}`, {
+      toast.error(`${(err as any).message}`, {
         duration: 4000,
         position: 'top-center',
       });
@@ -150,25 +116,16 @@ export default function TournamentsPage() {
   const handleCreateTournament = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await axios.post('http://localhost:8080/tournaments', newTournament, {
-        auth: {
-          username: 'admin',
-          password: 'password'
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        }
-      })
+      await dispatch(createTournamentAsync(newTournament)).unwrap();
       toast.success('Tournament created successfully!', {
         duration: 3000,
         position: 'top-center',
       })
       setIsCreateDialogOpen(false)
-      fetchTournaments()
+      dispatch(fetchTournamentsAsync()); // Refresh tournaments after creating
     } catch (err) {
       console.error('Error creating tournament:', err)
-      toast.error(`Failed to create tournament: ${(err as any).response?.data?.message || (err as Error).message}`, {
+      toast.error(`Failed to create tournament: ${(err as any).message}`, {
         duration: 4000,
         position: 'top-center',
       })
@@ -180,8 +137,8 @@ export default function TournamentsPage() {
     setNewTournament(prev => ({ ...prev, [name]: value }))
   }
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>Error: {error}</div>
+  if (status === 'loading') return <div>Loading...</div>
+  if (status === 'failed') return <div>Error: {error}</div>
 
   return (
     <>
@@ -202,7 +159,7 @@ export default function TournamentsPage() {
       {/* Search, Filters, and Create Button */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-2 lg:space-y-0 lg:space-x-4 mb-6">
         <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4 w-full lg:w-auto">
-          <div className="relative w-full lg:w-[300px]"> {/* Increased width here */}
+          <div className="relative w-full lg:w-[300px]">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
             <Input
               type="search"
@@ -350,7 +307,7 @@ export default function TournamentsPage() {
               </div>
               <div>
                 <label htmlFor="tournamentFormat" className="block text-sm font-medium text-gray-300">Tournament Format</label>
-                <Select name="tournamentFormat" onValueChange={(value) => handleInputChange({ target: { name: 'tournamentFormat', value } } as any)}>
+                <Select onValueChange={(value) => handleInputChange({ target: { name: 'tournamentFormat', value } } as any)}>
                   <SelectTrigger className="w-full mt-1">
                     <SelectValue placeholder="Select format" />
                   </SelectTrigger>
@@ -362,7 +319,7 @@ export default function TournamentsPage() {
               </div>
               <div>
                 <label htmlFor="knockoutFormat" className="block text-sm font-medium text-gray-300">Knockout Format</label>
-                <Select name="knockoutFormat" onValueChange={(value) => handleInputChange({ target: { name: 'knockoutFormat', value } } as any)}>
+                <Select onValueChange={(value) => handleInputChange({ target: { name: 'knockoutFormat', value } } as any)}>
                   <SelectTrigger className="w-full mt-1">
                     <SelectValue placeholder="Select format" />
                   </SelectTrigger>
