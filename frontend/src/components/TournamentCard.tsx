@@ -11,15 +11,26 @@ interface TournamentCardProps {
   children?: React.ReactNode
 }
 
+const formatTournamentFormat = (format: string): string => {
+  switch (format) {
+    case 'FIVE_SIDE':
+      return 'Five-a-side';
+    case 'SEVEN_SIDE':
+      return 'Seven-a-side';
+    default:
+      return format;
+  }
+};
+
 export default function TournamentCard({ name, startDate, endDate, format, teams, image, children }: TournamentCardProps) {
   return (
     <Card className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
       <CardContent className="p-0">
         <img src={image} alt={name} className="w-full h-48 object-cover rounded-t-lg" />
-        <div className="p-4">
+        <div className="p-4 space-y-2">
           <h3 className="text-lg font-semibold text-white">{name}</h3>
           <p className="text-sm text-gray-300">{startDate} - {endDate}</p>
-          <p className="text-sm text-gray-300">Format: {format}</p>
+          <p className="text-sm text-gray-300">Format: {formatTournamentFormat(format)}</p>
         </div>
       </CardContent>
       <CardFooter className="flex justify-between items-center p-4 border-t border-gray-700">

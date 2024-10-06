@@ -3,6 +3,7 @@ import { Search } from 'lucide-react'
 import { Input } from "../components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
 import { Button } from "../components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog"
 import axios from 'axios'
 import { Toaster, toast } from 'react-hot-toast'
 import TournamentCard from '../components/TournamentCard'
@@ -35,30 +36,32 @@ export default function TournamentsPage() {
   const [knockoutFormatFilter, setKnockoutFormatFilter] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null)
+
+  const fetchTournaments = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/tournaments', {
+        auth: {
+          username: 'admin',
+          password: 'password'
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        }
+      });
+      setTournaments(response.data);
+      setFilteredTournaments(response.data);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching tournaments:', err);
+      setError('Failed to fetch tournaments');
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchTournaments = async () => {
-      try {
-        const response = await axios.get('http://localhost:8080/tournaments', {
-          auth: {
-            username: 'admin',
-            password: 'password'
-          },
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          }
-        });
-        setTournaments(response.data);
-        setFilteredTournaments(response.data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching tournaments:', err);
-        setError('Failed to fetch tournaments');
-        setLoading(false);
-      }
-    };
-
     fetchTournaments();
   }, []);
 
@@ -88,6 +91,48 @@ export default function TournamentsPage() {
 
   const handleKnockoutFormatFilter = (value: string) => {
     setKnockoutFormatFilter(value === 'ALL' ? null : value);
+  };
+
+  const handleJoin = (tournament: Tournament) => {
+    setSelectedTournament(tournament);
+    setIsDialogOpen(true);
+  };
+
+  const handleConfirmJoin = async () => {
+    if (!selectedTournament) return;
+
+    try {
+      await axios.post('http://localhost:8080/tournaments/join', 
+        { 
+          clubId: 1, // Hardcoded club ID
+          tournamentId: selectedTournament.id 
+        },
+        {
+          auth: {
+            username: 'admin',
+            password: 'password'
+          },
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          }
+        }
+      );
+      toast.success(`Successfully joined ${selectedTournament.name}`, {
+        duration: 3000,
+        position: 'top-center',
+      });
+      setIsDialogOpen(false);
+      setSelectedTournament(null);
+      // Reload tournaments after joining
+      await fetchTournaments();
+    } catch (err) {
+      console.error('Error joining tournament:', err);
+      toast.error(`${(err as any).response?.data?.message || (err as Error).message}`, {
+        duration: 4000,
+        position: 'top-center',
+      });
+    }
   };
 
   if (loading) return <div>Loading...</div>
@@ -130,9 +175,9 @@ export default function TournamentsPage() {
             <SelectValue placeholder="Team Size" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="ALL" displayValue="All Sizes">All Sizes</SelectItem>
-            <SelectItem value="FIVE_SIDE" displayValue="Five-a-side">Five-a-side</SelectItem>
-            <SelectItem value="SEVEN_SIDE" displayValue="Seven-a-side">Seven-a-side</SelectItem>
+            <SelectItem value="ALL">All Sizes</SelectItem>
+            <SelectItem value="FIVE_SIDE">Five-a-side</SelectItem>
+            <SelectItem value="SEVEN_SIDE">Seven-a-side</SelectItem>
           </SelectContent>
         </Select>
         <Select onValueChange={handleKnockoutFormatFilter}>
@@ -140,9 +185,9 @@ export default function TournamentsPage() {
             <SelectValue placeholder="Knockout Format" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="ALL" displayValue="All Formats">All Formats</SelectItem>
-            <SelectItem value="SINGLE_ELIM" displayValue="Single Elimination">Single Elimination</SelectItem>
-            <SelectItem value="DOUBLE_ELIM" displayValue="Double Elimination">Double Elimination</SelectItem>
+            <SelectItem value="ALL">All Formats</SelectItem>
+            <SelectItem value="SINGLE_ELIM">Single Elimination</SelectItem>
+            <SelectItem value="DOUBLE_ELIM">Double Elimination</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -159,10 +204,36 @@ export default function TournamentsPage() {
             teams={`${tournament.joinedClubs.length}/${tournament.maxTeams}`}
             image={`https://picsum.photos/seed/${tournament.id}/400/300`}
           >
-            <Button onClick={() => console.log(`Join tournament ${tournament.id}`)}>Join</Button>
+            <Button onClick={() => handleJoin(tournament)}>Join</Button>
           </TournamentCard>
         ))}
       </div>
+
+      {/* Join confirmation dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Join {selectedTournament?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            <p>Are you sure you want to join this tournament?</p>
+          </div>
+          <div className="flex flex-col sm:flex-row justify-between mt-4 space-y-2 sm:space-y-0 sm:space-x-2">
+            <button 
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 w-full" 
+              onClick={() => setIsDialogOpen(false)}
+            >
+              Cancel
+            </button>
+            <button 
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full"
+              onClick={handleConfirmJoin}
+            >
+              Confirm
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
