@@ -116,6 +116,10 @@ export default function ClubPage() {
     }
   };
 
+  const handlePositionChange = (position: string) => {
+    setSelectedPosition(position as PlayerPosition);
+  };
+
   if (loading) return <div>Loading...</div>
   if (error) return <div>Error: {error}</div>
 
@@ -207,7 +211,7 @@ export default function ClubPage() {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="flex flex-col justify-between">
-              <Select onValueChange={(value) => setSelectedPosition(value as PlayerPosition)}>
+              <Select onValueChange={handlePositionChange}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select your preferred position" />
                 </SelectTrigger>

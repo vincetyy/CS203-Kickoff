@@ -130,9 +130,9 @@ export default function TournamentsPage() {
             <SelectValue placeholder="Team Size" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="ALL">All Sizes</SelectItem>
-            <SelectItem value="FIVE_SIDE">Five-a-side</SelectItem>
-            <SelectItem value="SEVEN_SIDE">Seven-a-side</SelectItem>
+            <SelectItem value="ALL" displayValue="All Sizes">All Sizes</SelectItem>
+            <SelectItem value="FIVE_SIDE" displayValue="Five-a-side">Five-a-side</SelectItem>
+            <SelectItem value="SEVEN_SIDE" displayValue="Seven-a-side">Seven-a-side</SelectItem>
           </SelectContent>
         </Select>
         <Select onValueChange={handleKnockoutFormatFilter}>
@@ -140,9 +140,9 @@ export default function TournamentsPage() {
             <SelectValue placeholder="Knockout Format" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="ALL">All Formats</SelectItem>
-            <SelectItem value="SINGLE_ELIM">Single Elimination</SelectItem>
-            <SelectItem value="DOUBLE_ELIM">Double Elimination</SelectItem>
+            <SelectItem value="ALL" displayValue="All Formats">All Formats</SelectItem>
+            <SelectItem value="SINGLE_ELIM" displayValue="Single Elimination">Single Elimination</SelectItem>
+            <SelectItem value="DOUBLE_ELIM" displayValue="Double Elimination">Double Elimination</SelectItem>
           </SelectContent>
         </Select>
       </div>
