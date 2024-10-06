@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { fetchTournaments, joinTournament, createTournament } from '../services/tournamentService';
 import { Tournament } from '../types/tournament';
 
@@ -30,7 +30,11 @@ const tournamentSlice = createSlice({
     status: 'idle',
     error: null as string | null,
   },
-  reducers: {},
+  reducers: {
+    updateTournaments: (state, action: PayloadAction<Tournament[]>) => {
+      state.tournaments = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchTournamentsAsync.pending, (state) => {
@@ -52,5 +56,7 @@ const tournamentSlice = createSlice({
       });
   },
 });
+
+export const { updateTournaments } = tournamentSlice.actions;
 
 export default tournamentSlice.reducer;

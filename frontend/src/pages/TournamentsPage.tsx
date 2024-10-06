@@ -93,7 +93,7 @@ export default function TournamentsPage() {
     if (!selectedTournament) return;
 
     try {
-      await dispatch(joinTournamentAsync({ 
+      const result = await dispatch(joinTournamentAsync({ 
         clubId: 1, // Hardcoded club ID
         tournamentId: selectedTournament.id 
       })).unwrap();
@@ -108,10 +108,11 @@ export default function TournamentsPage() {
         position: 'top-center',
       });
 
-      // Fetch tournaments after a short delay
-      setTimeout(() => {
-        dispatch(fetchTournamentsAsync());
-      }, 100);
+      // Update the specific tournament in the state
+      const updatedTournaments = tournaments.map(t => 
+        t.id === selectedTournament.id ? { ...t, joinedClubs: [...t.joinedClubs, { id: 1 }] } : t
+      );
+      dispatch({ type: 'tournaments/updateTournaments', payload: updatedTournaments });
 
     } catch (err) {
       console.error('Error joining tournament:', err);
@@ -122,8 +123,7 @@ export default function TournamentsPage() {
     }
   };
 
-  const handleCreateTournament = async (e: React.FormEvent) => {
-    e.preventDefault() // This line prevents the default form submission
+  const handleCreateTournament = async () => {
     if (!newTournament.name || !newTournament.startDateTime || !newTournament.endDateTime || !newTournament.locationId || !newTournament.maxTeams || !newTournament.tournamentFormat || !newTournament.knockoutFormat) {
       toast.error('Please fill in all required fields', {
         duration: 3000,
@@ -135,15 +135,13 @@ export default function TournamentsPage() {
     setIsCreateDialogOpen(false) // Close the dialog immediately
 
     try {
-      const result = await dispatch(createTournamentAsync(newTournament)).unwrap();
+      await dispatch(createTournamentAsync(newTournament)).unwrap();
       
-      // Show the success toast after a short delay
-      setTimeout(() => {
-        toast.success('Tournament created successfully!', {
-          duration: 3000,
-          position: 'top-center',
-        })
-      }, 100);
+      // Show the success toast
+      toast.success('Tournament created successfully!', {
+        duration: 3000,
+        position: 'top-center',
+      });
 
       // Reset the form
       setNewTournament({
@@ -156,12 +154,7 @@ export default function TournamentsPage() {
         knockoutFormat: '',
         minRank: 0,
         maxRank: 0,
-      })
-
-      // Fetch tournaments after a short delay
-      setTimeout(() => {
-        dispatch(fetchTournamentsAsync());
-      }, 200);
+      });
 
     } catch (err) {
       console.error('Error creating tournament:', err)
