@@ -7,24 +7,32 @@ import axios from 'axios'
 import { Toaster, toast } from 'react-hot-toast'
 import TournamentCard from '../components/TournamentCard'
 
+interface Location {
+  id: number
+  name: string
+}
+
 interface Tournament {
   id: number
   name: string
   startDateTime: string
   endDateTime: string
-  locationId: number
+  location: Location
   maxTeams: number
   tournamentFormat: string
   knockoutFormat: string
-  minRank: number
-  maxRank: number
-  joinedClubIds: number[]
+  minRank: number | null
+  maxRank: number | null
+  joinedClubs: any[] // You might want to define a more specific type for clubs
+  over: boolean
 }
 
 export default function TournamentsPage() {
   const [tournaments, setTournaments] = useState<Tournament[]>([])
   const [filteredTournaments, setFilteredTournaments] = useState<Tournament[]>([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [teamSizeFilter, setTeamSizeFilter] = useState<string | null>(null)
+  const [knockoutFormatFilter, setKnockoutFormatFilter] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -55,14 +63,31 @@ export default function TournamentsPage() {
   }, []);
 
   useEffect(() => {
-    const results = tournaments.filter(tournament =>
+    let results = tournaments.filter(tournament =>
       tournament.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    if (teamSizeFilter) {
+      results = results.filter(tournament => tournament.tournamentFormat === teamSizeFilter);
+    }
+
+    if (knockoutFormatFilter) {
+      results = results.filter(tournament => tournament.knockoutFormat === knockoutFormatFilter);
+    }
+
     setFilteredTournaments(results);
-  }, [searchTerm, tournaments]);
+  }, [searchTerm, teamSizeFilter, knockoutFormatFilter, tournaments]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
+  };
+
+  const handleTeamSizeFilter = (value: string) => {
+    setTeamSizeFilter(value === 'ALL' ? null : value);
+  };
+
+  const handleKnockoutFormatFilter = (value: string) => {
+    setKnockoutFormatFilter(value === 'ALL' ? null : value);
   };
 
   if (loading) return <div>Loading...</div>
@@ -100,20 +125,22 @@ export default function TournamentsPage() {
 
       {/* Filters */}
       <div className="flex flex-col lg:flex-row justify-end space-y-2 lg:space-y-0 lg:space-x-4 mb-6">
-        <Select>
+        <Select onValueChange={handleTeamSizeFilter}>
           <SelectTrigger className="w-full lg:w-[180px] bg-gray-800 border-gray-700 text-white">
-            <SelectValue placeholder="Format" />
+            <SelectValue placeholder="Team Size" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="ALL">All Sizes</SelectItem>
             <SelectItem value="FIVE_SIDE">Five-a-side</SelectItem>
             <SelectItem value="SEVEN_SIDE">Seven-a-side</SelectItem>
           </SelectContent>
         </Select>
-        <Select>
+        <Select onValueChange={handleKnockoutFormatFilter}>
           <SelectTrigger className="w-full lg:w-[180px] bg-gray-800 border-gray-700 text-white">
             <SelectValue placeholder="Knockout Format" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="ALL">All Formats</SelectItem>
             <SelectItem value="SINGLE_ELIM">Single Elimination</SelectItem>
             <SelectItem value="DOUBLE_ELIM">Double Elimination</SelectItem>
           </SelectContent>
@@ -129,7 +156,7 @@ export default function TournamentsPage() {
             startDate={new Date(tournament.startDateTime).toLocaleDateString()}
             endDate={new Date(tournament.endDateTime).toLocaleDateString()}
             format={tournament.tournamentFormat}
-            teams={`${tournament.joinedClubIds.length}/${tournament.maxTeams}`}
+            teams={`${tournament.joinedClubs.length}/${tournament.maxTeams}`}
             image={`https://picsum.photos/seed/${tournament.id}/400/300`}
           >
             <Button onClick={() => console.log(`Join tournament ${tournament.id}`)}>Join</Button>
