@@ -82,3 +82,18 @@ html, body, #root {
   flex-direction: column;
   min-height: 100vh;
 }
+
+/* Add these styles at the end of the file */
+.w-full {
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .lg\:w-\[300px\] {
+    width: 300px;
+  }
+}
+
+.h-10 {
+  height: 2.5rem;
+}

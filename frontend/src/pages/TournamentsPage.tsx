@@ -186,20 +186,6 @@ export default function TournamentsPage() {
   return (
     <>
       <Toaster />
-      {/* Search and actions */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 space-y-4 lg:space-y-0">
-        <div className="relative w-full lg:w-64">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-          <Input
-            type="search"
-            placeholder="Search tournaments"
-            className="pl-8 bg-gray-800 border-gray-700 w-full"
-            value={searchTerm}
-            onChange={handleSearch}
-          />
-        </div>
-      </div>
-
       {/* Banner */}
       <div className="bg-blue-600 rounded-lg p-4 lg:p-6 mb-6 flex items-center space-x-4">
         <div className="bg-yellow-400 rounded-full p-2 lg:p-3">
@@ -213,9 +199,19 @@ export default function TournamentsPage() {
         </div>
       </div>
 
-      {/* Filters and Create Button */}
+      {/* Search, Filters, and Create Button */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-2 lg:space-y-0 lg:space-x-4 mb-6">
-        <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
+        <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4 w-full lg:w-auto">
+          <div className="relative w-full lg:w-[300px]"> {/* Increased width here */}
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="search"
+              placeholder="Search tournaments"
+              className="pl-8 bg-gray-800 border-gray-700 w-full h-10"
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+          </div>
           <Select onValueChange={handleTeamSizeFilter}>
             <SelectTrigger className="w-full lg:w-[180px] bg-gray-800 border-gray-700 text-white">
               <SelectValue placeholder="Team Size" />
@@ -237,7 +233,7 @@ export default function TournamentsPage() {
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+        <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700 w-full lg:w-auto">
           Create Tournament
         </Button>
       </div>
