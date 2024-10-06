@@ -1,12 +1,14 @@
+export interface Location {
+  id: number;
+  name: string;
+}
+
 export interface Tournament {
   id: number;
   name: string;
   startDateTime: string;
   endDateTime: string;
-  location: {
-    id: number;
-    name: string;
-  };
+  location: Location;
   maxTeams: number;
   tournamentFormat: string;
   knockoutFormat: string;

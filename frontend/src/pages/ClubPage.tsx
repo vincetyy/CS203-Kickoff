@@ -11,14 +11,7 @@ import ClubCard from '../components/ClubCard'
 import { Toaster, toast } from 'react-hot-toast'
 import { Club } from '../types/club'
 
-interface Club {
-  id: number
-  name: string
-  description?: string
-  players: { id: number }[]
-  elo: number
-  ratingDeviation: number
-}
+// Remove the local Club interface
 
 enum PlayerPosition {
   POSITION_FORWARD = "POSITION_FORWARD",

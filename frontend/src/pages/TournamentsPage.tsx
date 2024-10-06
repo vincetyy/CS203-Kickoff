@@ -97,13 +97,22 @@ export default function TournamentsPage() {
         clubId: 1, // Hardcoded club ID
         tournamentId: selectedTournament.id 
       })).unwrap();
+      
+      // Close the dialog first
+      setIsDialogOpen(false);
+      setSelectedTournament(null);
+
+      // Show the success toast
       toast.success(`Successfully joined ${selectedTournament.name}`, {
         duration: 3000,
         position: 'top-center',
       });
-      setIsDialogOpen(false);
-      setSelectedTournament(null);
-      dispatch(fetchTournamentsAsync()); // Refresh tournaments after joining
+
+      // Fetch tournaments after a short delay
+      setTimeout(() => {
+        dispatch(fetchTournamentsAsync());
+      }, 100);
+
     } catch (err) {
       console.error('Error joining tournament:', err);
       toast.error(`${(err as any).message}`, {
@@ -114,15 +123,46 @@ export default function TournamentsPage() {
   };
 
   const handleCreateTournament = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      await dispatch(createTournamentAsync(newTournament)).unwrap();
-      toast.success('Tournament created successfully!', {
+    e.preventDefault() // This line prevents the default form submission
+    if (!newTournament.name || !newTournament.startDateTime || !newTournament.endDateTime || !newTournament.locationId || !newTournament.maxTeams || !newTournament.tournamentFormat || !newTournament.knockoutFormat) {
+      toast.error('Please fill in all required fields', {
         duration: 3000,
         position: 'top-center',
       })
-      setIsCreateDialogOpen(false)
-      dispatch(fetchTournamentsAsync()); // Refresh tournaments after creating
+      return
+    }
+
+    setIsCreateDialogOpen(false) // Close the dialog immediately
+
+    try {
+      const result = await dispatch(createTournamentAsync(newTournament)).unwrap();
+      
+      // Show the success toast after a short delay
+      setTimeout(() => {
+        toast.success('Tournament created successfully!', {
+          duration: 3000,
+          position: 'top-center',
+        })
+      }, 100);
+
+      // Reset the form
+      setNewTournament({
+        name: '',
+        startDateTime: '',
+        endDateTime: '',
+        locationId: '',
+        maxTeams: 0,
+        tournamentFormat: '',
+        knockoutFormat: '',
+        minRank: 0,
+        maxRank: 0,
+      })
+
+      // Fetch tournaments after a short delay
+      setTimeout(() => {
+        dispatch(fetchTournamentsAsync());
+      }, 200);
+
     } catch (err) {
       console.error('Error creating tournament:', err)
       toast.error(`Failed to create tournament: ${(err as any).message}`, {
@@ -244,71 +284,71 @@ export default function TournamentsPage() {
           <DialogHeader>
             <DialogTitle>Create New Tournament</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleCreateTournament} className="space-y-4">
+          <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-300">Tournament Name</label>
+                <label htmlFor="name" className="form-label">Tournament Name</label>
                 <Input
                   id="name"
                   name="name"
                   value={newTournament.name}
                   onChange={handleInputChange}
-                  className="mt-1"
+                  className="form-input"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="locationId" className="block text-sm font-medium text-gray-300">Location ID</label>
+                <label htmlFor="locationId" className="form-label">Location ID</label>
                 <Input
                   id="locationId"
                   name="locationId"
                   type="number"
                   value={newTournament.locationId}
                   onChange={handleInputChange}
-                  className="mt-1"
+                  className="form-input"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="startDateTime" className="block text-sm font-medium text-gray-300">Start Date & Time</label>
+                <label htmlFor="startDateTime" className="form-label">Start Date & Time</label>
                 <Input
                   id="startDateTime"
                   name="startDateTime"
                   type="datetime-local"
                   value={newTournament.startDateTime}
                   onChange={handleInputChange}
-                  className="mt-1"
+                  className="form-input"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="endDateTime" className="block text-sm font-medium text-gray-300">End Date & Time</label>
+                <label htmlFor="endDateTime" className="form-label">End Date & Time</label>
                 <Input
                   id="endDateTime"
                   name="endDateTime"
                   type="datetime-local"
                   value={newTournament.endDateTime}
                   onChange={handleInputChange}
-                  className="mt-1"
+                  className="form-input"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="maxTeams" className="block text-sm font-medium text-gray-300">Max Teams</label>
+                <label htmlFor="maxTeams" className="form-label">Max Teams</label>
                 <Input
                   id="maxTeams"
                   name="maxTeams"
                   type="number"
                   value={newTournament.maxTeams}
                   onChange={handleInputChange}
-                  className="mt-1"
+                  className="form-input"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="tournamentFormat" className="block text-sm font-medium text-gray-300">Tournament Format</label>
-                <Select onValueChange={(value) => handleInputChange({ target: { name: 'tournamentFormat', value } } as any)}>
-                  <SelectTrigger className="w-full mt-1">
+                <label htmlFor="tournamentFormat" className="form-label">Tournament Format</label>
+                <Select onValueChange={(value) => setNewTournament(prev => ({ ...prev, tournamentFormat: value }))}>
+                  <SelectTrigger className="select-trigger">
                     <SelectValue placeholder="Select format" />
                   </SelectTrigger>
                   <SelectContent>
@@ -318,9 +358,9 @@ export default function TournamentsPage() {
                 </Select>
               </div>
               <div>
-                <label htmlFor="knockoutFormat" className="block text-sm font-medium text-gray-300">Knockout Format</label>
-                <Select onValueChange={(value) => handleInputChange({ target: { name: 'knockoutFormat', value } } as any)}>
-                  <SelectTrigger className="w-full mt-1">
+                <label htmlFor="knockoutFormat" className="form-label">Knockout Format</label>
+                <Select onValueChange={(value) => setNewTournament(prev => ({ ...prev, knockoutFormat: value }))}>
+                  <SelectTrigger className="select-trigger">
                     <SelectValue placeholder="Select format" />
                   </SelectTrigger>
                   <SelectContent>
@@ -330,25 +370,25 @@ export default function TournamentsPage() {
                 </Select>
               </div>
               <div>
-                <label htmlFor="minRank" className="block text-sm font-medium text-gray-300">Min Rank</label>
+                <label htmlFor="minRank" className="form-label">Min Rank</label>
                 <Input
                   id="minRank"
                   name="minRank"
                   type="number"
                   value={newTournament.minRank}
                   onChange={handleInputChange}
-                  className="mt-1"
+                  className="form-input"
                 />
               </div>
               <div>
-                <label htmlFor="maxRank" className="block text-sm font-medium text-gray-300">Max Rank</label>
+                <label htmlFor="maxRank" className="form-label">Max Rank</label>
                 <Input
                   id="maxRank"
                   name="maxRank"
                   type="number"
                   value={newTournament.maxRank}
                   onChange={handleInputChange}
-                  className="mt-1"
+                  className="form-input"
                 />
               </div>
             </div>
@@ -356,11 +396,11 @@ export default function TournamentsPage() {
               <Button type="button" onClick={() => setIsCreateDialogOpen(false)} className="bg-gray-600 hover:bg-gray-700">
                 Cancel
               </Button>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+              <Button type="button" onClick={handleCreateTournament} className="bg-blue-600 hover:bg-blue-700">
                 Create
               </Button>
             </div>
-          </form>
+          </div>
         </DialogContent>
       </Dialog>
     </>
