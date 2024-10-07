@@ -1,19 +1,25 @@
 package com.crashcourse.kickoff.tms.club;
 
-import jakarta.persistence.*;
-
-import com.crashcourse.kickoff.tms.player.PlayerProfile;
-import com.crashcourse.kickoff.tms.tournament.model.*;
-import com.crashcourse.kickoff.tms.user.model.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
+import com.crashcourse.kickoff.tms.tournament.model.Tournament;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -44,6 +50,7 @@ public class Club {
     @Size(max = MAX_PLAYERS_IN_CLUB, message = "A club cannot have more than " +  MAX_PLAYERS_IN_CLUB + " players")
     private List<PlayerProfile> players = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "joinedClubs")
     private List<Tournament> tournaments = new ArrayList<>();
 }

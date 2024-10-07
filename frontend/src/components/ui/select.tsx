@@ -7,7 +7,8 @@ interface SelectProps {
 
 interface SelectContextType {
   value: string;
-  setValue: (value: string) => void;
+  displayValue: string;
+  setValue: (value: string, displayValue: string) => void;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
@@ -17,9 +18,11 @@ const SelectContext = React.createContext<SelectContextType | undefined>(undefin
 export const Select: React.FC<SelectProps> = ({ children, onValueChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState('');
+  const [displayValue, setDisplayValue] = useState('');
 
-  const handleValueChange = (newValue: string) => {
+  const handleValueChange = (newValue: string, newDisplayValue: string) => {
     setValue(newValue);
+    setDisplayValue(newDisplayValue);
     setIsOpen(false);
     if (onValueChange) {
       onValueChange(newValue);
@@ -27,7 +30,7 @@ export const Select: React.FC<SelectProps> = ({ children, onValueChange }) => {
   };
 
   return (
-    <SelectContext.Provider value={{ value, setValue: handleValueChange, isOpen, setIsOpen }}>
+    <SelectContext.Provider value={{ value, displayValue, setValue: handleValueChange, isOpen, setIsOpen }}>
       <div className="relative">
         {children}
       </div>
@@ -61,11 +64,7 @@ export const SelectValue: React.FC<{ placeholder: string }> = ({ placeholder }) 
   const context = React.useContext(SelectContext);
   if (!context) throw new Error('SelectValue must be used within a Select');
 
-  const formatPosition = (position: string) => {
-    return position.replace('POSITION_', '').charAt(0) + position.replace('POSITION_', '').slice(1).toLowerCase();
-  }
-
-  return <span>{context.value ? formatPosition(context.value) : placeholder}</span>;
+  return <span>{context.displayValue || placeholder}</span>;
 };
 
 export const SelectContent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ children, className = '', ...props }) => {
@@ -85,6 +84,7 @@ export const SelectContent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ 
 
 interface SelectItemProps extends React.LiHTMLAttributes<HTMLLIElement> {
   value: string;
+  children: React.ReactNode;
 }
 
 export const SelectItem: React.FC<SelectItemProps> = ({ children, className = '', value, ...props }) => {
@@ -94,7 +94,7 @@ export const SelectItem: React.FC<SelectItemProps> = ({ children, className = ''
   return (
     <li
       className={`block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white cursor-pointer ${className}`}
-      onClick={() => context.setValue(value)}
+      onClick={() => context.setValue(value, children as string)}
       {...props}
     >
       {children}

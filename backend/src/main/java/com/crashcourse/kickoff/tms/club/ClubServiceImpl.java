@@ -40,7 +40,7 @@ public class ClubServiceImpl implements ClubService {
     private ClubInvitationRepository clubInvitationRepository;
 
     // jparepository has automatically implemented crud methods
-    public Club createClub(@Valid Club club, Long creatorId) {
+    public Club createClub(@Valid Club club, Long creatorId) throws Exception {
 
         // Find the PlayerProfile by ID
         PlayerProfile creator = playerProfileRepository.findById(creatorId)
@@ -58,8 +58,10 @@ public class ClubServiceImpl implements ClubService {
         if (club.getPlayers().size() > Club.MAX_PLAYERS_IN_CLUB) {
             throw new PlayerLimitExceededException(String.format("A club cannot have more than %d players", Club.MAX_PLAYERS_IN_CLUB));
         }
-
-        return clubRepository.save(club);
+        clubRepository.save(club);
+        club = addPlayerToClub(club.getId(), creatorId);
+        clubRepository.save(club);
+        return club;
     }
 
     public List<Club> getAllClubs() {
@@ -145,7 +147,11 @@ public class ClubServiceImpl implements ClubService {
         }
 
         club.getPlayers().add(player);  
-        return clubRepository.save(club);
+        player.setClub(club);
+
+        clubRepository.save(club);
+        playerProfileRepository.save(player);
+        return club;
     }
 
     // remove a player from club
@@ -265,4 +271,14 @@ public class ClubServiceImpl implements ClubService {
         return clubInvitationRepository.findByPlayerProfileIdAndStatus(playerId, ApplicationStatus.PENDING);
     }
 
+    @Override
+    public List<PlayerProfile> getPlayers(Long clubId) {
+        Optional<Club> clubOptional = clubRepository.findById(clubId);
+        if (!clubOptional.isPresent()) {
+            throw new ClubNotFoundException("Club with ID " + clubId + " not found");
+        }
+
+        Club club = clubOptional.get();
+        return club.getPlayers();
+    }
 }

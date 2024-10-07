@@ -64,4 +64,10 @@ public class UserServiceImpl implements UserService {
     public User loadUserByUsername(String userName) {
         return users.findByUsername(userName).isPresent() ? users.findByUsername(userName).get() : null;
     }
+
+    @Override
+    public User getUserById(Long userId) {
+        return users.findById(userId).orElse(null);  
+    }
+
 }

@@ -10,4 +10,5 @@ public interface UserService {
     public List<User> getUsers();
     public User loadUserByUsername(String userName);
     User addUser(NewUserDTO newUserDTO);
+    User getUserById(Long userId);   
 }
