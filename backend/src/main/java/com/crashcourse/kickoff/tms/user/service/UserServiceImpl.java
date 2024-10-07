@@ -7,9 +7,7 @@ import java.util.List;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.crashcourse.kickoff.tms.host.HostProfile;
 import com.crashcourse.kickoff.tms.host.HostProfileService;
-import com.crashcourse.kickoff.tms.player.PlayerProfile;
 import com.crashcourse.kickoff.tms.player.service.PlayerProfileService;
 import com.crashcourse.kickoff.tms.user.UserRepository;
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
@@ -49,12 +47,10 @@ public class UserServiceImpl implements UserService {
         // Build the entire object graph before saving
         switch (newUserRole) {
             case Role.ROLE_PLAYER:
-                PlayerProfile playerProfile = playerProfileService.addPlayerProfile(newUser, newUserDTO);
-                newUser.setPlayerProfile(playerProfile);
+                playerProfileService.addPlayerProfile(newUser, newUserDTO);
                 break;
             case Role.ROLE_HOST:
-                HostProfile hostProfile = hostProfileService.addHostProfile(newUser, newUserDTO);
-                newUser.setHostProfile(hostProfile);
+                hostProfileService.addHostProfile(newUser, newUserDTO);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid role: " + newUserDTO.getRole());

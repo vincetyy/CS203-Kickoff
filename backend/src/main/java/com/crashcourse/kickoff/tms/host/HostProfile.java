@@ -1,8 +1,6 @@
 package com.crashcourse.kickoff.tms.host;
 
-import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.user.model.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.*;
 import jakarta.persistence.*;
@@ -16,10 +14,10 @@ import jakarta.persistence.*;
 @EqualsAndHashCode
 public class HostProfile {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnore
-    @OneToOne(mappedBy = "hostProfile", cascade = CascadeType.ALL)  // Corrected mappedBy field
+    @OneToOne
+    @MapsId // Shares the primary key with User
+    @JoinColumn(name = "user_id")  // The foreign key column name
     private User user;
 }

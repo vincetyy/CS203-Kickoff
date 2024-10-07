@@ -1,9 +1,5 @@
 package com.crashcourse.kickoff.tms.user.model;
 
-import com.crashcourse.kickoff.tms.club.Club;
-import com.crashcourse.kickoff.tms.host.HostProfile;
-import com.crashcourse.kickoff.tms.player.PlayerProfile;
-
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,7 +8,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -24,9 +19,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -65,15 +57,6 @@ public class User implements UserDetails {
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
     private Set<Role> roles;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "player_profile_id")
-    private PlayerProfile playerProfile;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "host_profile_id")
-    private HostProfile hostProfile;
-
 
     public User(String username, String password, Set<Role> roles) {
         this.username = username;

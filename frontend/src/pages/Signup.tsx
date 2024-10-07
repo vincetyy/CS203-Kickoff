@@ -19,7 +19,7 @@ const Signup = () => {
     const [showPassword, setShowPassword] = React.useState(false);
     const [selectedPositions, setPositions] = React.useState<string[]>([]);
     const [role, setRole] = React.useState(''); // For role selection
-    const positions = ["Forward", "Midfielder", "Defender", "Goalie"];
+    const positions = ["Forward", "Midfielder", "Defender", "Goalkeeper"];
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
