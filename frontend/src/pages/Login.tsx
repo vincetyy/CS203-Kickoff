@@ -12,7 +12,7 @@ import React from "react";
 import axios from 'axios';
 
 const Login = () => {
-    const [email, setEmail] = React.useState('');
+    const [username, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [showPassword, setShowPassword] = React.useState(false);
     const [rememberMe, setRememberMe] = React.useState(false);
@@ -23,19 +23,18 @@ const Login = () => {
 
     const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-
         try {
           // Make the POST request with Basic Authentication
           const response = await axios.post('http://localhost:8080/users/login', {
-            username: email,
-            password: password,
+            username,
+            password,
         });
     
           // Handle the response after successful authentication
           if (response.status === 200) {
-    
-            const token = response.data.jwt;  // Assuming the JWT is in the 'jwt' field of the response
+            const token = response.data;  // Assuming the JWT is in the 'jwt' field of the response
             localStorage.setItem('authToken', token);  // Store JWT in localStorage
+            localStorage.setItem('username', username); 
             console.log('Login successful');
             
           }
@@ -94,20 +93,20 @@ const Login = () => {
                     <form className="mt-8 space-y-6" onSubmit={handleLogin}>
                         <div className="rounded-md shadow-sm bg space-y-4">
                             <Field className="max-w-md">
-                                <Label htmlFor="email" className="block text-sm font-medium text-gray-700 text-left mb-1">
+                                <Label htmlFor="username" className="block text-sm font-medium text-gray-700 text-left mb-1">
                                     Username
                                 </Label>
                                 <Input
-                                    id="email"
-                                    name="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    id="username"
+                                    name="username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
                                     required
                                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                                    placeholder="Email or phone number"
+                                    placeholder="Enter Username"
                                 />
-                                <label htmlFor="email" className="sr-only">
-                                    Email address or phone number
+                                <label htmlFor="username" className="sr-only">
+                                    Username
                                 </label>
                             </Field>
                             <div>

@@ -14,6 +14,7 @@ import com.crashcourse.kickoff.tms.user.model.User;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -25,6 +26,11 @@ public class JwtUtil {
     private final String JWT_SECRET_KEY = dotenv.get("JWT_SECRET_KEY"); // Retrieve the secret key
     private final long jwtExpirationInMillis = 300000; // 5 mins in milliseconds
 
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(JWT_SECRET_KEY); // Decode the Base64-encoded secret key
+        return Keys.hmacShaKeyFor(keyBytes); // Generate the SecretKey using the decoded bytes
+    }
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -33,30 +39,41 @@ public class JwtUtil {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    public Long extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("userId", Long.class));
+    }
+
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(JWT_SECRET_KEY)
-                .parseClaimsJws(token)
-                .getBody();
+        SecretKey key = getSigningKey();
+
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            return null;
+        }
     }
 
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(User userDetails) {
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userDetails.getUsername());
+        claims.put("userId", user.getId()); // Add userId to the claims
+        return createToken(claims, user.getUsername());
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
-        byte[] keyBytes = Decoders.BASE64.decode(JWT_SECRET_KEY); // Decode the base64-encoded key
-        SecretKey key = Keys.hmacShaKeyFor(keyBytes); // Create the signing key
+        SecretKey key = getSigningKey();
 
         return Jwts.builder()
                 .setClaims(claims)

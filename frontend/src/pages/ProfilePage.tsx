@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import '../utils/axiosSetup'; 
+
 import { Toaster, toast } from 'react-hot-toast';
 
 // Enums for PlayerPosition
@@ -43,21 +45,20 @@ export default function PlayerProfilePage() {
   const [profileDescription, setProfileDescription] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const username = localStorage.getItem('username');
 
   // Fetch the player profile on component mount
   useEffect(() => {
+    if (!username) {
+      setError('User not logged in');
+      setLoading(false);
+      return;
+    }
+
     const fetchPlayerProfile = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/players/2', { // Adjust the ID as needed
-          auth: {
-            username: 'admin',
-            password: 'password'
-          },
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          }
-        });
+        const response = await axios.get(`http://localhost:8080/playerProfiles/${username}`);
+        console.log("response from server: ", response.data);
         setPlayerProfile(response.data);
         setPreferredPositions(response.data.preferredPositions || []);
         setProfileDescription(response.data.profileDescription || '');
@@ -70,7 +71,8 @@ export default function PlayerProfilePage() {
     };
 
     fetchPlayerProfile();
-  }, []);
+    console.log("player profile after fetch:" , playerProfile);
+  }, [username]);
 
   // Handle updating the preferred positions
   const handlePreferredPositionsChange = (position: PlayerPosition) => {
@@ -86,22 +88,10 @@ export default function PlayerProfilePage() {
     if (!playerProfile) return;
 
     try {
-      await axios.post(`http://localhost:8080/playerProfiles/${playerProfile.id}/update`, 
-        { 
-          preferredPositions,
-          profileDescription 
-        },
-        {
-          auth: {
-            username: 'admin',
-            password: 'password'
-          },
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          }
-        }
-      );
+      await axios.put(`http://localhost:8080/playerProfiles/${playerProfile.id}/update`, {
+        preferredPositions,
+        profileDescription,
+      });
       toast.success('Profile updated successfully', {
         duration: 3000,
         position: 'top-center',

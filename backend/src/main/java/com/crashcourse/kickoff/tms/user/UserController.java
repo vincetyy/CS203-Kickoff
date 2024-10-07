@@ -66,10 +66,8 @@ public class UserController {
         }
 
         // Load user details and generate JWT token
-        final User userDetails = userService.loadUserByUsername(loginDetails.getUsername());
-        System.out.println(loginDetails.getUsername());
-        final String jwt = jwtUtil.generateToken(userDetails);
-
+        final User user = userService.loadUserByUsername(loginDetails.getUsername());
+        final String jwt = jwtUtil.generateToken(user);
         return ResponseEntity.ok(jwt);
     }
 }
