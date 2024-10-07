@@ -41,6 +41,7 @@ public class UserServiceImpl implements UserService {
         User newUser = new User();
         newUser.setUsername(newUserDTO.getUsername());
         newUser.setPassword(encoder.encode(newUserDTO.getPassword()));
+        newUser.setEmail(newUserDTO.getEmail());
         Role newUserRole = Role.valueOf("ROLE_" + newUserDTO.getRole().toUpperCase());
         newUser.setRoles(new HashSet<Role>(Arrays.asList(newUserRole)));
 

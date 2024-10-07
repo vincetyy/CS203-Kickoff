@@ -58,6 +58,8 @@ public class User implements UserDetails {
     @Column(name = "role")
     private Set<Role> roles;
 
+    private String email;
+
     public User(String username, String password, Set<Role> roles) {
         this.username = username;
         this.password = password;
