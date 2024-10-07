@@ -1,11 +1,30 @@
 package com.crashcourse.kickoff.tms.player;
 
+import java.util.List;
+
 import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.user.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import lombok.*;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Getter
@@ -29,10 +48,11 @@ public class PlayerProfile {
     @OneToOne(mappedBy = "playerProfile", cascade = CascadeType.ALL)
     private User user;
     
-    // storing one PlayerPosition for now, may change later
-    // Store enum as a string in the database
+    @ElementCollection(targetClass = PlayerPosition.class)
     @Enumerated(EnumType.STRING)
-    private PlayerPosition preferredPosition;
+    @CollectionTable(name = "player_profile_positions", joinColumns = @JoinColumn(name = "player_profile_id"))
+    @Column(name = "preferred_position")
+    private List<PlayerPosition> preferredPositions;
 
     private String profileDescription;
 

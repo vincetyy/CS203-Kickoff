@@ -1,80 +1,71 @@
 package com.crashcourse.kickoff.tms.user.service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.crashcourse.kickoff.tms.host.HostProfile;
-import com.crashcourse.kickoff.tms.host.HostProfileRepository;
-import com.crashcourse.kickoff.tms.player.PlayerPosition;
+import com.crashcourse.kickoff.tms.host.HostProfileService;
 import com.crashcourse.kickoff.tms.player.PlayerProfile;
-import com.crashcourse.kickoff.tms.player.respository.PlayerProfileRepository;
+import com.crashcourse.kickoff.tms.player.service.PlayerProfileService;
 import com.crashcourse.kickoff.tms.user.UserRepository;
-import com.crashcourse.kickoff.tms.user.dto.LoginDetails;
+import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
 import com.crashcourse.kickoff.tms.user.model.Role;
 import com.crashcourse.kickoff.tms.user.model.User;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
     private UserRepository users;
-    private HostProfileRepository hostProfileRepository;
-    private PlayerProfileRepository playerProfileRepository;
+    private HostProfileService hostProfileService;
+    private PlayerProfileService playerProfileService;
     private BCryptPasswordEncoder encoder;
 
-    public UserServiceImpl(UserRepository users, HostProfileRepository hostProfileRepository, PlayerProfileRepository playerProfileRepository, BCryptPasswordEncoder encoder) {
+    public UserServiceImpl(UserRepository users, HostProfileService hostProfileService,
+            PlayerProfileService playerProfileService, BCryptPasswordEncoder encoder) {
         this.users = users;
-        this.hostProfileRepository = hostProfileRepository;
-        this.playerProfileRepository = playerProfileRepository;
+        this.hostProfileService = hostProfileService;
+        this.playerProfileService = playerProfileService;
         this.encoder = encoder;
     }
-
 
     public List<User> getUsers() {
         return users.findAll();
     }
+
+    @Transactional
     @Override
-    public User addUser(LoginDetails newUserDTO) {
+    public User addUser(NewUserDTO newUserDTO) {
         User newUser = new User();
         newUser.setUsername(newUserDTO.getUsername());
         newUser.setPassword(encoder.encode(newUserDTO.getPassword()));
-        newUser.setRoles(Set.of(Role.ROLE_USER)); // Set default role
+        Role newUserRole = Role.valueOf("ROLE_" + newUserDTO.getRole().toUpperCase());
+        newUser.setRoles(new HashSet<Role>(Arrays.asList(newUserRole)));
 
-        // Save the user first to get the user ID
-        User savedUser = users.save(newUser);
+        // Build the entire object graph before saving
+        switch (newUserRole) {
+            case Role.ROLE_PLAYER:
+                PlayerProfile playerProfile = playerProfileService.addPlayerProfile(newUser, newUserDTO);
+                newUser.setPlayerProfile(playerProfile);
+                break;
+            case Role.ROLE_HOST:
+                HostProfile hostProfile = hostProfileService.addHostProfile(newUser, newUserDTO);
+                newUser.setHostProfile(hostProfile);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid role: " + newUserDTO.getRole());
+        }
 
-        // // Check the role and create the respective profile
-        // if (newUserDTO.getRole().equals(Role.ROLE_PLAYER.name())) {
-        //     PlayerProfile playerProfile = new PlayerProfile();
-        //     playerProfile.setUser(savedUser); // Bidirectional relationship
-        //     savedUser.setPlayerProfile(playerProfile); // Link profile to user
-        //     playerProfileRepository.save(playerProfile); // Save player profile
-        // } else if (newUserDTO.getRole().equals(Role.ROLE_HOST.name())) {
-        //     HostProfile hostProfile = new HostProfile();
-        //     hostProfile.setUser(savedUser); // Bidirectional relationship
-        //     savedUser.setHostProfile(hostProfile); // Link profile to user
-        //     hostProfileRepository.save(hostProfile); // Save host profile
-        // }
-
-        // Return the saved user with the linked profile
-        return users.save(savedUser); // Save the user again to update the relationship
+        // Save the user along with the associated profile
+        return users.save(newUser);
     }
 
-    @Override 
+    @Override
     public User loadUserByUsername(String userName) {
         return users.findByUsername(userName).isPresent() ? users.findByUsername(userName).get() : null;
     }
-
-    // @Override
-    // public PlayerProfile addPlayerProfile(Long userId, PlayerProfile playerProfile) {
-    //     Optional<User> userOpt = users.findById(userId);
-    //     if (userOpt.isPresent()) {
-    //         User user = userOpt.get();
-    //         user.setPlayerProfile(playerProfile);
-    //         playerProfile.setUser(user); // Maintain bidirectional relationship
-    //         users.save(user);  // Save the user to update profile in DB
-    //         return playerProfile;
-    //     }
-    //     return null;
-    // }
 }

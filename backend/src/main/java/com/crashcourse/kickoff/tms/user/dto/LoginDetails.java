@@ -12,6 +12,4 @@ import lombok.Setter;
 public class LoginDetails {
     private String username;
     private String password;
-    // private PlayerPosition preferredPosition; // Captures the player's preferred position
-    // private Role role;
 }

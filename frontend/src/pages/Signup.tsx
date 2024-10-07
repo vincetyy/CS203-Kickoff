@@ -17,10 +17,23 @@ const Signup = () => {
     const [password, setPassword] = React.useState('');
     const [confirmPassword, setConfirmPassword] = React.useState('');
     const [showPassword, setShowPassword] = React.useState(false);
+    const [selectedPositions, setPositions] = React.useState<string[]>([]);
     const [role, setRole] = React.useState(''); // For role selection
+    const positions = ["Forward", "Midfielder", "Defender", "Goalie"];
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
+    };
+
+    const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value, checked } = event.target;
+        if (checked) {
+            // Add the selected position to the state
+            setPositions([...selectedPositions, value]);
+        } else {
+            // Remove the unselected position from the state
+            setPositions(selectedPositions.filter((selectedPosition) => selectedPosition !== value));
+        }
     };
 
     const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -35,11 +48,13 @@ const Signup = () => {
             username,
             email,
             password,
+            preferredPositions: selectedPositions,
             role,
         };
 
         try {
-            const response = await axios.post('http://localhost:8080/signup', payload, {
+            console.log(payload);
+            const response = await axios.post('http://localhost:8080/users', payload, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -161,6 +176,25 @@ const Signup = () => {
                                 />
                             </div>
                         </div>
+                        {/* Position Selection */}
+                        <div className="block text-sm font-medium text-gray-700 text-left mb-1">
+                        <label>Select Position(s):</label>
+                            {positions.map((position) => (
+                                <div key={position}>
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            value={position}
+                                            checked={selectedPositions.includes(position)} // Check if the position is already selected
+                                            onChange={handleCheckboxChange} // Handle checkbox change
+                                            className="mr-2"
+                                        />
+                                        {position}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+
                         {/* Role Selection */}
                         <div className="mt-4">
                             <label className="block text-sm font-medium text-gray-700 text-left mb-1">
