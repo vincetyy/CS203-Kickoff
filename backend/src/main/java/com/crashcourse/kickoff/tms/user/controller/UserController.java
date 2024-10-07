@@ -34,6 +34,12 @@ public class UserController {
         return userService.getUsers();
     }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<User> getUserProfile(@PathVariable Long userId) {
+        User user = userService.getUserById(userId);
+        return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+    }
+
     /**
      * Using BCrypt encoder to encrypt the password for storage
      * 

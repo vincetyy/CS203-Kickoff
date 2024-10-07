@@ -48,4 +48,10 @@ public class UserServiceImpl implements UserService {
         }
         return null;
     }
+
+    @Override
+    public User getUserById(Long userId) {
+        return users.findById(userId).orElse(null);  
+    }
+
 }
