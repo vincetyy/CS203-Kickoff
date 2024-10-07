@@ -1,30 +1,28 @@
 package com.crashcourse.kickoff.tms.club;
 
-import com.crashcourse.kickoff.tms.user.model.*;
-import com.crashcourse.kickoff.tms.user.repository.*;
-import com.crashcourse.kickoff.tms.user.repository.PlayerProfileRepository;
-import com.crashcourse.kickoff.tms.club.exception.ClubNotFoundException;
-import com.crashcourse.kickoff.tms.club.exception.PlayerLimitExceededException;
-import com.crashcourse.kickoff.tms.club.exception.ClubAlreadyExistsException;
-
-import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
-import com.crashcourse.kickoff.tms.club.model.PlayerApplication;
-import com.crashcourse.kickoff.tms.club.model.ApplicationStatus;
-import com.crashcourse.kickoff.tms.club.model.ClubInvitation;
-import com.crashcourse.kickoff.tms.club.repository.ClubInvitationRepository;
-import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
-import com.crashcourse.kickoff.tms.club.repository.PlayerApplicationRepository;
-import com.crashcourse.kickoff.tms.club.exception.PlayerAlreadyAppliedException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
+import com.crashcourse.kickoff.tms.club.exception.ClubAlreadyExistsException;
+import com.crashcourse.kickoff.tms.club.exception.ClubNotFoundException;
+import com.crashcourse.kickoff.tms.club.exception.PlayerAlreadyAppliedException;
+import com.crashcourse.kickoff.tms.club.exception.PlayerLimitExceededException;
+import com.crashcourse.kickoff.tms.club.model.ApplicationStatus;
+import com.crashcourse.kickoff.tms.club.model.ClubInvitation;
+import com.crashcourse.kickoff.tms.club.model.PlayerApplication;
+import com.crashcourse.kickoff.tms.club.repository.ClubInvitationRepository;
+import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
+import com.crashcourse.kickoff.tms.club.repository.PlayerApplicationRepository;
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
+import com.crashcourse.kickoff.tms.player.respository.PlayerProfileRepository;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-
-import java.util.List;
-import java.util.Optional;
-import java.time.LocalDateTime;
 
 @Service
 public class ClubServiceImpl implements ClubService {

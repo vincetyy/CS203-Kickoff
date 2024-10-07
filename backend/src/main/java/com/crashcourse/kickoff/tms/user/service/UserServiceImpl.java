@@ -5,15 +5,15 @@ import java.util.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.crashcourse.kickoff.tms.host.HostProfile;
+import com.crashcourse.kickoff.tms.host.HostProfileRepository;
+import com.crashcourse.kickoff.tms.player.PlayerPosition;
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
+import com.crashcourse.kickoff.tms.player.respository.PlayerProfileRepository;
+import com.crashcourse.kickoff.tms.user.UserRepository;
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
-import com.crashcourse.kickoff.tms.user.model.HostProfile;
-import com.crashcourse.kickoff.tms.user.model.PlayerPosition;
-import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
 import com.crashcourse.kickoff.tms.user.model.Role;
 import com.crashcourse.kickoff.tms.user.model.User;
-import com.crashcourse.kickoff.tms.user.repository.HostProfileRepository;
-import com.crashcourse.kickoff.tms.user.repository.PlayerProfileRepository;
-import com.crashcourse.kickoff.tms.user.repository.UserRepository;
 
 @Service
 public class UserServiceImpl implements UserService {

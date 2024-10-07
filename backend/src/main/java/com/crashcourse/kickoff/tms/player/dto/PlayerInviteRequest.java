@@ -1,4 +1,4 @@
-package com.crashcourse.kickoff.tms.user.dto;
+package com.crashcourse.kickoff.tms.player.dto;
 
 import jakarta.validation.constraints.NotNull;
 

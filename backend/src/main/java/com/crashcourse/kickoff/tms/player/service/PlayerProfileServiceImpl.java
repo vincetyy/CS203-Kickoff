@@ -1,12 +1,12 @@
-package com.crashcourse.kickoff.tms.user.service;
+package com.crashcourse.kickoff.tms.player.service;
 
 import org.springframework.stereotype.Service;
 
-import com.crashcourse.kickoff.tms.user.model.PlayerPosition;
-import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
+import com.crashcourse.kickoff.tms.host.HostProfileRepository;
+import com.crashcourse.kickoff.tms.player.PlayerPosition;
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
+import com.crashcourse.kickoff.tms.player.respository.PlayerProfileRepository;
 import com.crashcourse.kickoff.tms.user.model.User;
-import com.crashcourse.kickoff.tms.user.repository.HostProfileRepository;
-import com.crashcourse.kickoff.tms.user.repository.PlayerProfileRepository;
 
 import java.util.*;
 

@@ -6,7 +6,7 @@ import TournamentsPage from './pages/TournamentsPage';
 import ClubPage from './pages/ClubPage';
 import LeaderboardsPage from './pages/LeaderboardsPage';
 import CreateTournament from './pages/CreateTournament';
-import Login from './pages/Login.tsx'; 
+import Login from './pages/Login.tsx';
 import Signup from './pages/Signup.tsx';
 
 function App() {
@@ -20,9 +20,9 @@ function App() {
           <Route path="/club" element={<ClubPage />} />
           <Route path="/leaderboards" element={<LeaderboardsPage />} />
           <Route path="/create-tournament" element={<CreateTournament />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
         </Route>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
       </Routes>
     </Router>
   )

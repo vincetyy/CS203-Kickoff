@@ -2,7 +2,7 @@ package com.crashcourse.kickoff.tms.club;
 
 import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.club.exception.*;
-import com.crashcourse.kickoff.tms.user.dto.PlayerInviteRequest;
+import com.crashcourse.kickoff.tms.player.dto.PlayerInviteRequest;
 import com.crashcourse.kickoff.tms.user.model.*;
 import com.crashcourse.kickoff.tms.club.dto.*;
 

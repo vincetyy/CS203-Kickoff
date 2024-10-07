@@ -1,9 +1,9 @@
-package com.crashcourse.kickoff.tms.user.service;
+package com.crashcourse.kickoff.tms.player.service;
 
 import java.util.*;
 
-import com.crashcourse.kickoff.tms.user.model.PlayerPosition;
-import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
+import com.crashcourse.kickoff.tms.player.PlayerPosition;
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
 
 public interface PlayerProfileService {
     List<PlayerProfile> getPlayerProfiles();

@@ -1,16 +1,16 @@
-package com.crashcourse.kickoff.tms.user.controller;
+package com.crashcourse.kickoff.tms.player.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.club.ClubService;
-import com.crashcourse.kickoff.tms.user.dto.AcceptInvitationRequest;
-import com.crashcourse.kickoff.tms.user.dto.PlayerPositionDTO;
-import com.crashcourse.kickoff.tms.user.model.PlayerPosition;
-import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
+import com.crashcourse.kickoff.tms.player.PlayerPosition;
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
+import com.crashcourse.kickoff.tms.player.dto.AcceptInvitationRequest;
+import com.crashcourse.kickoff.tms.player.dto.PlayerPositionDTO;
+import com.crashcourse.kickoff.tms.player.service.PlayerProfileService;
 import com.crashcourse.kickoff.tms.user.model.User;
-import com.crashcourse.kickoff.tms.user.service.PlayerProfileService;
 import com.crashcourse.kickoff.tms.user.service.UserService;
 
 import java.util.*;

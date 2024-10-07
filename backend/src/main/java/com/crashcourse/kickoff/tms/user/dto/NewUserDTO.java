@@ -1,6 +1,6 @@
 package com.crashcourse.kickoff.tms.user.dto;
 
-import com.crashcourse.kickoff.tms.user.model.PlayerPosition;
+import com.crashcourse.kickoff.tms.player.PlayerPosition;
 import com.crashcourse.kickoff.tms.user.model.Role;
 
 import lombok.Getter;

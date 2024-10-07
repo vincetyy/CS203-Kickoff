@@ -2,6 +2,7 @@ package com.crashcourse.kickoff.tms.club;
 
 import jakarta.persistence.*;
 
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
 import com.crashcourse.kickoff.tms.tournament.model.*;
 import com.crashcourse.kickoff.tms.user.model.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;

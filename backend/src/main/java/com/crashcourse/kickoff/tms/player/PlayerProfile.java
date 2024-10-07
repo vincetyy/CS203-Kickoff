@@ -1,6 +1,7 @@
-package com.crashcourse.kickoff.tms.user.model;
+package com.crashcourse.kickoff.tms.player;
 
 import com.crashcourse.kickoff.tms.club.Club;
+import com.crashcourse.kickoff.tms.user.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.*;

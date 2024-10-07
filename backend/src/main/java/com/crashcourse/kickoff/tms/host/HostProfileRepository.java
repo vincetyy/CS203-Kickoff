@@ -1,6 +1,5 @@
-package com.crashcourse.kickoff.tms.user.repository;
+package com.crashcourse.kickoff.tms.host;
 
-import com.crashcourse.kickoff.tms.user.model.HostProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

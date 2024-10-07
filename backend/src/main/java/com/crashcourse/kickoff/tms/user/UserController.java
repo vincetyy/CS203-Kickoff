@@ -1,4 +1,4 @@
-package com.crashcourse.kickoff.tms.user.controller;
+package com.crashcourse.kickoff.tms.user;
 
 import java.util.List;
 
@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.crashcourse.kickoff.tms.player.PlayerPosition;
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
+import com.crashcourse.kickoff.tms.player.dto.PlayerPositionDTO;
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
-import com.crashcourse.kickoff.tms.user.dto.PlayerPositionDTO;
-import com.crashcourse.kickoff.tms.user.model.PlayerPosition;
-import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
 import com.crashcourse.kickoff.tms.user.model.User;
 import com.crashcourse.kickoff.tms.user.service.UserService;
 
