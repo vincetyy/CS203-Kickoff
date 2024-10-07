@@ -28,6 +28,16 @@ public class PlayerProfileServiceImpl implements PlayerProfileService {
     }
 
     @Override
+    public PlayerProfile getPlayerProfile(Long playerProfileId) {
+        Optional<PlayerProfile> userOpt = playerProfiles.findById(playerProfileId);
+        if (userOpt.isPresent()) {
+            return userOpt.get();
+        } else {
+            throw new IllegalArgumentException("User not found with id " + playerProfileId);
+        }
+    }
+
+    @Override
     public PlayerProfile updatePlayerPosition(Long playerProfileId, PlayerPosition preferredPosition) {
         Optional<PlayerProfile> userOpt = playerProfiles.findById(playerProfileId);
         if (userOpt.isPresent()) {

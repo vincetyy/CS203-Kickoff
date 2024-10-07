@@ -10,12 +10,11 @@ import com.crashcourse.kickoff.tms.player.PlayerProfile;
 import com.crashcourse.kickoff.tms.player.dto.AcceptInvitationRequest;
 import com.crashcourse.kickoff.tms.player.dto.PlayerPositionDTO;
 import com.crashcourse.kickoff.tms.player.service.PlayerProfileService;
-import com.crashcourse.kickoff.tms.user.model.User;
-import com.crashcourse.kickoff.tms.user.service.UserService;
 
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -42,6 +40,12 @@ public class PlayerProfileController {
     @GetMapping
     public List<PlayerProfile> getPlayerProfiles() {
         return playerProfileService.getPlayerProfiles();
+    }
+
+    @GetMapping("/{playerId}")
+    public PlayerProfile getPlayerProfile(@PathVariable Long playerId) {
+        System.out.println("get request receieve");
+        return playerProfileService.getPlayerProfile(playerId);
     }
 
     @PutMapping("/{playerProfileId}/position")

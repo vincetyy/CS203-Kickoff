@@ -8,6 +8,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.crashcourse.kickoff.tms.security.SecurityConfig;
 import com.crashcourse.kickoff.tms.user.UserRepository;
 import com.crashcourse.kickoff.tms.user.model.User;
+import com.crashcourse.kickoff.tms.user.service.UserService;
+import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
 
 @SpringBootApplication
 public class KickoffTournamentManagementApplication {
@@ -22,9 +24,12 @@ public class KickoffTournamentManagementApplication {
 		// JPA user repository init
 		UserRepository users = ctx.getBean(UserRepository.class);
 		BCryptPasswordEncoder encoder = ctx.getBean(BCryptPasswordEncoder.class);
-		System.out.println("[Add user]: " + users.save(
+		System.out.println("[Add admin]: " + users.save(
 				new User("admin", encoder.encode("password"), SecurityConfig.getAllRolesAsSet())).getUsername());
+		UserService userService = ctx.getBean(UserService.class);
+		NewUserDTO dummyUserDTO = new NewUserDTO("dummyUser", "user@email.com", "password",
+				new String[] { "Goalkeeper", "Midfielder" }, "player");
+		System.out.println("[Add dummy user]: " + userService.addUser(dummyUserDTO).getUsername());
 
 	}
-
 }
