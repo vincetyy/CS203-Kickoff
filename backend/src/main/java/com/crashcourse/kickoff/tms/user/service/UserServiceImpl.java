@@ -11,7 +11,7 @@ import com.crashcourse.kickoff.tms.player.PlayerPosition;
 import com.crashcourse.kickoff.tms.player.PlayerProfile;
 import com.crashcourse.kickoff.tms.player.respository.PlayerProfileRepository;
 import com.crashcourse.kickoff.tms.user.UserRepository;
-import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
+import com.crashcourse.kickoff.tms.user.dto.LoginDetails;
 import com.crashcourse.kickoff.tms.user.model.Role;
 import com.crashcourse.kickoff.tms.user.model.User;
 
@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
         return users.findAll();
     }
     @Override
-    public User addUser(NewUserDTO newUserDTO) {
+    public User addUser(LoginDetails newUserDTO) {
         User newUser = new User();
         newUser.setUsername(newUserDTO.getUsername());
         newUser.setPassword(encoder.encode(newUserDTO.getPassword()));
@@ -43,33 +43,38 @@ public class UserServiceImpl implements UserService {
         // Save the user first to get the user ID
         User savedUser = users.save(newUser);
 
-        // Check the role and create the respective profile
-        if (newUserDTO.getRole().equals(Role.ROLE_PLAYER.name())) {
-            PlayerProfile playerProfile = new PlayerProfile();
-            playerProfile.setUser(savedUser); // Bidirectional relationship
-            savedUser.setPlayerProfile(playerProfile); // Link profile to user
-            playerProfileRepository.save(playerProfile); // Save player profile
-        } else if (newUserDTO.getRole().equals(Role.ROLE_HOST.name())) {
-            HostProfile hostProfile = new HostProfile();
-            hostProfile.setUser(savedUser); // Bidirectional relationship
-            savedUser.setHostProfile(hostProfile); // Link profile to user
-            hostProfileRepository.save(hostProfile); // Save host profile
-        }
+        // // Check the role and create the respective profile
+        // if (newUserDTO.getRole().equals(Role.ROLE_PLAYER.name())) {
+        //     PlayerProfile playerProfile = new PlayerProfile();
+        //     playerProfile.setUser(savedUser); // Bidirectional relationship
+        //     savedUser.setPlayerProfile(playerProfile); // Link profile to user
+        //     playerProfileRepository.save(playerProfile); // Save player profile
+        // } else if (newUserDTO.getRole().equals(Role.ROLE_HOST.name())) {
+        //     HostProfile hostProfile = new HostProfile();
+        //     hostProfile.setUser(savedUser); // Bidirectional relationship
+        //     savedUser.setHostProfile(hostProfile); // Link profile to user
+        //     hostProfileRepository.save(hostProfile); // Save host profile
+        // }
 
         // Return the saved user with the linked profile
         return users.save(savedUser); // Save the user again to update the relationship
     }
 
-    @Override
-    public PlayerProfile addPlayerProfile(Long userId, PlayerProfile playerProfile) {
-        Optional<User> userOpt = users.findById(userId);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            user.setPlayerProfile(playerProfile);
-            playerProfile.setUser(user); // Maintain bidirectional relationship
-            users.save(user);  // Save the user to update profile in DB
-            return playerProfile;
-        }
-        return null;
+    @Override 
+    public User loadUserByUsername(String userName) {
+        return users.findByUsername(userName).isPresent() ? users.findByUsername(userName).get() : null;
     }
+
+    // @Override
+    // public PlayerProfile addPlayerProfile(Long userId, PlayerProfile playerProfile) {
+    //     Optional<User> userOpt = users.findById(userId);
+    //     if (userOpt.isPresent()) {
+    //         User user = userOpt.get();
+    //         user.setPlayerProfile(playerProfile);
+    //         playerProfile.setUser(user); // Maintain bidirectional relationship
+    //         users.save(user);  // Save the user to update profile in DB
+    //         return playerProfile;
+    //     }
+    //     return null;
+    // }
 }

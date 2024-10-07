@@ -1,28 +1,28 @@
 package com.crashcourse.kickoff.tms.club;
 
-import com.crashcourse.kickoff.tms.club.Club;
-import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
-import com.crashcourse.kickoff.tms.club.repository.PlayerApplicationRepository;
-import com.crashcourse.kickoff.tms.host.HostProfileRepository;
-import com.crashcourse.kickoff.tms.player.PlayerPosition;
-import com.crashcourse.kickoff.tms.player.PlayerProfile;
-import com.crashcourse.kickoff.tms.player.respository.PlayerProfileRepository;
-import com.crashcourse.kickoff.tms.user.model.User;
-import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
-import com.crashcourse.kickoff.tms.club.model.PlayerApplication;
-import com.crashcourse.kickoff.tms.club.model.ApplicationStatus;
-import com.crashcourse.kickoff.tms.club.exception.PlayerAlreadyAppliedException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
+import com.crashcourse.kickoff.tms.club.exception.PlayerAlreadyAppliedException;
+import com.crashcourse.kickoff.tms.club.model.PlayerApplication;
+import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
+import com.crashcourse.kickoff.tms.club.repository.PlayerApplicationRepository;
+import com.crashcourse.kickoff.tms.player.PlayerPosition;
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
+import com.crashcourse.kickoff.tms.player.respository.PlayerProfileRepository;
+import com.crashcourse.kickoff.tms.user.model.User;
 
 public class ClubServiceTest {
 

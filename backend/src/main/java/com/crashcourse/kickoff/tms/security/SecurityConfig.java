@@ -7,14 +7,17 @@ import java.util.stream.Collectors;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -25,9 +28,11 @@ import com.crashcourse.kickoff.tms.user.model.Role;
 @Configuration
 public class SecurityConfig {
     private UserDetailsService userDetailsService;
+    private JwtRequestFilter jwtRequestFilter;
 
-    public SecurityConfig(UserDetailsService userSvc) {
+    public SecurityConfig(UserDetailsService userSvc, JwtRequestFilter jwtRequestFilter) {
         this.userDetailsService = userSvc;
+        this.jwtRequestFilter = jwtRequestFilter;
     }
 
     public static Set<Role> getAllRolesAsSet() {
@@ -53,13 +58,18 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers(HttpMethod.GET, "/users/**").hasRole(Role.ROLE_ADMIN.name().substring(5))
-                        .anyRequest().permitAll()
-                )
+                        .anyRequest().authenticated())
                 // a bunch of copy pasted code from lab, need to sieve out irrelevant functions
                 // ensure that the application won’t create any session in our stateless REST
                 // APIs
@@ -70,6 +80,10 @@ public class SecurityConfig {
                 .headers(header -> header.disable()) // disable the security headers, as we do not return HTML in our
                                                      // APIs
                 .authenticationProvider(authenticationProvider());
+        // Add the JWT filter before Spring Security's built-in
+        // UsernamePasswordAuthenticationFilter
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
