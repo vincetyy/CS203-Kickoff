@@ -11,29 +11,33 @@ import {
 import React from "react";
 import axios from 'axios';
 
+// Enums for PlayerPosition
+enum PlayerPosition {
+    POSITION_FORWARD = "POSITION_FORWARD",
+    POSITION_MIDFIELDER = "POSITION_MIDFIELDER",
+    POSITION_DEFENDER = "POSITION_DEFENDER",
+    POSITION_GOALKEEPER = "POSITION_GOALKEEPER"
+}
+
 const Signup = () => {
     const [username, setUsername] = React.useState('');
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [confirmPassword, setConfirmPassword] = React.useState('');
     const [showPassword, setShowPassword] = React.useState(false);
-    const [selectedPositions, setPositions] = React.useState<string[]>([]);
+    const [preferredPositions, setPreferredPositions] = React.useState<PlayerPosition[]>([]);
     const [role, setRole] = React.useState(''); // For role selection
-    const positions = ["Forward", "Midfielder", "Defender", "Goalkeeper"];
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
 
-    const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value, checked } = event.target;
-        if (checked) {
-            // Add the selected position to the state
-            setPositions([...selectedPositions, value]);
-        } else {
-            // Remove the unselected position from the state
-            setPositions(selectedPositions.filter((selectedPosition) => selectedPosition !== value));
-        }
+    const handlePreferredPositionsChange = (position: PlayerPosition) => {
+        setPreferredPositions((prevPositions) =>
+            prevPositions.includes(position)
+                ? prevPositions.filter((pos) => pos !== position)
+                : [...prevPositions, position]
+        );
     };
 
     const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -48,7 +52,7 @@ const Signup = () => {
             username,
             email,
             password,
-            preferredPositions: selectedPositions,
+            preferredPositions,
             role,
         };
 
@@ -71,6 +75,11 @@ const Signup = () => {
                 console.error('Unknown error:', error);
             }
         }
+    };
+
+    // Utility function to format position names
+    const formatPosition = (position: string) => {
+        return position.replace('POSITION_', '').charAt(0) + position.replace('POSITION_', '').slice(1).toLowerCase();
     };
 
     return (
@@ -176,23 +185,22 @@ const Signup = () => {
                                 />
                             </div>
                         </div>
-                        {/* Position Selection */}
-                        <div className="block text-sm font-medium text-gray-700 text-left mb-1">
-                        <label>Select Position(s):</label>
-                            {positions.map((position) => (
-                                <div key={position}>
-                                    <label>
+                        {/* Preferred positions selection */}
+                        <div className="mb-6 text-gray-700">
+                            <h2 className="text-xl font-semibold">Preferred Positions</h2>
+                            <div className="flex flex-wrap">
+                                {Object.values(PlayerPosition).map((position) => (
+                                    <label key={position} className="mr-4 mb-2 flex items-center">
                                         <input
                                             type="checkbox"
-                                            value={position}
-                                            checked={selectedPositions.includes(position)} // Check if the position is already selected
-                                            onChange={handleCheckboxChange} // Handle checkbox change
-                                            className="mr-2"
+                                            checked={preferredPositions.includes(position)}
+                                            onChange={() => handlePreferredPositionsChange(position)}
+                                            className="form-checkbox h-4 w-4 text-blue-600"
                                         />
-                                        {position}
+                                        <span className="ml-2">{formatPosition(position)}</span>
                                     </label>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
 
                         {/* Role Selection */}
