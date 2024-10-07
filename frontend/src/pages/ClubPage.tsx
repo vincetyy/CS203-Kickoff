@@ -1,21 +1,17 @@
-import { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchClubsAsync, applyToClubAsync } from '../store/clubSlice'
+import { AppDispatch, RootState } from '../store'
 import { Search } from 'lucide-react'
 import { Input } from "../components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog"
 import { Button } from "../components/ui/button"
 import ClubCard from '../components/ClubCard'
-import axios from 'axios'
 import { Toaster, toast } from 'react-hot-toast'
+import { Club } from '../types/club'
 
-interface Club {
-  id: number
-  name: string
-  description?: string
-  players: { id: number }[]
-  elo: number
-  ratingDeviation: number
-}
+// Remove the local Club interface
 
 enum PlayerPosition {
   POSITION_FORWARD = "POSITION_FORWARD",
@@ -25,40 +21,17 @@ enum PlayerPosition {
 }
 
 export default function ClubPage() {
-  const [clubs, setClubs] = useState<Club[]>([])
+  const dispatch = useDispatch<AppDispatch>()
+  const { clubs, status, error } = useSelector((state: RootState) => state.clubs)
   const [filteredClubs, setFilteredClubs] = useState<Club[]>([])
   const [searchTerm, setSearchTerm] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [selectedClub, setSelectedClub] = useState<Club | null>(null)
   const [selectedPosition, setSelectedPosition] = useState<PlayerPosition | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   useEffect(() => {
-    const fetchClubs = async () => {
-      try {
-        const response = await axios.get('http://localhost:8080/clubs', {
-          auth: {
-            username: 'admin',
-            password: 'password'
-          },
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          }
-        });
-        setClubs(response.data);
-        setFilteredClubs(response.data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching clubs:', err);
-        setError('Failed to fetch clubs');
-        setLoading(false);
-      }
-    };
-
-    fetchClubs();
-  }, []);
+    dispatch(fetchClubsAsync())
+  }, [dispatch])
 
   useEffect(() => {
     const results = clubs.filter(club =>
@@ -84,22 +57,11 @@ export default function ClubPage() {
     if (!selectedClub || !selectedPosition) return;
 
     try {
-      await axios.post(`http://localhost:8080/clubs/${selectedClub.id}/apply`, 
-        { 
-          playerProfileId: 1, // Assuming a fixed player profile ID for now
-          desiredPosition: selectedPosition 
-        },
-        {
-          auth: {
-            username: 'admin',
-            password: 'password'
-          },
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          }
-        }
-      );
+      await dispatch(applyToClubAsync({
+        clubId: selectedClub.id,
+        playerProfileId: 1,
+        desiredPosition: selectedPosition
+      })).unwrap();
       toast.success(`Successfully applied to ${selectedClub.name} as ${selectedPosition.replace('POSITION_', '')}`, {
         duration: 3000,
         position: 'top-center',
@@ -109,33 +71,23 @@ export default function ClubPage() {
       setSelectedPosition(null);
     } catch (err) {
       console.error('Error applying to club:', err);
-      toast.error(`${(err as any).response?.data || (err as Error).message}`, {
+      toast.error(`${(err as any).message}`, {
         duration: 4000,
         position: 'top-center',
       });
     }
   };
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>Error: {error}</div>
+  const handlePositionChange = (position: string) => {
+    setSelectedPosition(position as PlayerPosition);
+  };
+
+  if (status === 'loading') return <div>Loading...</div>
+  if (status === 'failed') return <div>Error: {error}</div>
 
   return (
     <>
       <Toaster />
-      {/* Search and actions */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 space-y-4 lg:space-y-0">
-        <div className="relative w-full lg:w-64">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-          <Input
-            type="search"
-            placeholder="Search"
-            className="pl-8 bg-gray-800 border-gray-700 w-full"
-            value={searchTerm}
-            onChange={handleSearch}
-          />
-        </div>
-      </div>
-
       {/* Banner */}
       <div className="bg-blue-600 rounded-lg p-4 lg:p-6 mb-6 flex items-center space-x-4">
         <div className="bg-yellow-400 rounded-full p-2 lg:p-3">
@@ -149,38 +101,50 @@ export default function ClubPage() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col lg:flex-row justify-end space-y-2 lg:space-y-0 lg:space-x-4 mb-6">
-        <Select>
-          <SelectTrigger className="w-full lg:w-[180px] bg-gray-800 border-gray-700 text-white">
-            <SelectValue placeholder="Type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Casual">Casual</SelectItem>
-            <SelectItem value="Competitive">Competitive</SelectItem>
-            <SelectItem value="Friendly">Friendly</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select>
-          <SelectTrigger className="w-full lg:w-[180px] bg-gray-800 border-gray-700 text-white">
-            <SelectValue placeholder="Location" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Singapore">Singapore</SelectItem>
-            <SelectItem value="Malaysia">Malaysia</SelectItem>
-            <SelectItem value="Indonesia">Indonesia</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select>
-          <SelectTrigger className="w-full lg:w-[180px] bg-gray-800 border-gray-700 text-white">
-            <SelectValue placeholder="Skill Level" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Beginner">Beginner</SelectItem>
-            <SelectItem value="Intermediate">Intermediate</SelectItem>
-            <SelectItem value="Advanced">Advanced</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Search and Filters */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-2 lg:space-y-0 lg:space-x-4 mb-6">
+        <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4 w-full">
+          <div className="relative w-full lg:w-[300px]"> {/* Increased width here */}
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="search"
+              placeholder="Search clubs"
+              className="pl-8 bg-gray-800 border-gray-700 w-full h-10"
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+          </div>
+          <Select>
+            <SelectTrigger className="w-full lg:w-[180px] bg-gray-800 border-gray-700 text-white">
+              <SelectValue placeholder="Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Casual">Casual</SelectItem>
+              <SelectItem value="Competitive">Competitive</SelectItem>
+              <SelectItem value="Friendly">Friendly</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select>
+            <SelectTrigger className="w-full lg:w-[180px] bg-gray-800 border-gray-700 text-white">
+              <SelectValue placeholder="Location" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Singapore">Singapore</SelectItem>
+              <SelectItem value="Malaysia">Malaysia</SelectItem>
+              <SelectItem value="Indonesia">Indonesia</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select>
+            <SelectTrigger className="w-full lg:w-[180px] bg-gray-800 border-gray-700 text-white">
+              <SelectValue placeholder="Skill Level" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Beginner">Beginner</SelectItem>
+              <SelectItem value="Intermediate">Intermediate</SelectItem>
+              <SelectItem value="Advanced">Advanced</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Club cards */}
@@ -207,7 +171,7 @@ export default function ClubPage() {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="flex flex-col justify-between">
-              <Select onValueChange={(value) => setSelectedPosition(value as PlayerPosition)}>
+              <Select onValueChange={handlePositionChange}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select your preferred position" />
                 </SelectTrigger>
