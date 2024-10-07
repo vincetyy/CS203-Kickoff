@@ -28,7 +28,7 @@ public class KickoffTournamentManagementApplication {
 				new User("admin", encoder.encode("password"), SecurityConfig.getAllRolesAsSet())).getUsername());
 		UserService userService = ctx.getBean(UserService.class);
 		NewUserDTO dummyUserDTO = new NewUserDTO("dummyUser", "user@email.com", "password",
-				new String[] { "Goalkeeper", "Midfielder" }, "player");
+				new String[] { "POSITION_Goalkeeper", "POSITION_Midfielder" }, "player");
 		System.out.println("[Add dummy user]: " + userService.addUser(dummyUserDTO).getUsername());
 
 	}
