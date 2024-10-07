@@ -113,4 +113,13 @@ public class ClubController {
         }
     }
 
+    @GetMapping("/{clubId}/players")
+    public ResponseEntity<?> getPlayersFromClub(@PathVariable Long clubId) {
+        try {
+            List<PlayerProfile> players = clubService.getPlayers(clubId);
+            return new ResponseEntity<>(players, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }
