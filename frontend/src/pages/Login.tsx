@@ -23,33 +23,21 @@ const Login = () => {
 
     const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-    
-        // Encode credentials for Basic Auth (username:password in Base64)
-        const credentials = btoa(`${email}:${password}`);
-    
+
         try {
           // Make the POST request with Basic Authentication
-          const response = await axios.get(
-            'http://localhost:8080/users', // Replace with your API URL
-            {
-              headers: {
-                'Authorization': `Basic ${credentials}`, // Basic Auth header
-                'Content-Type': 'application/json',
-              },
-            }
-          );
+          const response = await axios.post('http://localhost:8080/users/login', {
+            username: email,
+            password: password,
+        });
     
           // Handle the response after successful authentication
           if (response.status === 200) {
-            console.log('Login successful:', response.data);
     
-            // Store credentials in localStorage or sessionStorage (use sessionStorage for temporary storage)
-            // localStorage.setItem('authToken', credentials); // Store Base64 encoded credentials
-    
-            // // Set axios defaults to include Basic Auth header in all requests
-            // axios.defaults.headers.common['Authorization'] = `Basic ${credentials}`;
-    
-            console.log("Success")!
+            const token = response.data.jwt;  // Assuming the JWT is in the 'jwt' field of the response
+            localStorage.setItem('authToken', token);  // Store JWT in localStorage
+            console.log('Login successful');
+            
           }
         } catch (error: unknown) {
             // Handle unknown error type properly

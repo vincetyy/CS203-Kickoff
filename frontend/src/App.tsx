@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import './utils/axiosSetup'; 
 import Layout from './components/Layout';
 import LandingPage from './pages/LandingPage';
 import ProfilePage from './pages/ProfilePage';

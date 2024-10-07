@@ -68,6 +68,7 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests((authz) -> authz
+                        .requestMatchers(HttpMethod.POST, "/users/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users/**").hasRole(Role.ROLE_ADMIN.name().substring(5))
                         .anyRequest().authenticated())
                 // a bunch of copy pasted code from lab, need to sieve out irrelevant functions
