@@ -5,13 +5,17 @@ import java.util.List;
 
 import com.crashcourse.kickoff.tms.player.PlayerProfile;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -25,6 +29,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIdentityInfo(
+    generator = ObjectIdGenerators.PropertyGenerator.class,
+    property = "id")
 
 // note lombok's @data annotations generates getters and setters automatically
 public class Club {
@@ -54,4 +61,14 @@ public class Club {
     @JsonIgnore
     @ManyToMany(mappedBy = "joinedClubs")
     private List<Tournament> tournaments = new ArrayList<>();
+
+    private String clubDescription;
+
+    @ManyToMany
+    @JoinTable(
+        name = "club_applicants",
+        joinColumns = @JoinColumn(name = "club_id"),
+        inverseJoinColumns = @JoinColumn(name = "player_id")
+    )
+    private List<PlayerProfile> applicants = new ArrayList<>();
 }

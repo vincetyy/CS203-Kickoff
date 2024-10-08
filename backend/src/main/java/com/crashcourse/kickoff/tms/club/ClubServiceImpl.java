@@ -18,6 +18,7 @@ import com.crashcourse.kickoff.tms.club.model.PlayerApplication;
 import com.crashcourse.kickoff.tms.club.repository.ClubInvitationRepository;
 import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
 import com.crashcourse.kickoff.tms.club.repository.PlayerApplicationRepository;
+import com.crashcourse.kickoff.tms.player.PlayerPosition;
 import com.crashcourse.kickoff.tms.player.PlayerProfile;
 import com.crashcourse.kickoff.tms.player.respository.PlayerProfileRepository;
 
@@ -281,5 +282,28 @@ public class ClubServiceImpl implements ClubService {
 
         Club club = clubOptional.get();
         return club.getPlayers();
+    }
+
+    public void applyToClub(Long clubId, Long playerId, PlayerPosition desiredPosition) throws Exception {
+        Optional<Club> clubOpt = clubRepository.findById(clubId);
+        Optional<PlayerProfile> playerOpt = playerProfileRepository.findById(playerId);
+    
+        if (clubOpt.isPresent() && playerOpt.isPresent()) {
+            Club club = clubOpt.get();
+            PlayerProfile player = playerOpt.get();
+    
+            // Create a new application
+            PlayerApplication application = new PlayerApplication();
+            application.setClub(club);
+            application.setPlayerProfile(player);
+            application.setDesiredPosition(desiredPosition);
+            application.setStatus(ApplicationStatus.PENDING);
+    
+            // Save the application (ensure you have a repository for ClubApplication)
+            applicationRepository.save(application);
+    
+        } else {
+            throw new Exception("Club or Player not found.");
+        }
     }
 }

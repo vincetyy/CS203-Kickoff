@@ -33,7 +33,7 @@ Content-Type: application/json
 }
 
 ### Assign a PlayerProfile to the normal user
-POST http://localhost:8080/users/1/playerProfile
+POST http://localhost:8080/users/2/playerProfile
 Authorization: Basic admin password
 Content-Type: application/json
 
@@ -80,7 +80,8 @@ Content-Type: application/json
   "club": {
     "name": "My New Club 2",
     "elo": 500,
-    "ratingDeviation": 25
+    "ratingDeviation": 25,
+    "clubDescription": "This is a new club"
   },
   "creatorId": 2
 }
@@ -106,4 +107,8 @@ Content-Type: application/json
 
 ### Get players from clubID
 GET http://localhost:8080/clubs/1/players
+Authorization: Basic admin:password
+
+### check specific club info page
+GET http://localhost:8080/clubs/1
 Authorization: Basic admin:password

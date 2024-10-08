@@ -6,3 +6,12 @@ export interface Club {
   elo: number;
   ratingDeviation: number;
 }
+
+export interface ClubProfile {
+  id: number;
+  name: string;
+  description: string;
+  elo: number;
+  captainName: string;
+  playerNames: string[];
+}
