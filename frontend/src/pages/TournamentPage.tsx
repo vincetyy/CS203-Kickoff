@@ -1,6 +1,7 @@
 // src/pages/TournamentPage.tsx
 
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { Button } from "../components/ui/button";
@@ -11,6 +12,8 @@ import { fetchTournamentById } from '../services/tournamentService';
 import { Tournament, Club } from '../types/tournament';
 
 const TournamentPage: React.FC = () => {
+  const navigate = useNavigate();
+
   const { id } = useParams<{ id: string }>();
   const tournamentId = id ? parseInt(id, 10) : null;
 
@@ -21,6 +24,10 @@ const TournamentPage: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'succeeded' | 'failed'>('idle');
   const [error, setError] = useState<string | null>(null);
   // const [joinRole, setJoinRole] = useState<TournamentJoinRole | null>(null);
+
+  const handleBackClick = () => {
+    navigate('/tournaments'); // Navigate back to /tournaments
+  };
 
   useEffect(() => {
     if (tournamentId === null || isNaN(tournamentId)) {
@@ -60,7 +67,6 @@ const TournamentPage: React.FC = () => {
 
   return (
     <>
-      <Toaster />
       {/* Tournament Details Banner */}
       <div className="bg-green-600 rounded-lg p-4 lg:p-6 mb-6 flex items-center space-x-4">
         <div className="bg-white rounded-full p-2 lg:p-3">
@@ -114,6 +120,12 @@ const TournamentPage: React.FC = () => {
             ))}
           </div>
         )}
+
+        
+      </div>
+      {/* Back Button */}
+      <div className="mb-4">
+        <Button onClick={handleBackClick}>Back to Tournaments</Button>
       </div>
     </>
   );

@@ -80,7 +80,6 @@ const Login = () => {
 
     return (
         <div className="flex ">
-            <Toaster />
             {/* Left section for the football player image */}
             <div className="w-1/2 flex items-center justify-center bg-black relative">
                 <div className="text-white text-center">
