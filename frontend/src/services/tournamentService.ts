@@ -1,6 +1,11 @@
 import api from './api';
 import { Tournament } from '../types/tournament';
 
+export const fetchTournamentById = async (tournamentId: number): Promise<Tournament> => {
+  const response = await api.get(`/tournaments/${tournamentId}`);
+  return response.data;
+};
+
 export const fetchTournaments = async (): Promise<Tournament[]> => {
   const response = await api.get('/tournaments');
   return response.data;

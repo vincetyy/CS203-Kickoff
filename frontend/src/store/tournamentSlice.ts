@@ -1,6 +1,13 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { fetchTournaments, joinTournament, createTournament } from '../services/tournamentService';
+import { fetchTournamentById, fetchTournaments, joinTournament, createTournament } from '../services/tournamentService';
 import { Tournament } from '../types/tournament';
+
+export const fetchTournamentByIdAsync = createAsyncThunk(
+  'tournaments/fetchTournamentById',
+  async (tournamentId: number) => {
+    return await fetchTournamentById(tournamentId);;
+  }
+);
 
 export const fetchTournamentsAsync = createAsyncThunk(
   'tournaments/fetchTournaments',
