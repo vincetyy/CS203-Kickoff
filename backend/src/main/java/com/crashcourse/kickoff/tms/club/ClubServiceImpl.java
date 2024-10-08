@@ -1,30 +1,29 @@
 package com.crashcourse.kickoff.tms.club;
 
-import com.crashcourse.kickoff.tms.user.model.*;
-import com.crashcourse.kickoff.tms.user.repository.*;
-import com.crashcourse.kickoff.tms.user.repository.PlayerProfileRepository;
-import com.crashcourse.kickoff.tms.club.exception.ClubNotFoundException;
-import com.crashcourse.kickoff.tms.club.exception.PlayerLimitExceededException;
-import com.crashcourse.kickoff.tms.club.exception.ClubAlreadyExistsException;
-
-import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
-import com.crashcourse.kickoff.tms.club.model.PlayerApplication;
-import com.crashcourse.kickoff.tms.club.model.ApplicationStatus;
-import com.crashcourse.kickoff.tms.club.model.ClubInvitation;
-import com.crashcourse.kickoff.tms.club.repository.ClubInvitationRepository;
-import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
-import com.crashcourse.kickoff.tms.club.repository.PlayerApplicationRepository;
-import com.crashcourse.kickoff.tms.club.exception.PlayerAlreadyAppliedException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
+import com.crashcourse.kickoff.tms.club.exception.ClubAlreadyExistsException;
+import com.crashcourse.kickoff.tms.club.exception.ClubNotFoundException;
+import com.crashcourse.kickoff.tms.club.exception.PlayerAlreadyAppliedException;
+import com.crashcourse.kickoff.tms.club.exception.PlayerLimitExceededException;
+import com.crashcourse.kickoff.tms.club.model.ApplicationStatus;
+import com.crashcourse.kickoff.tms.club.model.ClubInvitation;
+import com.crashcourse.kickoff.tms.club.model.PlayerApplication;
+import com.crashcourse.kickoff.tms.club.repository.ClubInvitationRepository;
+import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
+import com.crashcourse.kickoff.tms.club.repository.PlayerApplicationRepository;
+import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
+import com.crashcourse.kickoff.tms.user.repository.PlayerProfileRepository;
+
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-
-import java.util.List;
-import java.util.Optional;
-import java.time.LocalDateTime;
 
 @Service
 public class ClubServiceImpl implements ClubService {
@@ -282,5 +281,37 @@ public class ClubServiceImpl implements ClubService {
 
         Club club = clubOptional.get();
         return club.getPlayers();
+    }
+
+    @Transactional
+    public void applyToClub(Long clubId, Long playerId) throws Exception {
+        // Retrieve the club
+        Club club = clubRepository.findById(clubId)
+                .orElseThrow(() -> new Exception("Club not found"));
+
+        // Retrieve the player
+        PlayerProfile player = playerProfileRepository.findById(playerId)
+                .orElseThrow(() -> new Exception("Player not found"));
+
+        // Check if the player is free agent
+        if (!player.isFreeAgent()) {
+            throw new Exception("Player is already a member of another club");
+        }
+
+        // Check if the player has already applied to this club
+        if (club.getApplicants().contains(player)) {
+            throw new Exception("Player has already applied to this club");
+        }
+
+        // Optionally, check if the club has reached maximum capacity
+        if (club.getPlayers().size() >= Club.MAX_PLAYERS_IN_CLUB) {
+            throw new Exception("Club has reached maximum player capacity");
+        }
+
+        // Add the player to the club's applicants list
+        club.getApplicants().add(player);
+
+        // Save the club to persist the changes
+        clubRepository.save(club);
     }
 }

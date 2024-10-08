@@ -1,27 +1,14 @@
 package com.crashcourse.kickoff.tms.club;
 
-import com.crashcourse.kickoff.tms.user.model.*;
-import com.crashcourse.kickoff.tms.user.repository.PlayerProfileRepository;
-import com.crashcourse.kickoff.tms.club.exception.ClubNotFoundException;
-import com.crashcourse.kickoff.tms.club.exception.PlayerLimitExceededException;
-import com.crashcourse.kickoff.tms.club.exception.ClubAlreadyExistsException;
-
-import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
-import com.crashcourse.kickoff.tms.club.model.PlayerApplication;
-import com.crashcourse.kickoff.tms.club.model.ApplicationStatus;
-import com.crashcourse.kickoff.tms.club.model.ClubInvitation;
-import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
-import com.crashcourse.kickoff.tms.club.repository.PlayerApplicationRepository;
-import com.crashcourse.kickoff.tms.club.exception.PlayerAlreadyAppliedException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
-
 import java.util.List;
 import java.util.Optional;
+
+import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
+import com.crashcourse.kickoff.tms.club.model.ClubInvitation;
+import com.crashcourse.kickoff.tms.club.model.PlayerApplication;
+import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
+
+import jakarta.validation.Valid;
 
 public interface ClubService {
 

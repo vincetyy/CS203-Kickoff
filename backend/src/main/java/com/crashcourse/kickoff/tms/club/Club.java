@@ -1,18 +1,27 @@
 package com.crashcourse.kickoff.tms.club;
 
-import jakarta.persistence.*;
-
-import com.crashcourse.kickoff.tms.tournament.model.*;
-import com.crashcourse.kickoff.tms.user.model.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.crashcourse.kickoff.tms.tournament.model.Tournament;
+import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -46,4 +55,14 @@ public class Club {
     @JsonIgnore
     @ManyToMany(mappedBy = "joinedClubs")
     private List<Tournament> tournaments = new ArrayList<>();
+
+    private String clubDescription;
+
+    @ManyToMany
+    @JoinTable(
+        name = "club_applicants",
+        joinColumns = @JoinColumn(name = "club_id"),
+        inverseJoinColumns = @JoinColumn(name = "player_id")
+    )
+    private List<PlayerProfile> applicants = new ArrayList<>();
 }

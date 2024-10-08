@@ -14,6 +14,5 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("*") // Change to your frontend origin
                 .allowedMethods("GET", "POST", "PATCH", "DELETE")
                 .allowedHeaders("*");
-
     }
 }

@@ -122,4 +122,27 @@ public class ClubController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ClubProfile> getClubProfile(@PathVariable Long id) {
+        Optional<Club> club = clubService.getClubById(id);
+        if (club.isPresent()) {
+            Club existingClub = club.get();
+            ClubProfile profile = new ClubProfile(existingClub);
+            return ResponseEntity.ok(profile);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    // to link to free agent applying for club, in club info page
+    @PostMapping("/{id}/apply")
+    public ResponseEntity<?> applyToClub(@PathVariable Long id, @RequestBody ClubApplicationRequest request) {
+        try {
+            clubService.applyToClub(id, request.getPlayerId());
+            return ResponseEntity.ok().body("Application sent successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 }
