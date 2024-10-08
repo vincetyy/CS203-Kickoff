@@ -153,7 +153,7 @@ export default function ClubPage() {
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={handleCreateClubClick} className="bg-blue-600 hover:bg-blue-700">
+        <Button onClick={handleCreateClubClick} className="bg-blue-600 hover:bg-blue-700w-full lg:w-auto">
           Create Club
         </Button>
       </div>
