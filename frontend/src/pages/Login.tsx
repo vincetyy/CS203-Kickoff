@@ -40,7 +40,7 @@ const Login = () => {
             localStorage.setItem('username', username); 
             console.log('Login successful');
 
-            navigate('/club');  
+            navigate('/clubs');  
 
             // Show the success toast
             toast.success(`Welcome back, ${username}`, {
