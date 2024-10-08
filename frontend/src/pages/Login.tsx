@@ -11,7 +11,7 @@ import {
 import React from "react";
 import axios from 'axios';
 
-import { Toaster, toast } from 'react-hot-toast'
+import { toast } from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom';
 const Login = () => {
     const navigate = useNavigate();

@@ -61,7 +61,7 @@ public class KickoffTournamentManagementApplication {
 
 		// Club
 		ClubService clubService = ctx.getBean(ClubService.class);
-		Club newClub = new Club(null, "My New Club", 500, 50, playerProfileService.getPlayerProfile(admin.getId()), new ArrayList<PlayerProfile>(), new ArrayList<Tournament>());
+		Club newClub = new Club(null, "My New Club", 500, 50, playerProfileService.getPlayerProfile(admin.getId()), new ArrayList<PlayerProfile>(), new ArrayList<Tournament>(), "Club DESCRIPTION", new ArrayList<PlayerProfile>());
 		
 		try {
 			clubService.createClub(newClub, admin.getId());

@@ -46,14 +46,14 @@ public class ClubController {
         return clubService.getAllClubs();
     }
 
-    @GetMapping("/{clubId}")
-    public ResponseEntity<?> getClubById(@PathVariable Long clubId) {
-        Optional<Club> club = clubService.getClubById(clubId);
-        if (club.isPresent()) {
-            return new ResponseEntity<>(club.get(), HttpStatus.OK);
-        }
-        return new ResponseEntity<String>("Club not found", HttpStatus.NOT_FOUND);
-    }
+    // @GetMapping("/{clubId}")
+    // public ResponseEntity<?> getClubById(@PathVariable Long clubId) {
+    //     Optional<Club> club = clubService.getClubById(clubId);
+    //     if (club.isPresent()) {
+    //         return new ResponseEntity<>(club.get(), HttpStatus.OK);
+    //     }
+    //     return new ResponseEntity<String>("Club not found", HttpStatus.NOT_FOUND);
+    // }
 
     @PutMapping("/{clubId}")
     public ResponseEntity<?> updateClub(@PathVariable Long clubId, @RequestBody Club clubDetails) {
@@ -129,6 +129,18 @@ public class ClubController {
             return new ResponseEntity<>(players, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ClubProfile> getClubProfile(@PathVariable Long id) {
+        Optional<Club> club = clubService.getClubById(id);
+        if (club.isPresent()) {
+            Club existingClub = club.get();
+            ClubProfile profile = new ClubProfile(existingClub);
+            return ResponseEntity.ok(profile);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 }
