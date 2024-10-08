@@ -38,7 +38,14 @@ const TournamentPage: React.FC = () => {
 
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'succeeded' | 'failed'>('idle');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null); 
+  let isHost = false;
+  if (selectedTournament) {
+    // hardcoded rn
+    isHost = selectedTournament.host.id === 1;
+    console.log(isHost);
+    
+  }
   // const [joinRole, setJoinRole] = useState<TournamentJoinRole | null>(null);
 
   const [updatedTournament, setUpdatedTournament] = useState({
@@ -364,9 +371,11 @@ const TournamentPage: React.FC = () => {
       
       {/* Back Button */}
       <div className="flex space-x-3 mb-4">
-        <Button type="button" onClick={handleUpdate} className="bg-blue-600 hover:bg-blue-700">
-          Update
-        </Button>
+        {isHost &&
+          <Button type="button" onClick={handleUpdate} className="bg-blue-600 hover:bg-blue-700">
+            Update
+          </Button>
+        }
         <Button onClick={handleBackClick}>Back to Tournaments</Button>
       </div>
       
