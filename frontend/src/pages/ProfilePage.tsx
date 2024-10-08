@@ -115,7 +115,6 @@ export default function PlayerProfilePage() {
 
   return (
     <>
-      <Toaster />
       <div className="p-6 bg-gray-900 rounded-lg">
         <h1 className="text-2xl font-bold mb-4">Player Profile</h1>
 

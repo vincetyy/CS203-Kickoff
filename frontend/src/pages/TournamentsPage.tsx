@@ -176,7 +176,6 @@ export default function TournamentsPage() {
 
   return (
     <>
-      <Toaster />
       {/* Banner */}
       <div className="bg-blue-600 rounded-lg p-4 lg:p-6 mb-6 flex items-center space-x-4">
         <div className="bg-yellow-400 rounded-full p-2 lg:p-3">
@@ -234,6 +233,7 @@ export default function TournamentsPage() {
         {filteredTournaments.map((tournament) => (
           <TournamentCard
             key={tournament.id}
+            id={tournament.id}
             name={tournament.name}
             startDate={new Date(tournament.startDateTime).toLocaleDateString()}
             endDate={new Date(tournament.endDateTime).toLocaleDateString()}
