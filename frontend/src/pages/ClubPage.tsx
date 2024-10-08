@@ -20,9 +20,10 @@ import {
 import { Button } from '../components/ui/button';
 import ClubCard from '../components/ClubCard';
 import ClubInfoModal from '../components/ClubInfoModal';
-import { Toaster, toast } from 'react-hot-toast';
+import {  toast } from 'react-hot-toast';
 import { Club } from '../types/club';
 import { useNavigate } from 'react-router-dom';
+import CreateClub from './CreateClub';
 
 enum PlayerPosition {
   POSITION_FORWARD = 'POSITION_FORWARD',
@@ -43,7 +44,7 @@ export default function ClubPage() {
     useState<PlayerPosition | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isInfoDialogOpen, setIsInfoDialogOpen] = useState(false);
-  const navigate = useNavigate(); 
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchClubsAsync());
@@ -61,6 +62,10 @@ export default function ClubPage() {
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
+  };
+
+  const handleCreateClub = (newClub: Club) => {
+    setFilteredClubs(prevClubs => [...prevClubs, newClub]); // Add the new club to the list
   };
 
   const formatPosition = (position: string) => {
@@ -117,9 +122,8 @@ export default function ClubPage() {
   };
 
   const handleCreateClubClick = () => {
-    navigate('/clubs/create-club'); // Navigate to CreateClub page
+    setIsCreateDialogOpen(true);  // Open the CreateClub modal
   };
-
 
   if (status === 'loading') return <div>Loading...</div>;
   if (status === 'failed') return <div>Error: {error}</div>;
@@ -166,12 +170,13 @@ export default function ClubPage() {
           </div>
           {/* Additional filters can be added here */}
         </div>
-        <Button onClick={handleCreateClubClick} className="bg-blue-600 hover:bg-blue-700w-full lg:w-auto">
+
+        <Button onClick={handleCreateClubClick} className="bg-blue-600 hover:bg-blue-700 w-full lg:w-auto">
           Create Club
         </Button>
       </div>
 
-      {/* Club cards */}
+      {/* Club Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
         {filteredClubs.map((club) => (
           <ClubCard
@@ -209,6 +214,19 @@ export default function ClubPage() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] lg:max-w-[800px]">
+          <DialogHeader>
+            <DialogTitle>Create New Club</DialogTitle>
+          </DialogHeader>
+          <CreateClub 
+            isCreateDialogOpen={isCreateDialogOpen}
+            setIsCreateDialogOpen={setIsCreateDialogOpen}
+            handleClubCreated={handleCreateClub}
+          />
+        </DialogContent>
+      </Dialog>
+
       {/* Position Selection Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
@@ -233,15 +251,14 @@ export default function ClubPage() {
           </div>
           <div className="flex flex-col sm:flex-row justify-between mt-4 space-y-2 sm:space-y-0 sm:space-x-2">
             <Button
-              variant="secondary"
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 w-full"
               onClick={() => setIsDialogOpen(false)}
-              className="w-full"
             >
               Close
             </Button>
             <Button
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full"
               onClick={handleApply}
-              className="w-full"
               disabled={!selectedPosition}
             >
               Apply
