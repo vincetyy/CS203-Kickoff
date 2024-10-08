@@ -31,7 +31,7 @@ public class ClubController {
     @Autowired
     private ClubServiceImpl clubService;
 
-    @PostMapping("/create-club")
+    @PostMapping
     public ResponseEntity<?> createClub(@Valid @RequestBody ClubCreationRequest clubRequest) {
         try {
             Club createdClub = clubService.createClub(clubRequest.getClub(), clubRequest.getCreatorId());
