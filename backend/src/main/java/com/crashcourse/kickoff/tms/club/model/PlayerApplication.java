@@ -1,9 +1,9 @@
 package com.crashcourse.kickoff.tms.club.model;
 
-import com.crashcourse.kickoff.tms.user.model.User;
 import com.crashcourse.kickoff.tms.club.Club;
-import com.crashcourse.kickoff.tms.user.model.PlayerPosition;
-import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
+import com.crashcourse.kickoff.tms.player.PlayerPosition;
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
+import com.crashcourse.kickoff.tms.user.model.User;
 
 import jakarta.persistence.*;
 

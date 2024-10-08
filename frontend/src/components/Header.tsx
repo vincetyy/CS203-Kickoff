@@ -19,7 +19,7 @@ export default function Header({ isSidebarOpen, setIsSidebarOpen }: { isSidebarO
             <Sidebar />
           </SheetContent>
         </Sheet>
-        <Link to="/home" className="text-2xl font-bold ml-2 text-white hover:text-gray-300 transition-colors">
+        <Link to="/" className="text-2xl font-bold ml-2 text-white hover:text-gray-300 transition-colors">
           KICKOFF
         </Link>
       </div>

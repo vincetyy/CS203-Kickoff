@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import './utils/axiosSetup'; 
 import Layout from './components/Layout';
 import LandingPage from './pages/LandingPage';
 import ProfilePage from './pages/ProfilePage';
@@ -7,6 +8,8 @@ import TournamentPage from './pages/TournamentPage';
 import ClubPage from './pages/ClubPage';
 import LeaderboardsPage from './pages/LeaderboardsPage';
 import CreateTournament from './pages/CreateTournament';
+import Login from './pages/Login.tsx';
+import Signup from './pages/Signup.tsx';
 
 function App() {
   return (
@@ -20,6 +23,8 @@ function App() {
           <Route path="/club" element={<ClubPage />} />
           <Route path="/leaderboards" element={<LeaderboardsPage />} />
           <Route path="/create-tournament" element={<CreateTournament />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
         </Route>
       </Routes>
     </Router>

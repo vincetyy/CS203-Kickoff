@@ -1,24 +1,33 @@
 package com.crashcourse.kickoff.tms.user.service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.crashcourse.kickoff.tms.host.HostProfileService;
+import com.crashcourse.kickoff.tms.player.service.PlayerProfileService;
+import com.crashcourse.kickoff.tms.user.UserRepository;
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
-import com.crashcourse.kickoff.tms.user.model.PlayerPosition;
-import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
 import com.crashcourse.kickoff.tms.user.model.Role;
 import com.crashcourse.kickoff.tms.user.model.User;
-import com.crashcourse.kickoff.tms.user.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
     private UserRepository users;
+    private HostProfileService hostProfileService;
+    private PlayerProfileService playerProfileService;
     private BCryptPasswordEncoder encoder;
 
-    public UserServiceImpl(UserRepository users, BCryptPasswordEncoder encoder) {
+    public UserServiceImpl(UserRepository users, HostProfileService hostProfileService,
+            PlayerProfileService playerProfileService, BCryptPasswordEncoder encoder) {
         this.users = users;
+        this.hostProfileService = hostProfileService;
+        this.playerProfileService = playerProfileService;
         this.encoder = encoder;
     }
 
@@ -26,27 +35,35 @@ public class UserServiceImpl implements UserService {
         return users.findAll();
     }
 
+    @Transactional
     @Override
     public User addUser(NewUserDTO newUserDTO) {
         User newUser = new User();
         newUser.setUsername(newUserDTO.getUsername());
         newUser.setPassword(encoder.encode(newUserDTO.getPassword()));
-        // defaults new users to "user" role
-        newUser.setRoles(Set.of(Role.ROLE_USER));
+        newUser.setEmail(newUserDTO.getEmail());
+        Role newUserRole = Role.valueOf("ROLE_" + newUserDTO.getRole().toUpperCase());
+        newUser.setRoles(new HashSet<Role>(Arrays.asList(newUserRole)));
+
+        // Build the entire object graph before saving
+        switch (newUserRole) {
+            case Role.ROLE_PLAYER:
+                playerProfileService.addPlayerProfile(newUser, newUserDTO);
+                break;
+            case Role.ROLE_HOST:
+                hostProfileService.addHostProfile(newUser, newUserDTO);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid role: " + newUserDTO.getRole());
+        }
+
+        // Save the user along with the associated profile
         return users.save(newUser);
     }
 
     @Override
-    public PlayerProfile addPlayerProfile(Long userId, PlayerProfile playerProfile) {
-        Optional<User> userOpt = users.findById(userId);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            user.setPlayerProfile(playerProfile);
-            playerProfile.setUser(user); // Maintain bidirectional relationship
-            users.save(user);  // Save the user to update profile in DB
-            return playerProfile;
-        }
-        return null;
+    public User loadUserByUsername(String userName) {
+        return users.findByUsername(userName).isPresent() ? users.findByUsername(userName).get() : null;
     }
 
     @Override
