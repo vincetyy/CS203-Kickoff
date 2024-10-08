@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import LandingPage from './pages/LandingPage';
 import ProfilePage from './pages/ProfilePage';
 import TournamentsPage from './pages/TournamentsPage';
+import TournamentPage from './pages/TournamentPage';
 import ClubPage from './pages/ClubPage';
 import LeaderboardsPage from './pages/LeaderboardsPage';
 import CreateTournament from './pages/CreateTournament';
@@ -19,6 +20,7 @@ function App() {
         <Route element={<Layout />}>
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/tournaments" element={<TournamentsPage />} />
+          <Route path="/tournaments/:id" element={<TournamentPage />} />
           <Route path="/club" element={<ClubPage />} />
           <Route path="/leaderboards" element={<LeaderboardsPage />} />
           <Route path="/create-tournament" element={<CreateTournament />} />

@@ -119,7 +119,6 @@ export default function ClubPage() {
 
   return (
     <>
-      <Toaster />
       {/* Banner */}
       <div className="bg-blue-600 rounded-lg p-4 lg:p-6 mb-6 flex items-center space-x-4">
         <div className="bg-yellow-400 rounded-full p-2 lg:p-3">
