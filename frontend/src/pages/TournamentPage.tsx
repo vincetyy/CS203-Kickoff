@@ -15,6 +15,7 @@ import { Tournament, Club } from '../types/tournament';
 import { useDispatch } from 'react-redux';
 import { updateTournamentAsync } from '../store/tournamentSlice';
 
+
 const TournamentPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>()

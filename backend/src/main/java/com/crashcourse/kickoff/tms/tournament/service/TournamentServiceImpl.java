@@ -1,7 +1,8 @@
 package com.crashcourse.kickoff.tms.tournament.service;
 
 import com.crashcourse.kickoff.tms.club.*;
-
+import com.crashcourse.kickoff.tms.host.HostProfile;
+import com.crashcourse.kickoff.tms.host.HostProfileRepository;
 import com.crashcourse.kickoff.tms.location.service.LocationService;
 import com.crashcourse.kickoff.tms.player.PlayerProfile;
 import com.crashcourse.kickoff.tms.location.model.*;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class TournamentServiceImpl implements TournamentService {
-
+    private final HostProfileRepository hostProfileRepository;
     private final TournamentRepository tournamentRepository;
     private final LocationService locationService;
     private final ClubService clubService;
@@ -184,14 +185,16 @@ public class TournamentServiceImpl implements TournamentService {
         return tournament.getJoinedClubs();
     }
 
-    // // check if the username in the claim is indeed the profile id in the request variable
-    // public boolean isOwnerOfTournament(Long profileId, String username) {
-    //     Optional<PlayerProfile> playerProfileOpt = playerProfiles.findById(profileId);
-    //     if (playerProfileOpt.isPresent()) {
-    //         PlayerProfile playerProfile = playerProfileOpt.get();
-    //         return playerProfile.getUser().getUsername().equals(username);
-    //     }
-    //     return false;
-    // }
+    // check if the username in the claim is indeed the profile id in the request variable
+    public boolean isOwnerOfTournament(Long tournamentId, Long profileId) {
+        Optional<Tournament> tournamentOpt = tournamentRepository.findById(tournamentId);
+        if (tournamentOpt.isPresent()) {
+            Tournament tournament = tournamentOpt.get();
+            System.out.println(profileId);
+            System.out.println(tournament.getHost().getId());
+            return tournament.getHost().getId().equals(profileId);
+        }
+        return false;
+    }
     
 }
