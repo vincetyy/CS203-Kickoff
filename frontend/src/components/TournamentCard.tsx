@@ -1,5 +1,6 @@
 import { Button } from "./ui/button"
 import { Card, CardContent, CardFooter } from "./ui/card"
+import { useNavigate } from "react-router-dom"
 
 interface TournamentCardProps {
   name: string
@@ -22,9 +23,16 @@ const formatTournamentFormat = (format: string): string => {
   }
 };
 
-export default function TournamentCard({ name, startDate, endDate, format, teams, image, children }: TournamentCardProps) {
+export default function TournamentCard({ id, name, startDate, endDate, format, teams, image, children }: TournamentCardProps) {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/tournaments/${id}`); // Navigate to the tournament page with the corresponding id
+  }
+
+  
   return (
-    <Card className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
+    <Card className="bg-gray-800 rounded-lg overflow-hidden shadow-lg" onClick={handleCardClick}>
       <CardContent className="p-0">
         <img src={image} alt={name} className="w-full h-48 object-cover rounded-t-lg" />
         <div className="p-4 space-y-2">

@@ -4,10 +4,12 @@ import { Button } from "./ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet"
 import Sidebar from './Sidebar'
+import { Toaster } from 'react-hot-toast'
 
 export default function Header({ isSidebarOpen, setIsSidebarOpen }: { isSidebarOpen: boolean; setIsSidebarOpen: (isOpen: boolean) => void }) {
   return (
     <header className="flex justify-between items-center p-4 bg-gray-900">
+      <Toaster />
       <div className="flex items-center">
         <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
           <SheetTrigger asChild>

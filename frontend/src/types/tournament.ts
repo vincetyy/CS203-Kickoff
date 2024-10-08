@@ -3,6 +3,11 @@ export interface Location {
   name: string;
 }
 
+export interface Club {
+  id: number;
+  name: string;
+}
+
 export interface Tournament {
   id: number;
   name: string;
@@ -12,8 +17,9 @@ export interface Tournament {
   maxTeams: number;
   tournamentFormat: string;
   knockoutFormat: string;
+  prizePool: number | null;
   minRank: number | null;
   maxRank: number | null;
-  joinedClubs: any[]; // You might want to define a more specific type for clubs
+  joinedClubs: Club[];
   over: boolean;
 }
