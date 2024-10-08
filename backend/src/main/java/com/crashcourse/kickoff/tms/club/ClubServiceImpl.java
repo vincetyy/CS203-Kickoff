@@ -18,10 +18,10 @@ import com.crashcourse.kickoff.tms.club.model.PlayerApplication;
 import com.crashcourse.kickoff.tms.club.repository.ClubInvitationRepository;
 import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
 import com.crashcourse.kickoff.tms.club.repository.PlayerApplicationRepository;
+import com.crashcourse.kickoff.tms.user.model.PlayerPosition;
 import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
 import com.crashcourse.kickoff.tms.user.repository.PlayerProfileRepository;
 
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
@@ -283,35 +283,26 @@ public class ClubServiceImpl implements ClubService {
         return club.getPlayers();
     }
 
-    @Transactional
-    public void applyToClub(Long clubId, Long playerId) throws Exception {
-        // Retrieve the club
-        Club club = clubRepository.findById(clubId)
-                .orElseThrow(() -> new Exception("Club not found"));
-
-        // Retrieve the player
-        PlayerProfile player = playerProfileRepository.findById(playerId)
-                .orElseThrow(() -> new Exception("Player not found"));
-
-        // Check if the player is free agent
-        if (!player.isFreeAgent()) {
-            throw new Exception("Player is already a member of another club");
+    public void applyToClub(Long clubId, Long playerId, PlayerPosition desiredPosition) throws Exception {
+        Optional<Club> clubOpt = clubRepository.findById(clubId);
+        Optional<PlayerProfile> playerOpt = playerProfileRepository.findById(playerId);
+    
+        if (clubOpt.isPresent() && playerOpt.isPresent()) {
+            Club club = clubOpt.get();
+            PlayerProfile player = playerOpt.get();
+    
+            // Create a new application
+            PlayerApplication application = new PlayerApplication();
+            application.setClub(club);
+            application.setPlayerProfile(player);
+            application.setDesiredPosition(desiredPosition);
+            application.setStatus(ApplicationStatus.PENDING);
+    
+            // Save the application (ensure you have a repository for ClubApplication)
+            applicationRepository.save(application);
+    
+        } else {
+            throw new Exception("Club or Player not found.");
         }
-
-        // Check if the player has already applied to this club
-        if (club.getApplicants().contains(player)) {
-            throw new Exception("Player has already applied to this club");
-        }
-
-        // Optionally, check if the club has reached maximum capacity
-        if (club.getPlayers().size() >= Club.MAX_PLAYERS_IN_CLUB) {
-            throw new Exception("Club has reached maximum player capacity");
-        }
-
-        // Add the player to the club's applicants list
-        club.getApplicants().add(player);
-
-        // Save the club to persist the changes
-        clubRepository.save(club);
     }
 }

@@ -1,22 +1,18 @@
-// src/components/ClubInfoModal.tsx
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ClubProfile } from '../types/club';
 import { Button } from './ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface ClubInfoModalProps {
   clubId: number;
-  onApplyClick: () => void;
 }
 
-const ClubInfoModal: React.FC<ClubInfoModalProps> = ({
-  clubId,
-  onApplyClick,
-}) => {
+const ClubInfoModal: React.FC<ClubInfoModalProps> = ({ clubId }) => {
   const [club, setClub] = useState<ClubProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchClub = async () => {
@@ -46,6 +42,10 @@ const ClubInfoModal: React.FC<ClubInfoModalProps> = ({
     );
   }
 
+  const handleViewMore = () => {
+    navigate(`/club/${clubId}`);
+  };
+
   return (
     <div>
       <img
@@ -64,20 +64,8 @@ const ClubInfoModal: React.FC<ClubInfoModalProps> = ({
         </div>
       </div>
 
-      {/* Players List */}
-      <details className="mb-4">
-        <summary className="cursor-pointer font-semibold">
-          Players in the Club
-        </summary>
-        <ul className="list-disc list-inside mt-2">
-          {club.playerNames.map((playerName: string, index: number) => (
-            <li key={index}>{playerName}</li>
-          ))}
-        </ul>
-      </details>
-
-      {/* Apply Button */}
-      <Button onClick={onApplyClick}>Apply to Join</Button>
+      {/* View More Button */}
+      <Button onClick={handleViewMore}>View More</Button>
     </div>
   );
 };

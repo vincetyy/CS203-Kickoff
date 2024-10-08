@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.crashcourse.kickoff.tms.club.dto.CaptainTransferRequest;
-import com.crashcourse.kickoff.tms.club.dto.ClubApplicationRequest;
 import com.crashcourse.kickoff.tms.club.dto.ClubCreationRequest;
 import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
 import com.crashcourse.kickoff.tms.user.dto.PlayerInviteRequest;
@@ -142,17 +141,6 @@ public class ClubController {
             return ResponseEntity.ok(profile);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-    }
-
-    // to link to free agent applying for club, in club info page
-    @PostMapping("/{id}/apply")
-    public ResponseEntity<?> applyToClub(@PathVariable Long id, @RequestBody ClubApplicationRequest request) {
-        try {
-            clubService.applyToClub(id, request.getPlayerId());
-            return ResponseEntity.ok().body("Application sent successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 }
