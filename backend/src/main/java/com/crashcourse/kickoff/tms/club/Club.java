@@ -3,8 +3,8 @@ package com.crashcourse.kickoff.tms.club;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
-import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -15,8 +15,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -44,7 +44,7 @@ public class Club {
     private double elo;
     private double ratingDeviation;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(mappedBy = "clubCaptainOf", cascade = CascadeType.PERSIST)
     private PlayerProfile captain;
 
     @JsonIgnore

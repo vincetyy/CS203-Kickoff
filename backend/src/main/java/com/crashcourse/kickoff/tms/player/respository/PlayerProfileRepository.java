@@ -1,8 +1,9 @@
-package com.crashcourse.kickoff.tms.user.repository;
+package com.crashcourse.kickoff.tms.player.respository;
 
-import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
 
 @Repository
 public interface PlayerProfileRepository extends JpaRepository<PlayerProfile, Long> {

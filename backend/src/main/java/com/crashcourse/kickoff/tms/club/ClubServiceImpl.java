@@ -18,10 +18,10 @@ import com.crashcourse.kickoff.tms.club.model.PlayerApplication;
 import com.crashcourse.kickoff.tms.club.repository.ClubInvitationRepository;
 import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
 import com.crashcourse.kickoff.tms.club.repository.PlayerApplicationRepository;
-import com.crashcourse.kickoff.tms.user.model.PlayerPosition;
-import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
-import com.crashcourse.kickoff.tms.user.repository.PlayerProfileRepository;
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
+import com.crashcourse.kickoff.tms.player.respository.PlayerProfileRepository;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
@@ -41,8 +41,8 @@ public class ClubServiceImpl implements ClubService {
     private ClubInvitationRepository clubInvitationRepository;
 
     // jparepository has automatically implemented crud methods
+    @Transactional
     public Club createClub(@Valid Club club, Long creatorId) throws Exception {
-
         // Find the PlayerProfile by ID
         PlayerProfile creator = playerProfileRepository.findById(creatorId)
         .orElseThrow(() -> new RuntimeException("PlayerProfile not found"));

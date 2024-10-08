@@ -5,8 +5,7 @@ import java.util.Optional;
 
 import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
 import com.crashcourse.kickoff.tms.club.model.ClubInvitation;
-import com.crashcourse.kickoff.tms.club.model.PlayerApplication;
-import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
 
 import jakarta.validation.Valid;
 

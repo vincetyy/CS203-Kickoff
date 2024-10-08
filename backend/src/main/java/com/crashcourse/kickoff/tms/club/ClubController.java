@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.crashcourse.kickoff.tms.club.dto.CaptainTransferRequest;
 import com.crashcourse.kickoff.tms.club.dto.ClubCreationRequest;
 import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
-import com.crashcourse.kickoff.tms.user.dto.PlayerInviteRequest;
-import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
+import com.crashcourse.kickoff.tms.player.dto.PlayerInviteRequest;
 
 import jakarta.validation.Valid;
 
