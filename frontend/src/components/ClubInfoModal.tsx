@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 interface ClubInfoModalProps {
   clubId: number;
+  onApplyClick: () => void;
 }
 
 const ClubInfoModal: React.FC<ClubInfoModalProps> = ({ clubId }) => {
