@@ -152,7 +152,6 @@ const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreate
           </div>
         </DialogContent>
       </Dialog>
-      <Toaster position="top-center" />
     </>
   );
 };
