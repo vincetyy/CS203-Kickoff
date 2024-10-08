@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.user.model.User;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -30,6 +32,9 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
+@JsonIdentityInfo(
+    generator = ObjectIdGenerators.PropertyGenerator.class,
+    property = "id")
 public class PlayerProfile {
     @Id
     private Long id;

@@ -5,7 +5,9 @@ import java.util.List;
 
 import com.crashcourse.kickoff.tms.player.PlayerProfile;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -27,6 +29,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIdentityInfo(
+    generator = ObjectIdGenerators.PropertyGenerator.class,
+    property = "id")
 
 // note lombok's @data annotations generates getters and setters automatically
 public class Club {
