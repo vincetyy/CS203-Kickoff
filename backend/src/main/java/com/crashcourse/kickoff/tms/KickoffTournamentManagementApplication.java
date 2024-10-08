@@ -5,11 +5,26 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.crashcourse.kickoff.tms.club.Club;
+import com.crashcourse.kickoff.tms.club.ClubService;
+import com.crashcourse.kickoff.tms.location.model.Location;
+import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
+import com.crashcourse.kickoff.tms.location.service.LocationService;
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
+import com.crashcourse.kickoff.tms.player.service.PlayerProfileService;
 import com.crashcourse.kickoff.tms.security.SecurityConfig;
+import com.crashcourse.kickoff.tms.tournament.dto.TournamentCreateDTO;
+import com.crashcourse.kickoff.tms.tournament.model.KnockoutFormat;
+import com.crashcourse.kickoff.tms.tournament.model.Tournament;
+import com.crashcourse.kickoff.tms.tournament.model.TournamentFormat;
+import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
 import com.crashcourse.kickoff.tms.user.UserRepository;
 import com.crashcourse.kickoff.tms.user.model.User;
 import com.crashcourse.kickoff.tms.user.service.UserService;
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
+
+import java.time.LocalDateTime;
+import java.util.*;
 
 @SpringBootApplication
 public class KickoffTournamentManagementApplication {
@@ -21,15 +36,51 @@ public class KickoffTournamentManagementApplication {
 	}
 
 	private static void initialiseMockData(ApplicationContext ctx) {
-		// JPA user repository init
-		UserRepository users = ctx.getBean(UserRepository.class);
-		BCryptPasswordEncoder encoder = ctx.getBean(BCryptPasswordEncoder.class);
-		System.out.println("[Add admin]: " + users.save(
-				new User("admin", encoder.encode("password"), SecurityConfig.getAllRolesAsSet())).getUsername());
+		// User
 		UserService userService = ctx.getBean(UserService.class);
+		PlayerProfileService playerProfileService = ctx.getBean(PlayerProfileService.class);
+		BCryptPasswordEncoder encoder = ctx.getBean(BCryptPasswordEncoder.class);
+
+		// Creating admin
+		NewUserDTO adminDTO = new NewUserDTO("admin", "admin@email.com", "password",
+				new String[] { "POSITION_Goalkeeper", "POSITION_Midfielder" }, "player");
+		User admin = userService.addUser(adminDTO);
+		admin.setRoles(SecurityConfig.getAllRolesAsSet());
+		admin = userService.getUserById(admin.getId());
+		System.out.println("[Add admin]: " + admin.getUsername());
+
+		// Creating dummy
 		NewUserDTO dummyUserDTO = new NewUserDTO("dummyUser", "user@email.com", "password",
 				new String[] { "POSITION_Goalkeeper", "POSITION_Midfielder" }, "player");
-		System.out.println("[Add dummy user]: " + userService.addUser(dummyUserDTO).getUsername());
+		User dummy = userService.addUser(dummyUserDTO);
+		System.out.println("[Add dummy user]: " + dummy.getUsername());
 
+		// Club
+		ClubService clubService = ctx.getBean(ClubService.class);
+		Club newClub = new Club(null, "My New Club", 500, 50, playerProfileService.getPlayerProfile(admin.getId()), new ArrayList<PlayerProfile>(), new ArrayList<Tournament>());
+		
+		try {
+			clubService.createClub(newClub, admin.getId());
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Gone case");
+		}
+		System.out.println("[Add club]: " + newClub.getName());
+
+
+		// Location
+		LocationService locationService = ctx.getBean(LocationService.class);
+		Location location1 = new Location(null, "MBS");
+		locationService.createLocation(location1);
+		Location location2 = new Location(null, "Botanic Gardens");
+		locationService.createLocation(location2);
+
+		// Tournament
+		TournamentService tournamentService = ctx.getBean(TournamentService.class);
+		TournamentCreateDTO tournament1DTO = new TournamentCreateDTO("Tournament 1", LocalDateTime.of(
+            2021, 4, 24, 14, 33, 48), LocalDateTime.of(
+			2021,5, 24, 14, 33, 48), location1.getId(), 16, TournamentFormat.FIVE_SIDE, KnockoutFormat.SINGLE_ELIM, new ArrayList<Float>(), null, null);
+		tournamentService.createTournament(tournament1DTO);
+		
 	}
 }

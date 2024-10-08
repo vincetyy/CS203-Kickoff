@@ -14,6 +14,8 @@ import com.crashcourse.kickoff.tms.player.respository.PlayerProfileRepository;
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
 import com.crashcourse.kickoff.tms.user.model.User;
 
+import jakarta.transaction.Transactional;
+
 @Service("playerProfileService")
 public class PlayerProfileServiceImpl implements PlayerProfileService {
     private PlayerProfileRepository playerProfiles;
@@ -72,6 +74,7 @@ public class PlayerProfileServiceImpl implements PlayerProfileService {
         return false;
     }
 
+    @Transactional
     @Override
     public PlayerProfile updatePlayerProfile(PlayerProfile playerProfile,
             PlayerProfileUpdateDTO playerProfileUpdateDTO) {
@@ -82,6 +85,7 @@ public class PlayerProfileServiceImpl implements PlayerProfileService {
         return playerProfiles.save(playerProfile);
     }
 
+    @Transactional
     @Override
     public PlayerProfile addPlayerProfile(User newUser, NewUserDTO newUserDTO) {
         PlayerProfile newPlayerProfile = new PlayerProfile();

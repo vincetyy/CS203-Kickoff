@@ -65,7 +65,7 @@ export default function PlayerProfilePage() {
         setLoading(false);
       } catch (err) {
         console.error('Error fetching player profile:', err);
-        setError('Failed to fetch player profile');
+        // setError('Failed to fetch player profile');
         setLoading(false);
       }
     };

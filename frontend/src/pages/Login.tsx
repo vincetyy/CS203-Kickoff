@@ -79,18 +79,16 @@ const Login = () => {
       };
 
     return (
-        <div className="flex h-screen">
+        <div className="flex ">
+            <Toaster />
             {/* Left section for the football player image */}
             <div className="w-1/2 flex items-center justify-center bg-black relative">
                 <div className="text-white text-center">
                     <img
-                        className="w-3/4 mx-auto rounded-lg"
+                        className="mx-auto rounded-lg"
                         src={loginpageBackground} // Replace with the actual path
                         alt="Football Player"
                     />
-                    <h1 className="absolute text-6xl top-1/3 left-1/4 text-white font-bold">
-                        21
-                    </h1>
                 </div>
             </div>
 

@@ -13,8 +13,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -42,7 +42,7 @@ public class Club {
     private double elo;
     private double ratingDeviation;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(mappedBy = "clubCaptainOf", cascade = CascadeType.PERSIST)
     private PlayerProfile captain;
 
     @JsonIgnore

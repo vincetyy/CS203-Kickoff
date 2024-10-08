@@ -39,6 +39,10 @@ public class PlayerProfile {
     private Club club;
 
     @OneToOne
+    @JoinColumn(name = "club_captain_of_id")
+    private Club clubCaptainOf;
+
+    @OneToOne
     @MapsId // Shares the primary key with User
     @JoinColumn(name = "id")  // The foreign key column name
     private User user;

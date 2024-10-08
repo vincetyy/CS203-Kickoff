@@ -124,6 +124,7 @@ export default function TournamentsPage() {
   };
 
   const handleCreateTournament = async () => {
+    console.log(newTournament)
     if (!newTournament.name || !newTournament.startDateTime || !newTournament.endDateTime || !newTournament.locationId || !newTournament.maxTeams || !newTournament.tournamentFormat || !newTournament.knockoutFormat) {
       toast.error('Please fill in all required fields', {
         duration: 3000,
@@ -158,7 +159,7 @@ export default function TournamentsPage() {
 
     } catch (err) {
       console.error('Error creating tournament:', err)
-      toast.error(`Failed to create tournament: ${(err as any).message}`, {
+      toast.error(`Failed to create tournament: ${err.message}`, {
         duration: 4000,
         position: 'top-center',
       })
