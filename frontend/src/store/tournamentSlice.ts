@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { fetchTournamentById, fetchTournaments, joinTournament, createTournament } from '../services/tournamentService';
+import { fetchTournamentById, fetchTournaments, joinTournament, createTournament, updateTournament } from '../services/tournamentService';
 import { Tournament } from '../types/tournament';
 
 export const fetchTournamentByIdAsync = createAsyncThunk(
@@ -27,6 +27,13 @@ export const createTournamentAsync = createAsyncThunk(
   'tournaments/createTournament',
   async (tournamentData: Partial<Tournament>) => {
     return await createTournament(tournamentData);
+  }
+);
+
+export const updateTournamentAsync = createAsyncThunk(
+  'tournaments/updateTournament',
+  async ({ tournamentId, tournamentData }: { tournamentId: number; tournamentData: Partial<Tournament> }) => {
+    return await updateTournament(tournamentId, tournamentData);
   }
 );
 
@@ -60,6 +67,12 @@ const tournamentSlice = createSlice({
       })
       .addCase(createTournamentAsync.fulfilled, (state, action) => {
         state.tournaments.push(action.payload);
+      }).addCase(updateTournamentAsync.fulfilled, (state, action) => {
+        const updatedTournament = action.payload;
+        const index = state.tournaments.findIndex(tournament => tournament.id === updatedTournament.id);
+        if (index !== -1) {
+          state.tournaments[index] = updatedTournament;
+        }
       });
   },
 });

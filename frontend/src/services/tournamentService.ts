@@ -20,3 +20,8 @@ export const createTournament = async (tournamentData: Partial<Tournament>): Pro
   const response = await api.post('/tournaments', tournamentData);
   return response.data;
 };
+
+export const updateTournament = async (tournamentId: number, tournamentData: Partial<Tournament>): Promise<Tournament> => {
+  const response = await api.put(`/tournaments/${tournamentId}`, tournamentData);
+  return response.data;
+};

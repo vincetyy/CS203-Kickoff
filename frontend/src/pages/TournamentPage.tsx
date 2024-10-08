@@ -3,16 +3,21 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast';
+import { AppDispatch, RootState } from '../store'
+import { Input } from "../components/ui/input"
 import { Button } from "../components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 
-import { fetchTournamentById } from '../services/tournamentService';
+import { fetchTournamentById, updateTournament } from '../services/tournamentService';
 import { Tournament, Club } from '../types/tournament';
+import { useDispatch } from 'react-redux';
+import { updateTournamentAsync } from '../store/tournamentSlice';
 
 const TournamentPage: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>()
 
   const { id } = useParams<{ id: string }>();
   const tournamentId = id ? parseInt(id, 10) : null;
@@ -24,6 +29,90 @@ const TournamentPage: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'succeeded' | 'failed'>('idle');
   const [error, setError] = useState<string | null>(null);
   // const [joinRole, setJoinRole] = useState<TournamentJoinRole | null>(null);
+
+  const [updatedTournament, setUpdatedTournament] = useState({
+    name: '',
+    startDateTime: '',
+    endDateTime: '',
+    locationId: '',
+    maxTeams: 0,
+    tournamentFormat: '',
+    knockoutFormat: '',
+    minRank: 0,
+    maxRank: 0,
+  })
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+
+  const handleUpdate = () => {
+    if (selectedTournament) {
+      setUpdatedTournament({
+        name: selectedTournament.name || '',
+        locationId: selectedTournament.location.id || '',
+        startDateTime: selectedTournament.startDateTime || '',
+        endDateTime: selectedTournament.endDateTime || '',
+        maxTeams: selectedTournament.maxTeams || 0,
+        tournamentFormat: selectedTournament.tournamentFormat || '',
+        knockoutFormat: selectedTournament.knockoutFormat || '',
+        minRank: selectedTournament.minRank || 0,
+        maxRank: selectedTournament.maxRank || 0,
+      });
+      setIsCreateDialogOpen(true);
+    }
+  };
+
+  const handleUpdateTournament = async () => {
+    console.log(updatedTournament)
+    if (!updatedTournament.name || !updatedTournament.startDateTime || !updatedTournament.endDateTime || !updatedTournament.locationId || !updatedTournament.maxTeams || !updatedTournament.tournamentFormat || !updatedTournament.knockoutFormat) {
+      toast.error('Please fill in all required fields', {
+        duration: 3000,
+        position: 'top-center',
+      })
+      return
+    }
+
+    setIsCreateDialogOpen(false) // Close the dialog immediately
+
+    try {
+
+      const result = await dispatch(updateTournamentAsync({ 
+        tournamentId: selectedTournament.id,
+        tournamentData: updatedTournament
+      })).unwrap();
+      
+      setIsCreateDialogOpen(false)
+      
+      // Show the success toast
+      toast.success('Tournament updated successfully!', {
+        duration: 3000,
+        position: 'top-center',
+      });
+
+      // Reset the form
+      setUpdatedTournament({
+        name: '',
+        startDateTime: '',
+        endDateTime: '',
+        locationId: '',
+        maxTeams: 0,
+        tournamentFormat: '',
+        knockoutFormat: '',
+        minRank: 0,
+        maxRank: 0,
+      });
+
+    } catch (err) {
+      console.error('Error updating tournament:', err)
+      toast.error(`Failed to update tournament: ${err.message}`, {
+        duration: 4000,
+        position: 'top-center',
+      })
+    }
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    setUpdatedTournament(prev => ({ ...prev, [name]: value }))
+  }
 
   const handleBackClick = () => {
     navigate('/tournaments'); // Navigate back to /tournaments
@@ -123,10 +212,138 @@ const TournamentPage: React.FC = () => {
 
         
       </div>
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] lg:max-w-[800px]">
+          <DialogHeader>
+            <DialogTitle>Create New Tournament</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="name" className="form-label">Tournament Name</label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={updatedTournament.name}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="locationId" className="form-label">Location ID</label>
+                <Input
+                  id="locationId"
+                  name="locationId"
+                  type="number"
+                  value={updatedTournament.locationId}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="startDateTime" className="form-label">Start Date & Time</label>
+                <Input
+                  id="startDateTime"
+                  name="startDateTime"
+                  type="datetime-local"
+                  value={updatedTournament.startDateTime}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="endDateTime" className="form-label">End Date & Time</label>
+                <Input
+                  id="endDateTime"
+                  name="endDateTime"
+                  type="datetime-local"
+                  value={updatedTournament.endDateTime}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="maxTeams" className="form-label">Max Teams</label>
+                <Input
+                  id="maxTeams"
+                  name="maxTeams"
+                  type="number"
+                  value={updatedTournament.maxTeams}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="tournamentFormat" className="form-label">Tournament Format</label>
+                <Select onValueChange={(value) => setUpdatedTournament(prev => ({ ...prev, tournamentFormat: value }))}>
+                  <SelectTrigger className="select-trigger">
+                    <SelectValue placeholder="Select format" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="FIVE_SIDE">Five-a-side</SelectItem>
+                    <SelectItem value="SEVEN_SIDE">Seven-a-side</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label htmlFor="knockoutFormat" className="form-label">Knockout Format</label>
+                <Select onValueChange={(value) => setUpdatedTournament(prev => ({ ...prev, knockoutFormat: value }))}>
+                  <SelectTrigger className="select-trigger">
+                    <SelectValue placeholder="Select format" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="SINGLE_ELIM">Single Elimination</SelectItem>
+                    <SelectItem value="DOUBLE_ELIM">Double Elimination</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label htmlFor="minRank" className="form-label">Min Rank</label>
+                <Input
+                  id="minRank"
+                  name="minRank"
+                  type="number"
+                  value={updatedTournament.minRank}
+                  onChange={handleInputChange}
+                  className="form-input"
+                />
+              </div>
+              <div>
+                <label htmlFor="maxRank" className="form-label">Max Rank</label>
+                <Input
+                  id="maxRank"
+                  name="maxRank"
+                  type="number"
+                  value={updatedTournament.maxRank}
+                  onChange={handleInputChange}
+                  className="form-input"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2 mt-6">
+              <Button type="button" onClick={() => setIsCreateDialogOpen(false)} className="bg-gray-600 hover:bg-gray-700">
+                Cancel
+              </Button>
+              <Button type="button" onClick={handleUpdateTournament} className="bg-blue-600 hover:bg-blue-700">
+                Update
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Button type="button" onClick={handleUpdate} className="bg-blue-600 hover:bg-blue-700">
+        Update
+      </Button>
       {/* Back Button */}
       <div className="mb-4">
         <Button onClick={handleBackClick}>Back to Tournaments</Button>
       </div>
+      
     </>
   );
 };

@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const CreateTournament: React.FC = () => {
+interface CreateTournamentProps {
+    tournamentId?: number; // Add this to support updating existing tournaments
+    existingTournamentData?: Tournament; // Pass existing tournament data for updates
+    isUpdate?: boolean; // Flag to indicate whether it's an update or create
+    onClose: () => void; // Function to close the popup
+  }
+
+const CreateTournament: React.FC<CreateTournamentProps> = ({ tournamentId, existingTournamentData, isUpdate = false, onClose }) => {
     const [form, setForm] = useState({
         name: '',
         startDateTime: '',
@@ -23,6 +30,23 @@ const CreateTournament: React.FC = () => {
     ];
     const tournamentFormats = ['FIVE_SIDE', 'SEVEN_SIDE']; // Match backend enums
     const knockoutFormats = ['SINGLE_ELIM', 'DOUBLE_ELIM']; // Match backend enums
+
+    // If updating, prefill the form with existing data
+    useEffect(() => {
+        if (isUpdate && existingTournamentData) {
+            setForm({
+                name: existingTournamentData.name || '',
+                startDateTime: existingTournamentData.startDateTime || '',
+                endDateTime: existingTournamentData.endDateTime || '',
+                locationId: existingTournamentData.location?.id?.toString() || '',
+                maxTeams: existingTournamentData.maxTeams || 0,
+                minRank: existingTournamentData.minRank || 0,
+                maxRank: existingTournamentData.maxRank || 0,
+                tournamentFormat: existingTournamentData.tournamentFormat || '',
+                knockoutFormat: existingTournamentData.knockoutFormat || '',
+            });
+        }
+    }, [isUpdate, existingTournamentData]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -47,13 +71,25 @@ const CreateTournament: React.FC = () => {
                 // Include other fields if needed
             };
 
-            const response = await axios.post('http://localhost:8080/tournaments', payload, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            setSuccess('Tournament created successfully!');
-            console.log('Tournament created:', response.data);
+            let response;
+            if (isUpdate && tournamentId) {
+                // Update tournament with PUT or PATCH
+                response = await axios.put(`http://localhost:8080/tournaments/${tournamentId}`, payload, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                setSuccess('Tournament updated successfully!');
+            } else {
+                // Create new tournament with POST
+                response = await axios.post('http://localhost:8080/tournaments', payload, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                setSuccess('Tournament created successfully!');
+            }
+            console.log('Tournament created/updated:', response.data);
         } catch (error: any) {
             if (error.response && error.response.data) {
                 setError(error.response.data.message || 'Failed to create tournament');
