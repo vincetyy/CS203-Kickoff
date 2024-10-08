@@ -32,8 +32,8 @@ export default function TournamentCard({ id, name, startDate, endDate, format, t
 
   
   return (
-    <Card className="bg-gray-800 rounded-lg overflow-hidden shadow-lg" onClick={handleCardClick}>
-      <CardContent className="p-0">
+    <Card className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
+      <CardContent className="p-0" onClick={handleCardClick}>
         <img src={image} alt={name} className="w-full h-48 object-cover rounded-t-lg" />
         <div className="p-4 space-y-2">
           <h3 className="text-lg font-semibold text-white">{name}</h3>

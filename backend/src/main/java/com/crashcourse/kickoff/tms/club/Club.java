@@ -49,6 +49,7 @@ public class Club {
     private double elo;
     private double ratingDeviation;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "clubCaptainOf", cascade = CascadeType.PERSIST)
     private PlayerProfile captain;
 

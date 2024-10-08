@@ -10,3 +10,7 @@ export const applyToClub = async (clubId: number, playerProfileId: number, desir
   const response = await api.post(`/clubs/${clubId}/apply`, { playerProfileId, desiredPosition });
   return response.data;
 };
+
+export const createClub = async (clubData: any) => {
+  return api.post('/clubs', clubData);
+};
