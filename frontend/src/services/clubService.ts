@@ -11,6 +11,7 @@ export const applyToClub = async (clubId: number, playerProfileId: number, desir
   return response.data;
 };
 
-export const createClub = async (clubData: any) => {
-  return api.post('/clubs', clubData);
+export const createClub = async (clubData: any): Promise<any> => {
+  const response = await api.post('/clubs', clubData);
+  return response.data;
 };
