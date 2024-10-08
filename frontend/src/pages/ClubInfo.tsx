@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Toaster, toast } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { Button } from '../components/ui/button';
 import { ClubProfile } from '../types/club';
 import {
@@ -89,7 +89,6 @@ const ClubInfo: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <Toaster />
       <img
         src={`https://picsum.photos/seed/club-${club.id}/800/200`}
         alt={`${club.name} banner`}
