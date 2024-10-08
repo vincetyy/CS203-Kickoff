@@ -11,7 +11,10 @@ import {
 import React from "react";
 import axios from 'axios';
 
+import { Toaster, toast } from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom';
 const Login = () => {
+    const navigate = useNavigate();
     const [username, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [showPassword, setShowPassword] = React.useState(false);
@@ -36,6 +39,14 @@ const Login = () => {
             localStorage.setItem('authToken', token);  // Store JWT in localStorage
             localStorage.setItem('username', username); 
             console.log('Login successful');
+
+            navigate('/club');  
+
+            // Show the success toast
+            toast.success(`Welcome back, ${username}`, {
+                duration: 3000,
+                position: 'top-center',
+            });
             
           }
         } catch (error: unknown) {
@@ -44,7 +55,11 @@ const Login = () => {
               // Axios-specific error handling
               if (error.response) {
                 console.error('Error response:', error.response.data);
-                console.error('Error status:', error.response.status);
+                console.error('Error status:', error.response.status)
+                toast.error(`${error.response.data.message}`, {
+                    duration: 4000,
+                    position: 'top-center',
+                  });;
               } else if (error.request) {
                 console.error('Error request:', error.request);
               } else {
@@ -53,6 +68,10 @@ const Login = () => {
             } else if (error instanceof Error) {
               // Generic error handling
               console.error('Generic error:', error.message);
+              toast.error(`${error.message}`, {
+                duration: 4000,
+                position: 'top-center',
+              });
             } else {
               console.error('Unknown error:', error);
             }
