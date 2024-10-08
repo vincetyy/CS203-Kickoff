@@ -1,5 +1,6 @@
 package com.crashcourse.kickoff.tms.tournament.dto;
 
+import com.crashcourse.kickoff.tms.host.HostProfile;
 import com.crashcourse.kickoff.tms.location.model.*;
 import com.crashcourse.kickoff.tms.tournament.model.*;
 
@@ -84,5 +85,8 @@ public class TournamentCreateDTO {
      */
     @Min(value = 0, message = "Maximum rank cannot be negative")
     private Integer maxRank;
+
+    @NotNull(message = "Host is required")
+    private HostProfile host;
 
 }

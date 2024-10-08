@@ -45,13 +45,14 @@ public class UserServiceImpl implements UserService {
         Role newUserRole = Role.valueOf("ROLE_" + newUserDTO.getRole().toUpperCase());
         newUser.setRoles(new HashSet<Role>(Arrays.asList(newUserRole)));
 
+        newUser = users.save(newUser);
         // Build the entire object graph before saving
         switch (newUserRole) {
             case Role.ROLE_PLAYER:
                 playerProfileService.addPlayerProfile(newUser, newUserDTO);
                 break;
             case Role.ROLE_HOST:
-                hostProfileService.addHostProfile(newUser, newUserDTO);
+                hostProfileService.addHostProfile(newUser);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid role: " + newUserDTO.getRole());
@@ -61,11 +62,13 @@ public class UserServiceImpl implements UserService {
         return users.save(newUser);
     }
 
+    @Transactional
     @Override
     public User loadUserByUsername(String userName) {
         return users.findByUsername(userName).isPresent() ? users.findByUsername(userName).get() : null;
     }
 
+    @Transactional
     @Override
     public User getUserById(Long userId) {
         return users.findById(userId).orElse(null);  

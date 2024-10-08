@@ -3,6 +3,7 @@ package com.crashcourse.kickoff.tms.tournament.service;
 import com.crashcourse.kickoff.tms.club.*;
 
 import com.crashcourse.kickoff.tms.location.service.LocationService;
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
 import com.crashcourse.kickoff.tms.location.model.*;
 
 import com.crashcourse.kickoff.tms.tournament.dto.*;
@@ -101,6 +102,7 @@ public class TournamentServiceImpl implements TournamentService {
         tournament.setPrizePool(dto.getPrizePool());
         tournament.setMinRank(dto.getMinRank());
         tournament.setMaxRank(dto.getMaxRank());
+        tournament.setHost(dto.getHost());
 
         return tournament;
     }
@@ -134,7 +136,8 @@ public class TournamentServiceImpl implements TournamentService {
                 tournament.getPrizePool(),
                 tournament.getMinRank(),
                 tournament.getMaxRank(),
-                clubDTOs
+                clubDTOs,
+                tournament.getHost()
         );
     }
 
@@ -180,5 +183,15 @@ public class TournamentServiceImpl implements TournamentService {
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + id));
         return tournament.getJoinedClubs();
     }
+
+    // // check if the username in the claim is indeed the profile id in the request variable
+    // public boolean isOwnerOfTournament(Long profileId, String username) {
+    //     Optional<PlayerProfile> playerProfileOpt = playerProfiles.findById(profileId);
+    //     if (playerProfileOpt.isPresent()) {
+    //         PlayerProfile playerProfile = playerProfileOpt.get();
+    //         return playerProfile.getUser().getUsername().equals(username);
+    //     }
+    //     return false;
+    // }
     
 }

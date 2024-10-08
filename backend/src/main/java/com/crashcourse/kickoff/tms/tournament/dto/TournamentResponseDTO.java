@@ -5,6 +5,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.crashcourse.kickoff.tms.host.HostProfile;
+
 /**
  * Data Transfer Object for responding with Tournament data.
  * This DTO excludes sensitive or unnecessary fields and presents data in a client-friendly format.
@@ -31,6 +33,7 @@ public class TournamentResponseDTO {
     private Integer maxRank;
 
     private List<ClubDTO> joinedClubs;
+    private HostProfile host;
 
     /**
      * Inner DTO for Location data.
