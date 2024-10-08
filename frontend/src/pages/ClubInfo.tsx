@@ -14,7 +14,7 @@ const ClubInfo: React.FC = () => {
   useEffect(() => {
     const fetchClub = async () => {
       try {
-        const response = await axios.get(`/clubs/${id}`);
+        const response = await axios.get(`http://localhost:8080/clubs/${id}`);
         setClub(response.data);
       } catch (err: any) {
         console.error('Error fetching club info:', err);
@@ -31,7 +31,7 @@ const ClubInfo: React.FC = () => {
     try {
       // Replace `userId` with the actual player ID from your auth context
       const userId = 1; // Placeholder
-      await axios.post(`/clubs/${id}/apply`, {
+      await axios.post(`http://localhost:8080/clubs/${id}/apply`, {
         playerId: userId,
       });
       toast.success('Application sent successfully!');

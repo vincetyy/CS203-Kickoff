@@ -1,19 +1,29 @@
 package com.crashcourse.kickoff.tms.club;
 
-import com.crashcourse.kickoff.tms.club.Club;
-import com.crashcourse.kickoff.tms.club.exception.*;
-import com.crashcourse.kickoff.tms.user.dto.PlayerInviteRequest;
-import com.crashcourse.kickoff.tms.user.model.*;
-import com.crashcourse.kickoff.tms.club.dto.*;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.crashcourse.kickoff.tms.club.dto.CaptainTransferRequest;
+import com.crashcourse.kickoff.tms.club.dto.ClubApplicationRequest;
+import com.crashcourse.kickoff.tms.club.dto.ClubCreationRequest;
+import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
+import com.crashcourse.kickoff.tms.user.dto.PlayerInviteRequest;
+import com.crashcourse.kickoff.tms.user.model.PlayerProfile;
 
 import jakarta.validation.Valid;
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/clubs")
@@ -37,14 +47,14 @@ public class ClubController {
         return clubService.getAllClubs();
     }
 
-    @GetMapping("/{clubId}")
-    public ResponseEntity<?> getClubById(@PathVariable Long clubId) {
-        Optional<Club> club = clubService.getClubById(clubId);
-        if (club.isPresent()) {
-            return new ResponseEntity<>(club.get(), HttpStatus.OK);
-        }
-        return new ResponseEntity<String>("Club not found", HttpStatus.NOT_FOUND);
-    }
+    // @GetMapping("/{clubId}")
+    // public ResponseEntity<?> getClubById(@PathVariable Long clubId) {
+    //     Optional<Club> club = clubService.getClubById(clubId);
+    //     if (club.isPresent()) {
+    //         return new ResponseEntity<>(club.get(), HttpStatus.OK);
+    //     }
+    //     return new ResponseEntity<String>("Club not found", HttpStatus.NOT_FOUND);
+    // }
 
     @PutMapping("/{clubId}")
     public ResponseEntity<?> updateClub(@PathVariable Long clubId, @RequestBody Club clubDetails) {
