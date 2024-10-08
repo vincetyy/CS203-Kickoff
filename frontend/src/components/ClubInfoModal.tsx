@@ -44,7 +44,7 @@ const ClubInfoModal: React.FC<ClubInfoModalProps> = ({ clubId }) => {
   }
 
   const handleViewMore = () => {
-    navigate(`/club/${clubId}`);
+    navigate(`/clubs/${clubId}`);
   };
 
   return (

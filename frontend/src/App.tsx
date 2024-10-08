@@ -21,12 +21,12 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/tournaments" element={<TournamentsPage />} />
           <Route path="/tournaments/:id" element={<TournamentPage />} />
-          <Route path="/club" element={<ClubPage />} />
+          <Route path="/clubs" element={<ClubPage />} />
           <Route path="/leaderboards" element={<LeaderboardsPage />} />
           <Route path="/create-tournament" element={<CreateTournament />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/club/:id" element={<ClubInfo />} />
+          <Route path="/clubs/:id" element={<ClubInfo />} />
         </Route>
       </Routes>
     </Router>
