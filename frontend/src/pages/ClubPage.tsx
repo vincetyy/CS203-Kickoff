@@ -10,6 +10,8 @@ import { Button } from "../components/ui/button"
 import ClubCard from '../components/ClubCard'
 import { Toaster, toast } from 'react-hot-toast'
 import { Club } from '../types/club'
+import { useNavigate } from 'react-router-dom';
+
 
 // Remove the local Club interface
 
@@ -28,6 +30,7 @@ export default function ClubPage() {
   const [selectedClub, setSelectedClub] = useState<Club | null>(null)
   const [selectedPosition, setSelectedPosition] = useState<PlayerPosition | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     dispatch(fetchClubsAsync())
@@ -82,9 +85,13 @@ export default function ClubPage() {
     setSelectedPosition(position as PlayerPosition);
   };
 
+  const handleCreateClubClick = () => {
+    navigate('/clubs/create-club'); // Navigate to CreateClub page
+  };
+
   if (status === 'loading') return <div>Loading...</div>
   if (status === 'failed') return <div>Error: {error}</div>
-
+  
   return (
     <>
       <Toaster />
@@ -145,6 +152,9 @@ export default function ClubPage() {
             </SelectContent>
           </Select>
         </div>
+        <Button onClick={handleCreateClubClick} className="bg-blue-600 hover:bg-blue-700">
+          Create Club
+        </Button>
       </div>
 
       {/* Club cards */}

@@ -6,22 +6,30 @@ import TournamentsPage from './pages/TournamentsPage';
 import ClubPage from './pages/ClubPage';
 import LeaderboardsPage from './pages/LeaderboardsPage';
 import CreateTournament from './pages/CreateTournament';
+import CreateClub from './pages/CreateClub';
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* No sidebar */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/home" element={<LandingPage />} />
+        
+        
+        {/* Layout with sidebar */}
         <Route element={<Layout />}>
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/tournaments" element={<TournamentsPage />} />
           <Route path="/club" element={<ClubPage />} />
           <Route path="/leaderboards" element={<LeaderboardsPage />} />
           <Route path="/create-tournament" element={<CreateTournament />} />
+          <Route path="/clubs/create-club" element={<CreateClub />} />
+
         </Route>
       </Routes>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
