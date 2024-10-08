@@ -1,125 +1,178 @@
-import { useState, useEffect } from 'react'
-import axios from 'axios'
-import { Toaster, toast } from 'react-hot-toast'
-import { useNavigate } from 'react-router-dom' // Import useNavigate for client-side navigation
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Input } from '../components/ui/input';
+import { Button } from '../components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import '../utils/axiosSetup'; 
 
-interface UserProfile {
-  id: number
-  username: string
-  roles: string[]
-  playerProfile: null | {
-    preferredPosition: string
-    profileDescription: string
-  }
-  hostProfile: null | {
-    // Add host profile properties if available
-  }
+import { Toaster, toast } from 'react-hot-toast';
+
+// Enums for PlayerPosition
+enum PlayerPosition {
+  POSITION_FORWARD = "POSITION_FORWARD",
+  POSITION_MIDFIELDER = "POSITION_MIDFIELDER",
+  POSITION_DEFENDER = "POSITION_DEFENDER",
+  POSITION_GOALKEEPER = "POSITION_GOALKEEPER"
 }
 
-export default function ProfilePage() {
-  const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const userId = 1 // Replace this with dynamic user ID
-  const navigate = useNavigate() // Initialize useNavigate hook for navigation
+// Interface for Club
+interface Club {
+  id: number;
+  name: string;
+  description?: string;
+  // Add other Club properties if needed
+}
 
-  const fetchUserProfile = async () => {
-    try {
-      const response = await axios.get(`http://localhost:8080/users/${userId}`, {
-        auth: {
-          username: 'admin',
-          password: 'password',
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        }
-      })
-      setProfile(response.data)
-      setLoading(false)
-    } catch (err: any) {
-      console.error('Error fetching profile:', err)
-      if (err.response) {
-        setError(`Error: ${err.response.status} - ${err.response.data?.message || 'Unknown error occurred'}`)
-      } else if (err.request) {
-        setError('Error: No response from server. Please check your network connection or server.')
-      } else {
-        setError(`Error: ${err.message}`)
-      }
-      setLoading(false)
-    }
-  }
+// Interface for User
+interface User {
+  id: number;
+  username: string;
+  // Add other User properties if needed
+}
 
+// Interface for PlayerProfile
+interface PlayerProfile {
+  id: number;
+  club: Club | null;
+  user: User;
+  preferredPositions: PlayerPosition[];
+  profileDescription: string;
+}
+
+export default function PlayerProfilePage() {
+  const [playerProfile, setPlayerProfile] = useState<PlayerProfile | null>(null);
+  const [preferredPositions, setPreferredPositions] = useState<PlayerPosition[]>([]);
+  const [profileDescription, setProfileDescription] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const username = localStorage.getItem('username');
+
+  // Fetch the player profile on component mount
   useEffect(() => {
-    fetchUserProfile()
-  }, [])
+    if (!username) {
+      setError('User not logged in');
+      setLoading(false);
+      return;
+    }
 
-  const handleKickoffClick = () => {
-    // Navigate to the landing page using useNavigate
-    navigate('/')
-  }
+    const fetchPlayerProfile = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8080/playerProfiles/${username}`);
+        console.log("response from server: ", response.data);
+        setPlayerProfile(response.data);
+        setPreferredPositions(response.data.preferredPositions || []);
+        setProfileDescription(response.data.profileDescription || '');
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching player profile:', err);
+        // setError('Failed to fetch player profile');
+        setLoading(false);
+      }
+    };
 
-  if (loading) return <div className="flex justify-center items-center h-screen bg-gray-900 text-white">Loading...</div>
-  if (error) return <div className="flex justify-center items-center h-screen bg-gray-900 text-red-500">Error: {error}</div>
+    fetchPlayerProfile();
+    console.log("player profile after fetch:" , playerProfile);
+  }, [username]);
+
+  // Handle updating the preferred positions
+  const handlePreferredPositionsChange = (position: PlayerPosition) => {
+    setPreferredPositions((prevPositions) =>
+      prevPositions.includes(position)
+        ? prevPositions.filter((pos) => pos !== position)
+        : [...prevPositions, position]
+    );
+  };
+
+  // Handle submitting the updated profile
+  const handleSubmit = async () => {
+    if (!playerProfile) return;
+
+    try {
+      await axios.put(`http://localhost:8080/playerProfiles/${playerProfile.id}/update`, {
+        preferredPositions,
+        profileDescription,
+      });
+      toast.success('Profile updated successfully', {
+        duration: 3000,
+        position: 'top-center',
+      });
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      toast.error('Failed to update profile', {
+        duration: 4000,
+        position: 'top-center',
+      });
+    }
+  };
+
+  // Utility function to format position names
+  const formatPosition = (position: string) => {
+    return position.replace('POSITION_', '').charAt(0) + position.replace('POSITION_', '').slice(1).toLowerCase();
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error || !playerProfile) return <div>Error: {error || 'Profile not found'}</div>;
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen">
-      <header className="bg-gray-800 p-4 flex justify-between items-center">
-        {/* Removed the KICKOFF button from here */}
-        <nav>{/* Add navigation items here if needed */}</nav>
-      </header>
-      <main className="p-8">
-        <h1 className="text-3xl font-bold mb-8">Welcome, {profile?.username}</h1>
-        <div className="bg-gray-800 rounded-lg p-6">
-          <h2 className="text-2xl font-bold mb-6">{profile?.username}'s Profile</h2>
-          <div className="flex items-center space-x-4 mb-6">
-            <div className="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center text-3xl font-bold">
-              {profile?.username?.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold">{profile?.username}</h3>
-              <div className="flex space-x-2 mt-2">
-                <button className="px-4 py-2 bg-gray-700 rounded text-sm font-medium">Reset Password</button>
-                <button className="px-4 py-2 bg-blue-600 rounded text-sm font-medium">Edit</button>
-              </div>
-            </div>
-          </div>
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold mb-2">Roles:</h3>
-            <div className="flex flex-wrap gap-2">
-              {profile?.roles.map((role, index) => (
-                <span key={index} className="bg-blue-600 text-white px-3 py-1 rounded-md text-sm font-medium">
-                  {role}
-                </span>
-              ))}
-              <button className="px-3 py-1 bg-gray-700 rounded-md text-sm font-medium">Edit</button>
-            </div>
-          </div>
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold mb-2">Player Profile:</h3>
-            {profile?.playerProfile ? (
-              <div>
-                <p>Preferred Position: {profile.playerProfile.preferredPosition}</p>
-                <p>Description: {profile.playerProfile.profileDescription}</p>
-              </div>
-            ) : (
-              <p>Player Profile: null</p>
-            )}
-          </div>
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold mb-2">Host Profile:</h3>
-            {profile?.hostProfile ? (
-              <div>
-                {/* Add host profile details here when available */}
-                <p>Host Profile details would go here</p>
-              </div>
-            ) : (
-              <p>Host Profile: null</p>
-            )}
+    <>
+      <Toaster />
+      <div className="p-6 bg-gray-900 rounded-lg">
+        <h1 className="text-2xl font-bold mb-4">Player Profile</h1>
+
+        {/* Display user information */}
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold">User Information</h2>
+          <p>Username: {playerProfile.user.username}</p>
+          {/* Include other user fields as necessary */}
+        </div>
+
+        {/* Display club information */}
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold">Club Information</h2>
+          {playerProfile.club ? (
+            <>
+              <p>Club Name: {playerProfile.club.name}</p>
+              {/* Include other club fields as necessary */}
+            </>
+          ) : (
+            <p>You are not currently associated with a club.</p>
+          )}
+        </div>
+
+        {/* Editable profile description */}
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold">Profile Description</h2>
+          <Input
+            value={profileDescription}
+            onChange={(e) => setProfileDescription(e.target.value)}
+            placeholder="Describe yourself"
+            className="w-full bg-gray-800 border-gray-700"
+          />
+        </div>
+
+        {/* Preferred positions selection */}
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold">Preferred Positions</h2>
+          <div className="flex flex-wrap">
+            {Object.values(PlayerPosition).map((position) => (
+              <label key={position} className="mr-4 mb-2 flex items-center">
+                <input
+                  type="checkbox"
+                  checked={preferredPositions.includes(position)}
+                  onChange={() => handlePreferredPositionsChange(position)}
+                  className="form-checkbox h-4 w-4 text-blue-600"
+                />
+                <span className="ml-2">{formatPosition(position)}</span>
+              </label>
+            ))}
           </div>
         </div>
-      </main>
-      <Toaster />
-    </div>
-  )
+
+        {/* Submit button */}
+        <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700">
+          Update Profile
+        </Button>
+      </div>
+    </>
+  );
 }
