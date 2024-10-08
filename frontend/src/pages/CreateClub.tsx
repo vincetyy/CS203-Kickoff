@@ -106,7 +106,6 @@ export default function CreateClub() {
 
   return (
     <div className="p-8 bg-gray-900 text-white min-h-screen">
-      <Toaster />
       <h1 className="text-3xl font-bold mb-6">Create a New Club</h1>
 
       <div className="bg-gray-800 p-6 rounded-lg">
