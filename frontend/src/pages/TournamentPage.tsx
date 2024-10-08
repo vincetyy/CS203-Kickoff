@@ -22,6 +22,16 @@ const TournamentPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const tournamentId = id ? parseInt(id, 10) : null;
 
+  const tournamentFormatMap: { [key: string]: string } = {
+    FIVE_SIDE: 'Five-a-side',
+    SEVEN_SIDE: 'Seven-a-side'
+  };
+
+  const knockoutFormatMap: { [key: string]: string } = {
+    SINGLE_ELIM: 'Single Elimination',
+    DOUBLE_ELIM: 'Double Elimination'
+  };
+
   // Retrieve clubId from the user slice in Redux store
   // const clubId = useSelector((state: RootState) => state.user.clubId); // Adjust based on your user slice
 
@@ -78,6 +88,14 @@ const TournamentPage: React.FC = () => {
         tournamentId: selectedTournament.id,
         tournamentData: updatedTournament
       })).unwrap();
+
+      if (tournamentId === null || isNaN(tournamentId)) {
+        setError('Invalid tournament ID.');
+        setStatus('failed');
+        return;
+      }
+      const updatedTournamentData = await fetchTournamentById(tournamentId);
+      setSelectedTournament(updatedTournamentData); // Update the state with the new details
       
       setIsCreateDialogOpen(false)
       
@@ -280,7 +298,10 @@ const TournamentPage: React.FC = () => {
               </div>
               <div>
                 <label htmlFor="tournamentFormat" className="form-label">Tournament Format</label>
-                <Select onValueChange={(value) => setUpdatedTournament(prev => ({ ...prev, tournamentFormat: value }))}>
+                <Select defaultValue={updatedTournament.tournamentFormat} 
+                  defaultDisplayValue={tournamentFormatMap[updatedTournament.tournamentFormat]}
+                  onValueChange={(value) => setUpdatedTournament(prev => ({ ...prev, tournamentFormat: value }))
+                }>
                   <SelectTrigger className="select-trigger">
                     <SelectValue placeholder="Select format" />
                   </SelectTrigger>
@@ -292,7 +313,10 @@ const TournamentPage: React.FC = () => {
               </div>
               <div>
                 <label htmlFor="knockoutFormat" className="form-label">Knockout Format</label>
-                <Select onValueChange={(value) => setUpdatedTournament(prev => ({ ...prev, knockoutFormat: value }))}>
+                <Select defaultValue={updatedTournament.knockoutFormat} 
+                  defaultDisplayValue={knockoutFormatMap[updatedTournament.knockoutFormat]}
+                  onValueChange={(value) => setUpdatedTournament(prev => ({ ...prev, knockoutFormat: value }))
+                }>
                   <SelectTrigger className="select-trigger">
                     <SelectValue placeholder="Select format" />
                   </SelectTrigger>
@@ -336,11 +360,12 @@ const TournamentPage: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
-      <Button type="button" onClick={handleUpdate} className="bg-blue-600 hover:bg-blue-700">
-        Update
-      </Button>
+      
       {/* Back Button */}
-      <div className="mb-4">
+      <div className="flex space-x-3 mb-4">
+        <Button type="button" onClick={handleUpdate} className="bg-blue-600 hover:bg-blue-700">
+          Update
+        </Button>
         <Button onClick={handleBackClick}>Back to Tournaments</Button>
       </div>
       

@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 interface SelectProps {
   children: React.ReactNode;
   onValueChange?: (value: string) => void;
+  defaultValue?: string; // Add defaultValue prop
+  defaultDisplayValue?: string; // Add defaultDisplayValue prop
 }
 
 interface SelectContextType {
@@ -15,10 +17,14 @@ interface SelectContextType {
 
 const SelectContext = React.createContext<SelectContextType | undefined>(undefined);
 
-export const Select: React.FC<SelectProps> = ({ children, onValueChange }) => {
+export const Select: React.FC<SelectProps> = ({ children, 
+  onValueChange, 
+  defaultValue = '', 
+  defaultDisplayValue = '' 
+}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [value, setValue] = useState('');
-  const [displayValue, setDisplayValue] = useState('');
+  const [value, setValue] = useState(defaultValue);
+  const [displayValue, setDisplayValue] = useState(defaultDisplayValue);
 
   const handleValueChange = (newValue: string, newDisplayValue: string) => {
     setValue(newValue);
