@@ -80,9 +80,7 @@ public class TournamentController {
         if (token == null || !token.startsWith("Bearer ")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization token is missing or invalid" + token);
         }
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
+        token = token.substring(7);
         Long userIdFromToken = jwtUtil.extractUserId(token);
         if (id != userIdFromToken) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to update this tournament");
