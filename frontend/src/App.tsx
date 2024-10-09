@@ -6,7 +6,6 @@ import TournamentsPage from './pages/TournamentsPage';
 import TournamentPage from './pages/TournamentPage';
 import ClubPage from './pages/ClubPage';
 import LeaderboardsPage from './pages/LeaderboardsPage';
-import CreateTournament from './pages/CreateTournament';
 import Login from './pages/Login.tsx';
 import Signup from './pages/Signup.tsx';
 import ClubInfo from './pages/ClubInfo';
@@ -22,7 +21,6 @@ function App() {
           <Route path="/tournaments/:id" element={<TournamentPage />} />
           <Route path="/clubs" element={<ClubPage />} />
           <Route path="/leaderboards" element={<LeaderboardsPage />} />
-          <Route path="/create-tournament" element={<CreateTournament />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/clubs/:id" element={<ClubInfo />} />
