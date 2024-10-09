@@ -2,41 +2,11 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
+import { PlayerPosition, PlayerProfile } from '../types/profile';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 
 import { toast } from 'react-hot-toast';
-
-// Enums for PlayerPosition
-enum PlayerPosition {
-  POSITION_FORWARD = "POSITION_FORWARD",
-  POSITION_MIDFIELDER = "POSITION_MIDFIELDER",
-  POSITION_DEFENDER = "POSITION_DEFENDER",
-  POSITION_GOALKEEPER = "POSITION_GOALKEEPER"
-}
-
-// Interface for Club
-interface Club {
-  id: number;
-  name: string;
-  description?: string;
-  // Add other Club properties if needed
-}
-
-// Interface for User
-interface User {
-  id: number;
-  username: string;
-  // Add other User properties if needed
-}
-
-// Interface for PlayerProfile
-interface PlayerProfile {
-  id: number;
-  club: Club | null;
-  user: User;
-  preferredPositions: PlayerPosition[];
-  profileDescription: string;
-}
+import { fetchPlayerProfileByUsername, updatePlayerProfile } from '../services/profileService';
 
 export default function PlayerProfilePage() {
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile | null>(null);
@@ -56,11 +26,11 @@ export default function PlayerProfilePage() {
 
     const fetchPlayerProfile = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/playerProfiles/${username}`);
-        console.log("response from server: ", response.data);
-        setPlayerProfile(response.data);
-        setPreferredPositions(response.data.preferredPositions || []);
-        setProfileDescription(response.data.profileDescription || '');
+        const response = await fetchPlayerProfileByUsername(username);
+        console.log("response from server: ", response);
+        setPlayerProfile(response);
+        setPreferredPositions(response.preferredPositions || []);
+        setProfileDescription(response.profileDescription || '');
         setLoading(false);
       } catch (err) {
         console.error('Error fetching player profile:', err);
@@ -87,10 +57,7 @@ export default function PlayerProfilePage() {
     if (!playerProfile) return;
 
     try {
-      await axios.put(`http://localhost:8080/playerProfiles/${playerProfile.id}/update`, {
-        preferredPositions,
-        profileDescription,
-      });
+      await updatePlayerProfile(playerProfile.id, preferredPositions, profileDescription);
       toast.success('Profile updated successfully', {
         duration: 3000,
         position: 'top-center',
@@ -110,6 +77,7 @@ export default function PlayerProfilePage() {
   };
 
   if (loading) return <div>Loading...</div>;
+
   if (error || !playerProfile) return <div>Error: {error || 'Profile not found'}</div>;
 
   return (

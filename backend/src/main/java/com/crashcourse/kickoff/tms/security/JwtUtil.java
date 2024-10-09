@@ -58,7 +58,9 @@ public class JwtUtil {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
-            return null;
+            throw new ExpiredJwtException(e.getHeader(), e.getClaims(), "Token has expired");
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid JWT token");
         }
     }
 

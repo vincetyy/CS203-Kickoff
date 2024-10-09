@@ -52,14 +52,15 @@ public class PlayerProfileController {
 
     @GetMapping("/{username}")
     public ResponseEntity<?> getPlayerProfileByUsername(@PathVariable String username,
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
+                if (token == null || !token.startsWith("Bearer ")) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization token is missing or invalid" + token);
+                }
+                token = token.substring(7);
         Long userIdFromUsername = userService.loadUserByUsername(username).getId();
         // Extract the userId from the token using JwtUtil
         Long userIdFromToken = jwtUtil.extractUserId(token);
-        if (userIdFromUsername != userIdFromToken) {
+        if (!userIdFromUsername.equals(userIdFromToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to view this profile");
         }
 

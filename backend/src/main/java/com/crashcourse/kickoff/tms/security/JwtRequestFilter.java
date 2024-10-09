@@ -11,6 +11,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +38,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         // Extract the JWT token from the Authorization header
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
-            username = jwtUtil.extractUsername(jwt);  // Extract username from the token
+            try {
+                username = jwtUtil.extractUsername(jwt);
+            } catch (ExpiredJwtException e) {
+                // Handle expired token
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token has expired, please log in again.");
+                return;  // Exit the filter chain early
+            } catch (Exception e) {
+                // Handle other JWT exceptions (invalid token, etc.)
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Invalid token");
+                return;
+            }
         }
 
         // Validate the token and set the authentication context
