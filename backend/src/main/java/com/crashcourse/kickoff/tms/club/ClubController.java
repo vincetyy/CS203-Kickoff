@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,20 +23,28 @@ import com.crashcourse.kickoff.tms.club.dto.ClubCreationRequest;
 import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
 import com.crashcourse.kickoff.tms.player.PlayerProfile;
 import com.crashcourse.kickoff.tms.player.dto.PlayerInviteRequest;
+import com.crashcourse.kickoff.tms.security.JwtUtil;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/clubs")
+@RequiredArgsConstructor
 public class ClubController {
 
     @Autowired
     private ClubServiceImpl clubService;
+    @Autowired
+    private final JwtUtil jwtUtil; // final for constructor injection
 
     @PostMapping("/create-club")
-    public ResponseEntity<?> createClub(@Valid @RequestBody ClubCreationRequest clubRequest) {
+    public ResponseEntity<?> createClub(@Valid @RequestBody ClubCreationRequest clubRequest,
+     @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         try {
-            Club createdClub = clubService.createClub(clubRequest.getClub(), clubRequest.getCreatorId());
+            token = token.substring(7);
+            Long userIdFromToken = jwtUtil.extractUserId(token);
+            Club createdClub = clubService.createClub(clubRequest.getClub(), userIdFromToken);
             return new ResponseEntity<>(createdClub, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

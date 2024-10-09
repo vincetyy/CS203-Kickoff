@@ -22,6 +22,7 @@ public class ClubProfile {
     private List<String> playerNames;
 
     public ClubProfile(Club club) {
+        System.out.println(club.getCaptain());
         this.id = club.getId();
         this.name = club.getName();
         this.clubDescription = club.getClubDescription();

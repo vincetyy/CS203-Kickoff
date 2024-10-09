@@ -23,16 +23,20 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIdentityInfo(
     generator = ObjectIdGenerators.PropertyGenerator.class,
     property = "id")
-
 // note lombok's @data annotations generates getters and setters automatically
 public class Club {
     public static final int MAX_PLAYERS_IN_CLUB = 20;
@@ -50,7 +54,8 @@ public class Club {
     private double ratingDeviation;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "clubCaptainOf", cascade = CascadeType.PERSIST)
+    @OneToOne
+    @JoinColumn(name = "captain")
     private PlayerProfile captain;
 
     @JsonIgnore

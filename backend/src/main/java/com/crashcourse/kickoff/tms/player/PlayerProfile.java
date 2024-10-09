@@ -5,6 +5,7 @@ import java.util.List;
 import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.user.model.User;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CollectionTable;
@@ -19,6 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,12 +28,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Getter
-@Setter
-@ToString
-@AllArgsConstructor
-@NoArgsConstructor
-@EqualsAndHashCode
+@Data
 @JsonIdentityInfo(
     generator = ObjectIdGenerators.PropertyGenerator.class,
     property = "id")
@@ -42,10 +39,6 @@ public class PlayerProfile {
     @ManyToOne
     @JoinColumn(name = "club_id")
     private Club club;
-
-    @OneToOne
-    @JoinColumn(name = "club_captain_of_id")
-    private Club clubCaptainOf;
 
     @OneToOne
     @MapsId // Shares the primary key with User
