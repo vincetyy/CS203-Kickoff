@@ -1,6 +1,7 @@
 package com.crashcourse.kickoff.tms.tournament.model;
 
 import com.crashcourse.kickoff.tms.club.Club;
+import com.crashcourse.kickoff.tms.host.HostProfile;
 import com.crashcourse.kickoff.tms.location.model.*;
 
 import jakarta.persistence.*;
@@ -39,6 +40,10 @@ public class Tournament {
 
     private Integer minRank;
     private Integer maxRank;
+
+    @ManyToOne
+    @JoinColumn(name = "tournament_id")
+    private HostProfile host;
 
     @ManyToMany
     @JoinTable(

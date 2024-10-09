@@ -22,4 +22,5 @@ export interface Tournament {
   maxRank: number | null;
   joinedClubs: Club[];
   over: boolean;
+  host: object;
 }

@@ -19,12 +19,14 @@ const LandingPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-black text-white">
+    <div className="min-h-screen flex flex-col bg-gray-900 text-white">
       <Helmet>
         <title>Kickoff</title>
       </Helmet>
-      <header className="bg-black text-white p-4 flex justify-between items-center z-20 relative">
-        <h1 className="text-2xl font-bold">KICKOFF</h1>
+      <header className="bg-gray-900 text-white p-4 flex justify-between items-center z-20 relative">
+        <Link to="/" className="text-2xl font-bold ml-2 text-white hover:text-gray-300 transition-colors">
+          KICKOFF
+        </Link>
         <div 
           className="relative"
           onMouseEnter={() => setShowAbout(true)}
@@ -36,7 +38,7 @@ const LandingPage: React.FC = () => {
           <AnimatePresence>
             {showAbout && (
               <motion.div
-                className="absolute right-0 mt-2 w-64 bg-black text-white rounded-lg shadow-lg p-4 text-sm"
+                className="absolute right-0 mt-2 w-64 bg-gray-900 text-white rounded-lg shadow-lg p-4 text-sm"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
@@ -63,7 +65,7 @@ const LandingPage: React.FC = () => {
         <AnimatePresence>
           {videoEnded && (
             <motion.div 
-              className="absolute inset-y-0 right-0 w-1/2 flex flex-col justify-center items-start p-8 bg-black bg-opacity-50"
+              className="absolute inset-y-0 right-0 w-1/2 flex flex-col justify-center items-start p-8 bg-gray-900 bg-opacity-50"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               transition={{ type: "spring", stiffness: 100, damping: 20 }}

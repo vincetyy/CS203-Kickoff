@@ -7,6 +7,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.club.ClubService;
+import com.crashcourse.kickoff.tms.host.HostProfile;
+import com.crashcourse.kickoff.tms.host.HostProfileService;
 import com.crashcourse.kickoff.tms.location.model.Location;
 import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
 import com.crashcourse.kickoff.tms.location.service.LocationService;
@@ -39,6 +41,7 @@ public class KickoffTournamentManagementApplication {
 		// User
 		UserService userService = ctx.getBean(UserService.class);
 		PlayerProfileService playerProfileService = ctx.getBean(PlayerProfileService.class);
+		HostProfileService hostProfileService = ctx.getBean(HostProfileService.class);
 		BCryptPasswordEncoder encoder = ctx.getBean(BCryptPasswordEncoder.class);
 
 		// Creating admin
@@ -47,6 +50,7 @@ public class KickoffTournamentManagementApplication {
 		User admin = userService.addUser(adminDTO);
 		admin.setRoles(SecurityConfig.getAllRolesAsSet());
 		admin = userService.getUserById(admin.getId());
+		HostProfile adminHostProfile = hostProfileService.addHostProfile(admin);
 		System.out.println("[Add admin]: " + admin.getUsername());
 
 		// Creating dummy
@@ -79,7 +83,7 @@ public class KickoffTournamentManagementApplication {
 		TournamentService tournamentService = ctx.getBean(TournamentService.class);
 		TournamentCreateDTO tournament1DTO = new TournamentCreateDTO("Tournament 1", LocalDateTime.of(
             2021, 4, 24, 14, 33, 48), LocalDateTime.of(
-			2021,5, 24, 14, 33, 48), location1.getId(), 16, TournamentFormat.FIVE_SIDE, KnockoutFormat.SINGLE_ELIM, new ArrayList<Float>(), null, null);
+			2021,5, 24, 14, 33, 48), location1.getId(), 16, TournamentFormat.FIVE_SIDE, KnockoutFormat.SINGLE_ELIM, new ArrayList<Float>(), null, null, adminHostProfile);
 		tournamentService.createTournament(tournament1DTO);
 		
 	}

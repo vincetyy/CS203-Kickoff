@@ -1,11 +1,14 @@
 package com.crashcourse.kickoff.tms.tournament.controller;
 
 import com.crashcourse.kickoff.tms.club.Club;
+import com.crashcourse.kickoff.tms.security.JwtUtil;
 import com.crashcourse.kickoff.tms.tournament.dto.*;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +25,7 @@ import java.util.List;
 public class TournamentController {
 
     private final TournamentService tournamentService;
+    private final JwtUtil jwtUtil; // final for constructor injection
 
     /**
      * Create a new Tournament.
@@ -67,9 +71,20 @@ public class TournamentController {
      * @return ResponseEntity with the updated Tournament data and HTTP status.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<TournamentResponseDTO> updateTournament(
+    public ResponseEntity<?> updateTournament(
             @PathVariable Long id,
-            @Valid @RequestBody TournamentCreateDTO tournamentCreateDTO) {
+            @Valid @RequestBody TournamentCreateDTO tournamentCreateDTO,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token
+            ) {
+
+        if (token == null || !token.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization token is missing or invalid" + token);
+        }
+        token = token.substring(7);
+        Long userIdFromToken = jwtUtil.extractUserId(token);
+        if (id != userIdFromToken) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to update this tournament");
+        }
         TournamentResponseDTO updatedTournament = tournamentService.updateTournament(id, tournamentCreateDTO);
         return ResponseEntity.ok(updatedTournament);
     }
