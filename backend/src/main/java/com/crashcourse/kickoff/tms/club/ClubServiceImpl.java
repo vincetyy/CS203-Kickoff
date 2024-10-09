@@ -55,15 +55,15 @@ public class ClubServiceImpl implements ClubService {
 
         // set the player who created the club as the captain
         club.setCaptain(creator);
+        clubRepository.save(club);
 
         // player count exceeds the limit
         if (club.getPlayers().size() > Club.MAX_PLAYERS_IN_CLUB) {
             throw new PlayerLimitExceededException(String.format("A club cannot have more than %d players", Club.MAX_PLAYERS_IN_CLUB));
         }
-        clubRepository.save(club);
+        
         club = addPlayerToClub(club.getId(), creatorId);
-        clubRepository.save(club);
-        return club;
+        return clubRepository.save(club);
     }
 
     public List<Club> getAllClubs() {

@@ -58,7 +58,7 @@ const ClubInfoModal: React.FC<ClubInfoModalProps> = ({ clubId }) => {
       <p className="text-lg mb-4">{club.description || 'No description available.'}</p>
       <div className="flex items-center mb-4">
         <div className="mr-4">
-          <strong>Captain:</strong> {club.captainName || 'No captain assigned.'}
+          <strong>Captain:</strong> {club.captain.user.username || 'No captain assigned.'}
         </div>
         <div>
           <strong>ELO:</strong> {club.elo ? club.elo.toFixed(2) : 'N/A'}
