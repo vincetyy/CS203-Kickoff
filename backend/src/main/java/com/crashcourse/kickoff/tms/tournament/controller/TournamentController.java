@@ -74,7 +74,7 @@ public class TournamentController {
     public ResponseEntity<?> updateTournament(
             @PathVariable Long id,
             @Valid @RequestBody TournamentCreateDTO tournamentCreateDTO,
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String token
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token
             ) {
 
         if (token == null || !token.startsWith("Bearer ")) {
