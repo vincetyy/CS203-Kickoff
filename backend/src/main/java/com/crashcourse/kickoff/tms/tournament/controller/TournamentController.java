@@ -77,7 +77,7 @@ public class TournamentController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateTournament(
             @PathVariable Long id,
-            @Valid @RequestBody TournamentCreateDTO tournamentCreateDTO,
+            @Valid @RequestBody TournamentUpdateDTO TournamentUpdateDTO,
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token
             ) {
 
@@ -89,7 +89,7 @@ public class TournamentController {
         if (id != userIdFromToken) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to update this tournament");
         }
-        TournamentResponseDTO updatedTournament = tournamentService.updateTournament(id, tournamentCreateDTO);
+        TournamentResponseDTO updatedTournament = tournamentService.updateTournament(id, TournamentUpdateDTO);
         return ResponseEntity.ok(updatedTournament);
     }
 

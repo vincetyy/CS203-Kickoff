@@ -21,9 +21,6 @@ const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreate
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Hardcoding creatorId for now
-  const creatorId = 1;
-
   const fetchPlayersForClub = async (clubId: number) => {
     try {
       const response = await axios.get(`http://localhost:8080/clubs/${clubId}/players`);
@@ -46,8 +43,7 @@ const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreate
         name: clubName,
         elo,
         ratingDeviation,
-      },
-      creatorId,
+      }
     };
 
     try {

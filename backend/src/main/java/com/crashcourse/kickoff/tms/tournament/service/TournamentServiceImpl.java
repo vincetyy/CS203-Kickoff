@@ -63,7 +63,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public TournamentResponseDTO updateTournament(Long id, TournamentCreateDTO dto) {
+    public TournamentResponseDTO updateTournament(Long id, TournamentUpdateDTO dto) {
         Tournament existingTournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + id));
 
@@ -71,9 +71,6 @@ public class TournamentServiceImpl implements TournamentService {
         existingTournament.setStartDateTime(dto.getStartDateTime());
         existingTournament.setEndDateTime(dto.getEndDateTime());
         existingTournament.setLocation(locationService.getLocationById(dto.getLocationId()));
-        existingTournament.setMaxTeams(dto.getMaxTeams());
-        existingTournament.setTournamentFormat(dto.getTournamentFormat());
-        existingTournament.setKnockoutFormat(dto.getKnockoutFormat());
         existingTournament.setPrizePool(dto.getPrizePool());
         existingTournament.setMinRank(dto.getMinRank());
         existingTournament.setMaxRank(dto.getMaxRank());

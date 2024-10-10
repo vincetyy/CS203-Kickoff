@@ -1,11 +1,10 @@
 // src/pages/TournamentPage.tsx
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
-import { AppDispatch, RootState } from '../store'
-import { Input } from "../components/ui/input"
+import { AppDispatch, RootState } from '../store';
+import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
@@ -16,13 +15,27 @@ import { useDispatch, useSelector } from 'react-redux';
 import { removeClubFromTournamentAsync, updateTournamentAsync } from '../store/tournamentSlice';
 import { selectUserId } from '../store/userSlice';
 
+import UpdateTournament from '../components/UpdateTournament';
+import { TournamentUpdate } from '../types/tournamentUpdate'; // Import the update type
 
 const TournamentPage: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useDispatch<AppDispatch>();
 
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [clubToRemove, setClubToRemove] = useState<Club | null>(null);
+
+  // State for Update Tournament Dialog
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [initialUpdateData, setInitialUpdateData] = useState<TournamentUpdate>({
+    name: '',
+    startDateTime: '',
+    endDateTime: '',
+    locationId: 0,
+    prizePool: [],
+    minRank: 0,
+    maxRank: 0,
+  });
 
   // Open the dialog and set the club to be deleted
   const handleOpenRemoveDialog = (club: Club) => {
@@ -40,8 +53,6 @@ const TournamentPage: React.FC = () => {
 
   const handleRemoveClub = async (clubId: number) => {
     try {
-      // Dispatch the async thunk and unwrap the result to handle success or error
-
       // Handle case where tournamentId is invalid
       if (selectedTournament === null) {
         toast.error('Invalid tournament');
@@ -53,18 +64,15 @@ const TournamentPage: React.FC = () => {
       // Fetch the updated tournament data after removal
       const updatedTournamentData = await fetchTournamentById(selectedTournament.id);
   
-      // Assuming you have a setSelectedTournament state function to update the tournament details
+      // Update the tournament details
       setSelectedTournament(updatedTournamentData);
-  
-      // Close the dialog or perform other UI updates as necessary
-      setIsCreateDialogOpen(false);  // If you have a dialog, close it
   
       // Show a success toast notification
       toast.success('Club removed successfully!', {
         duration: 3000,
         position: 'top-center',
       });
-    } catch (error) {
+    } catch (error: any) {
       // Handle error case
       console.error('Failed to remove the club:', error);
   
@@ -72,8 +80,6 @@ const TournamentPage: React.FC = () => {
       toast.error('Failed to remove the club. Please try again.');
     }
   };
-
-  
 
   const { id } = useParams<{ id: string }>();
   const tournamentId = id ? parseInt(id, 10) : null;
@@ -89,108 +95,12 @@ const TournamentPage: React.FC = () => {
     DOUBLE_ELIM: 'Double Elimination'
   };
 
-  // Retrieve clubId from the user slice in Redux store
-  // const clubId = useSelector((state: RootState) => state.user.clubId); // Adjust based on your user slice
-
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'succeeded' | 'failed'>('idle');
   const [error, setError] = useState<string | null>(null); 
   let isHost = false;
   if (selectedTournament) {
     isHost = selectedTournament.host.id === userId;
-  }
-  // const [joinRole, setJoinRole] = useState<TournamentJoinRole | null>(null);
-
-  const [updatedTournament, setUpdatedTournament] = useState({
-    name: '',
-    startDateTime: '',
-    endDateTime: '',
-    locationId: '',
-    maxTeams: 0,
-    tournamentFormat: '',
-    knockoutFormat: '',
-    minRank: 0,
-    maxRank: 0,
-  })
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-
-  const handleUpdate = () => {
-    if (selectedTournament) {
-      setUpdatedTournament({
-        name: selectedTournament.name || '',
-        locationId: selectedTournament.location.id || '',
-        startDateTime: selectedTournament.startDateTime || '',
-        endDateTime: selectedTournament.endDateTime || '',
-        maxTeams: selectedTournament.maxTeams || 0,
-        tournamentFormat: selectedTournament.tournamentFormat || '',
-        knockoutFormat: selectedTournament.knockoutFormat || '',
-        minRank: selectedTournament.minRank || 0,
-        maxRank: selectedTournament.maxRank || 0,
-      });
-      setIsCreateDialogOpen(true);
-    }
-  };
-
-  const handleUpdateTournament = async () => {
-    console.log(updatedTournament)
-    if (!updatedTournament.name || !updatedTournament.startDateTime || !updatedTournament.endDateTime || !updatedTournament.locationId || !updatedTournament.maxTeams || !updatedTournament.tournamentFormat || !updatedTournament.knockoutFormat) {
-      toast.error('Please fill in all required fields', {
-        duration: 3000,
-        position: 'top-center',
-      })
-      return
-    }
-
-    setIsCreateDialogOpen(false) // Close the dialog immediately
-
-    try {
-
-      const result = await dispatch(updateTournamentAsync({ 
-        tournamentId: selectedTournament.id,
-        tournamentData: updatedTournament
-      })).unwrap();
-
-      if (tournamentId === null || isNaN(tournamentId)) {
-        setError('Invalid tournament ID.');
-        setStatus('failed');
-        return;
-      }
-      const updatedTournamentData = await fetchTournamentById(tournamentId);
-      setSelectedTournament(updatedTournamentData); // Update the state with the new details
-      
-      setIsCreateDialogOpen(false)
-      
-      // Show the success toast
-      toast.success('Tournament updated successfully!', {
-        duration: 3000,
-        position: 'top-center',
-      });
-
-      // Reset the form
-      setUpdatedTournament({
-        name: '',
-        startDateTime: '',
-        endDateTime: '',
-        locationId: '',
-        maxTeams: 0,
-        tournamentFormat: '',
-        knockoutFormat: '',
-        minRank: 0,
-        maxRank: 0,
-      });
-
-    } catch (err) {
-      console.error('Error updating tournament:', err)
-      toast.error(`Failed to update tournament: ${err.message}`, {
-        duration: 4000,
-        position: 'top-center',
-      })
-    }
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setUpdatedTournament(prev => ({ ...prev, [name]: value }))
   }
 
   const handleBackClick = () => {
@@ -229,12 +139,45 @@ const TournamentPage: React.FC = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  const handleUpdateClick = () => {
+    if (selectedTournament) {
+      const initialData: TournamentUpdate = {
+        name: selectedTournament.name,
+        startDateTime: selectedTournament.startDateTime,
+        endDateTime: selectedTournament.endDateTime,
+        locationId: selectedTournament.location.id,
+        prizePool: selectedTournament.prizePool,
+        minRank: selectedTournament.minRank,
+        maxRank: selectedTournament.maxRank,
+      };
+      setInitialUpdateData(initialData);
+      setIsUpdateDialogOpen(true);
+    }
+  };
+
+  const handleUpdateTournament = async (data: TournamentUpdate) => {
+    if (selectedTournament === null || tournamentId === null) {
+      throw new Error('Invalid tournament data.');
+    }
+
+    // Dispatch the update action
+    await dispatch(updateTournamentAsync({ 
+      tournamentId: selectedTournament.id,
+      tournamentData: data
+    })).unwrap();
+
+    // Fetch the updated tournament data
+    const updatedTournamentData = await fetchTournamentById(tournamentId);
+    setSelectedTournament(updatedTournamentData);
+  };
+
   if (status === 'loading') return <div className="text-center mt-10">Loading tournament details...</div>;
   if (status === 'failed') return <div className="text-center mt-10 text-red-500">Error: {error}</div>;
   if (!selectedTournament) return <div className="text-center mt-10">No tournament found.</div>;
 
   return (
     <>
+      <Toaster />
       {/* Tournament Details Banner */}
       <div className="bg-green-600 rounded-lg p-4 lg:p-6 mb-6 flex items-center space-x-4">
         <div className="bg-white rounded-full p-2 lg:p-3">
@@ -259,10 +202,10 @@ const TournamentPage: React.FC = () => {
           </div>
           <div>
             <p><strong>Max Teams:</strong> {selectedTournament.maxTeams}</p>
-            <p><strong>Tournament Format:</strong> {selectedTournament.tournamentFormat.replace('_', ' ')}</p>
-            <p><strong>Knockout Format:</strong> {selectedTournament.knockoutFormat.replace('_', ' ')}</p>
-            <p><strong>Prize Pool:</strong> {selectedTournament.prizePool ? `$${selectedTournament.prizePool}` : 'N/A'}</p>
-            <p><strong>Rank Range:</strong> {selectedTournament.minRank && selectedTournament.maxRank ? `${selectedTournament.minRank} - ${selectedTournament.maxRank}` : 'N/A'}</p>
+            <p><strong>Tournament Format:</strong> {tournamentFormatMap[selectedTournament.tournamentFormat]}</p>
+            <p><strong>Knockout Format:</strong> {knockoutFormatMap[selectedTournament.knockoutFormat]}</p>
+            <p><strong>Prize Pool:</strong> {selectedTournament.prizePool && selectedTournament.prizePool.length > 0 ? `$${selectedTournament.prizePool.join(', ')}` : 'N/A'}</p>
+            <p><strong>Rank Range:</strong> {selectedTournament.minRank !== null && selectedTournament.maxRank !== null ? `${selectedTournament.minRank} - ${selectedTournament.maxRank}` : 'N/A'}</p>
           </div>
         </div>
       </div>
@@ -300,8 +243,9 @@ const TournamentPage: React.FC = () => {
           </div>
         )}
       </div>
-       {/* Delete confirmation dialog */}
-       <Dialog open={isRemoveDialogOpen} onOpenChange={setIsRemoveDialogOpen}>
+
+      {/* Remove Confirmation Dialog */}
+      <Dialog open={isRemoveDialogOpen} onOpenChange={setIsRemoveDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Remove {clubToRemove?.name}</DialogTitle>
@@ -325,147 +269,28 @@ const TournamentPage: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] lg:max-w-[800px]">
-          <DialogHeader>
-            <DialogTitle>Create New Tournament</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="name" className="form-label">Tournament Name</label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={updatedTournament.name}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="locationId" className="form-label">Location ID</label>
-                <Input
-                  id="locationId"
-                  name="locationId"
-                  type="number"
-                  value={updatedTournament.locationId}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="startDateTime" className="form-label">Start Date & Time</label>
-                <Input
-                  id="startDateTime"
-                  name="startDateTime"
-                  type="datetime-local"
-                  value={updatedTournament.startDateTime}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="endDateTime" className="form-label">End Date & Time</label>
-                <Input
-                  id="endDateTime"
-                  name="endDateTime"
-                  type="datetime-local"
-                  value={updatedTournament.endDateTime}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="maxTeams" className="form-label">Max Teams</label>
-                <Input
-                  id="maxTeams"
-                  name="maxTeams"
-                  type="number"
-                  value={updatedTournament.maxTeams}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="tournamentFormat" className="form-label">Tournament Format</label>
-                <Select defaultValue={updatedTournament.tournamentFormat} 
-                  defaultDisplayValue={tournamentFormatMap[updatedTournament.tournamentFormat]}
-                  onValueChange={(value) => setUpdatedTournament(prev => ({ ...prev, tournamentFormat: value }))
-                }>
-                  <SelectTrigger className="select-trigger">
-                    <SelectValue placeholder="Select format" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="FIVE_SIDE">Five-a-side</SelectItem>
-                    <SelectItem value="SEVEN_SIDE">Seven-a-side</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label htmlFor="knockoutFormat" className="form-label">Knockout Format</label>
-                <Select defaultValue={updatedTournament.knockoutFormat} 
-                  defaultDisplayValue={knockoutFormatMap[updatedTournament.knockoutFormat]}
-                  onValueChange={(value) => setUpdatedTournament(prev => ({ ...prev, knockoutFormat: value }))
-                }>
-                  <SelectTrigger className="select-trigger">
-                    <SelectValue placeholder="Select format" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="SINGLE_ELIM">Single Elimination</SelectItem>
-                    <SelectItem value="DOUBLE_ELIM">Double Elimination</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label htmlFor="minRank" className="form-label">Min Rank</label>
-                <Input
-                  id="minRank"
-                  name="minRank"
-                  type="number"
-                  value={updatedTournament.minRank}
-                  onChange={handleInputChange}
-                  className="form-input"
-                />
-              </div>
-              <div>
-                <label htmlFor="maxRank" className="form-label">Max Rank</label>
-                <Input
-                  id="maxRank"
-                  name="maxRank"
-                  type="number"
-                  value={updatedTournament.maxRank}
-                  onChange={handleInputChange}
-                  className="form-input"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end space-x-2 mt-6">
-              <Button type="button" onClick={() => setIsCreateDialogOpen(false)} className="bg-gray-600 hover:bg-gray-700">
-                Cancel
-              </Button>
-              <Button type="button" onClick={handleUpdateTournament} className="bg-blue-600 hover:bg-blue-700">
-                Update
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Back Button */}
+
+      {/* Update Tournament Dialog */}
+      <UpdateTournament
+        isOpen={isUpdateDialogOpen}
+        onClose={() => setIsUpdateDialogOpen(false)}
+        initialData={initialUpdateData}
+        onUpdate={handleUpdateTournament}
+      />
+
+      {/* Back and Update Buttons */}
       <div className="flex space-x-3 mb-4">
         {isHost &&
-          <Button type="button" onClick={handleUpdate} className="bg-blue-600 hover:bg-blue-700">
-            Update
+          <Button 
+            type="button" 
+            onClick={handleUpdateClick} 
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            Update Tournament
           </Button>
         }
         <Button onClick={handleBackClick}>Back to Tournaments</Button>
       </div>
-      
     </>
   );
 };

@@ -13,6 +13,9 @@ interface CreateTournamentProps {
   onClose: (open: boolean) => void
 }
 
+/*
+* REMOVE THIS ONCE YOU CHANGE LOCATIONID TO LOCATION
+*/
 interface NewTournament {
   name: string
   startDateTime: string
