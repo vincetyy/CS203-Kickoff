@@ -1,8 +1,7 @@
 package com.crashcourse.kickoff.tms.tournament.service;
 
 import com.crashcourse.kickoff.tms.club.*;
-import com.crashcourse.kickoff.tms.host.HostProfile;
-import com.crashcourse.kickoff.tms.host.HostProfileRepository;
+import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
 import com.crashcourse.kickoff.tms.location.service.LocationService;
 import com.crashcourse.kickoff.tms.player.PlayerProfile;
 import com.crashcourse.kickoff.tms.location.model.*;
@@ -34,6 +33,7 @@ public class TournamentServiceImpl implements TournamentService {
     private final TournamentRepository tournamentRepository;
     private final LocationService locationService;
     private final HostProfileService hostProfileService;
+    private final ClubRepository clubRepository;
 
     private final ClubService clubService;
 
@@ -181,6 +181,25 @@ public class TournamentServiceImpl implements TournamentService {
         Tournament updatedTournament = tournamentRepository.save(tournament);
         return mapToResponseDTO(updatedTournament);
     } 
+
+    public void removeClubFromTournament(Long tournamentId, Long clubId) {
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new RuntimeException("Tournament not found"));
+        
+        Club club = clubRepository.findById(clubId)
+                .orElseThrow(() -> new RuntimeException("Club not found"));
+
+        // Ensure the club is part of the tournament
+        if (!tournament.getJoinedClubs().contains(club)) {
+            throw new RuntimeException("Club is not part of the tournament");
+        }
+
+        // Remove the club from the tournament
+        tournament.getJoinedClubs().remove(club);
+        
+        // Save the tournament after modification
+        tournamentRepository.save(tournament);
+    }
 
     /**
      * @param id Tournament ID

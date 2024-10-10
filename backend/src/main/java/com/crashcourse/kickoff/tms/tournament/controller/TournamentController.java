@@ -127,4 +127,23 @@ public class TournamentController {
         List<Club> clubs = tournamentService.getAllClubsInTournament(id);
         return ResponseEntity.ok(clubs);
     }
+
+    @DeleteMapping("/{tournamentId}/clubs/{clubId}")
+    public ResponseEntity<Void> removeClubFromTournament(
+            @PathVariable Long tournamentId,
+            @PathVariable Long clubId,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+        
+        token = token.substring(7); // Remove "Bearer " from token
+        Long userIdFromToken = jwtUtil.extractUserId(token);
+
+        // Ensure the user is authorized (e.g., check if they are the host)
+        if (!tournamentService.isOwnerOfTournament(tournamentId, userIdFromToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // Call the service method to remove the club
+        tournamentService.removeClubFromTournament(tournamentId, clubId);
+        return ResponseEntity.noContent().build();
+    }
 }
