@@ -3,6 +3,7 @@ package com.crashcourse.kickoff.tms.tournament.service;
 import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.tournament.dto.*;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
+import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
 
 import java.util.List;
 
@@ -25,4 +26,6 @@ public interface TournamentService {
     void removeClubFromTournament(Long tournamentId, Long clubId);
 
     boolean isOwnerOfTournament(Long tournamentId, Long profileId);
+    List<TournamentResponseDTO> getTournamentsForClub(Long clubId, TournamentFilter filter);
+
 }

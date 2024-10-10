@@ -20,6 +20,7 @@ public class ClubProfile {
     private double elo;
     private PlayerProfile captain;
     private List<String> playerNames;
+    private List<PlayerProfile> players;
 
     public ClubProfile(Club club) {
         System.out.println(club.getCaptain());
@@ -31,6 +32,7 @@ public class ClubProfile {
         this.playerNames = club.getPlayers().stream()
                 .map(player -> player.getUser().getUsername())
                 .collect(Collectors.toList());
+        this.players = club.getPlayers();
     }
 
 }

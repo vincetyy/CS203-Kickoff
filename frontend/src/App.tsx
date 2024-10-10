@@ -9,6 +9,7 @@ import LeaderboardsPage from './pages/LeaderboardsPage';
 import Login from './pages/Login.tsx';
 import Signup from './pages/Signup.tsx';
 import ClubInfo from './pages/ClubInfo';
+import ClubDashboard from './pages/ClubDashboard';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/clubs/:id" element={<ClubInfo />} />
+          <Route path="/clubs/:id/dashboard" element={<ClubDashboard />} />
         </Route>
       </Routes>
     </Router>
