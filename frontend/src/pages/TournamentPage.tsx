@@ -12,8 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 
 import { fetchTournamentById, updateTournament } from '../services/tournamentService';
 import { Tournament, Club } from '../types/tournament';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateTournamentAsync } from '../store/tournamentSlice';
+import { selectUserId } from '../store/userSlice';
 
 
 const TournamentPage: React.FC = () => {
@@ -22,6 +23,7 @@ const TournamentPage: React.FC = () => {
 
   const { id } = useParams<{ id: string }>();
   const tournamentId = id ? parseInt(id, 10) : null;
+  const userId = useSelector(selectUserId);
 
   const tournamentFormatMap: { [key: string]: string } = {
     FIVE_SIDE: 'Five-a-side',
@@ -42,7 +44,10 @@ const TournamentPage: React.FC = () => {
   let isHost = false;
   if (selectedTournament) {
     // hardcoded rn
-    isHost = selectedTournament.host.id === 1;
+    console.log(selectedTournament.host.id);
+    console.log(userId);
+
+    isHost = selectedTournament.host.id === userId;
     console.log(isHost);
     
   }
