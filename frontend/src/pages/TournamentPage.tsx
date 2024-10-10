@@ -43,13 +43,7 @@ const TournamentPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null); 
   let isHost = false;
   if (selectedTournament) {
-    // hardcoded rn
-    console.log(selectedTournament.host.id);
-    console.log(userId);
-
     isHost = selectedTournament.host.id === userId;
-    console.log(isHost);
-    
   }
   // const [joinRole, setJoinRole] = useState<TournamentJoinRole | null>(null);
 
