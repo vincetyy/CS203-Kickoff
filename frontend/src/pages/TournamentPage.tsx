@@ -13,11 +13,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { fetchTournamentById, updateTournament } from '../services/tournamentService';
 import { Tournament, Club } from '../types/tournament';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateTournamentAsync } from '../store/tournamentSlice';
+import { removeClubFromTournamentAsync, updateTournamentAsync } from '../store/tournamentSlice';
 import { selectUserId } from '../store/userSlice';
 
 
 const TournamentPage: React.FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>()
+
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [clubToRemove, setClubToRemove] = useState<Club | null>(null);
 
@@ -35,15 +38,42 @@ const TournamentPage: React.FC = () => {
     setIsRemoveDialogOpen(false); // Close the dialog
   };
 
-  const handleRemoveClub = (clubId: number) => {
-    // Logic to handle the deletion of the club
-    console.log(`Remove club with ID: ${clubId}`);
-    
-    // You would update your state or call an API here to delete the club from the tournament
+  const handleRemoveClub = async (clubId: number) => {
+    try {
+      // Dispatch the async thunk and unwrap the result to handle success or error
+
+      // Handle case where tournamentId is invalid
+      if (selectedTournament === null) {
+        toast.error('Invalid tournament');
+        return;
+      }
+
+      await dispatch(removeClubFromTournamentAsync({ tournamentId: selectedTournament.id, clubId })).unwrap();
+  
+      // Fetch the updated tournament data after removal
+      const updatedTournamentData = await fetchTournamentById(selectedTournament.id);
+  
+      // Assuming you have a setSelectedTournament state function to update the tournament details
+      setSelectedTournament(updatedTournamentData);
+  
+      // Close the dialog or perform other UI updates as necessary
+      setIsCreateDialogOpen(false);  // If you have a dialog, close it
+  
+      // Show a success toast notification
+      toast.success('Club removed successfully!', {
+        duration: 3000,
+        position: 'top-center',
+      });
+    } catch (error) {
+      // Handle error case
+      console.error('Failed to remove the club:', error);
+  
+      // Show error toast notification
+      toast.error('Failed to remove the club. Please try again.');
+    }
   };
 
-  const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>()
+  
 
   const { id } = useParams<{ id: string }>();
   const tournamentId = id ? parseInt(id, 10) : null;
