@@ -18,6 +18,30 @@ import { selectUserId } from '../store/userSlice';
 
 
 const TournamentPage: React.FC = () => {
+  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
+  const [clubToRemove, setClubToRemove] = useState<Club | null>(null);
+
+  // Open the dialog and set the club to be deleted
+  const handleOpenRemoveDialog = (club: Club) => {
+    setClubToRemove(club);  // Set the club to delete
+    setIsRemoveDialogOpen(true);   // Open the dialog
+  };
+
+  // Handle confirming the deletion
+  const handleConfirmRemove = () => {
+    if (clubToRemove) {
+      handleRemoveClub(clubToRemove.id); // Call the actual delete function with the club's id
+    }
+    setIsRemoveDialogOpen(false); // Close the dialog
+  };
+
+  const handleRemoveClub = (clubId: number) => {
+    // Logic to handle the deletion of the club
+    console.log(`Remove club with ID: ${clubId}`);
+    
+    // You would update your state or call an API here to delete the club from the tournament
+  };
+
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>()
 
@@ -235,10 +259,10 @@ const TournamentPage: React.FC = () => {
                 {/* Conditionally render Delete button based on isHost */}
                 {isHost && (
                   <button 
-                    onClick={() => handleDeleteClub(club.id)} 
+                    onClick={() => handleOpenRemoveDialog(club)} 
                     className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
                   >
-                    Delete
+                    Remove
                   </button>
                 )}
               </div>
@@ -246,6 +270,31 @@ const TournamentPage: React.FC = () => {
           </div>
         )}
       </div>
+       {/* Delete confirmation dialog */}
+       <Dialog open={isRemoveDialogOpen} onOpenChange={setIsRemoveDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Remove {clubToRemove?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            <p>Are you sure you want to remove {clubToRemove?.name} from this tournament?</p>
+          </div>
+          <div className="flex flex-col sm:flex-row justify-between mt-4 space-y-2 sm:space-y-0 sm:space-x-2">
+            <button 
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 w-full" 
+              onClick={() => setIsRemoveDialogOpen(false)}
+            >
+              Cancel
+            </button>
+            <button 
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full"
+              onClick={handleConfirmRemove}
+            >
+              Confirm
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[600px] lg:max-w-[800px]">
           <DialogHeader>
