@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { PlayerPosition, PlayerProfile } from '../types/profile';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-
 import { toast } from 'react-hot-toast';
 import { fetchPlayerProfileByUsername, updatePlayerProfile } from '../services/profileService';
 
@@ -16,7 +15,6 @@ export default function PlayerProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const username = localStorage.getItem('username');
 
-  // Fetch the player profile on component mount
   useEffect(() => {
     if (!username) {
       setError('User not logged in');
@@ -34,16 +32,13 @@ export default function PlayerProfilePage() {
         setLoading(false);
       } catch (err) {
         console.error('Error fetching player profile:', err);
-        // setError('Failed to fetch player profile');
         setLoading(false);
       }
     };
 
     fetchPlayerProfile();
-    console.log("player profile after fetch:" , playerProfile);
   }, [username]);
 
-  // Handle updating the preferred positions
   const handlePreferredPositionsChange = (position: PlayerPosition) => {
     setPreferredPositions((prevPositions) =>
       prevPositions.includes(position)
@@ -52,7 +47,6 @@ export default function PlayerProfilePage() {
     );
   };
 
-  // Handle submitting the updated profile
   const handleSubmit = async () => {
     if (!playerProfile) return;
 
@@ -71,7 +65,6 @@ export default function PlayerProfilePage() {
     }
   };
 
-  // Utility function to format position names
   const formatPosition = (position: string) => {
     return position.replace('POSITION_', '').charAt(0) + position.replace('POSITION_', '').slice(1).toLowerCase();
   };
@@ -81,33 +74,41 @@ export default function PlayerProfilePage() {
   if (error || !playerProfile) return <div>Error: {error || 'Profile not found'}</div>;
 
   return (
-    <>
-      <div className="p-6 bg-gray-900 rounded-lg">
-        <h1 className="text-2xl font-bold mb-4">Player Profile</h1>
-
-        {/* Display user information */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold">User Information</h2>
-          <p>Username: {playerProfile.user.username}</p>
-          {/* Include other user fields as necessary */}
+    <div className="container mx-auto p-6">
+      <div className="bg-gray-900 rounded-lg p-6">
+        <div className="flex items-center mb-6">
+          <img
+            src={`https://picsum.photos/seed/${playerProfile.id}/200/200`}
+            alt={`${playerProfile.user.username}'s profile`}
+            className="w-24 h-24 rounded-full object-cover mr-6"
+          />
+          <div>
+            <h1 className="text-3xl font-bold">{playerProfile.user.username}</h1>
+            <p className="text-gray-400">Player ID: {playerProfile.id}</p>
+          </div>
         </div>
 
-        {/* Display club information */}
         <div className="mb-6">
-          <h2 className="text-xl font-semibold">Club Information</h2>
+          <h2 className="text-xl font-semibold mb-2">Club Information</h2>
           {playerProfile.club ? (
-            <>
-              <p>Club Name: {playerProfile.club.name}</p>
-              {/* Include other club fields as necessary */}
-            </>
+            <div className="flex items-center">
+              <img
+                src={`https://picsum.photos/seed/${playerProfile.club.id}/400/300`}
+                alt={`${playerProfile.club.name} logo`}
+                className="w-16 h-16 rounded-full object-cover mr-4"
+              />
+              <div>
+                <p className="font-semibold">{playerProfile.club.name}</p>
+                <p className="text-sm text-gray-400">ELO: {playerProfile.club.elo.toFixed(2)}</p>
+              </div>
+            </div>
           ) : (
             <p>You are not currently associated with a club.</p>
           )}
         </div>
 
-        {/* Editable profile description */}
         <div className="mb-6">
-          <h2 className="text-xl font-semibold">Profile Description</h2>
+          <h2 className="text-xl font-semibold mb-2">Profile Description</h2>
           <Input
             value={profileDescription}
             onChange={(e) => setProfileDescription(e.target.value)}
@@ -116,9 +117,8 @@ export default function PlayerProfilePage() {
           />
         </div>
 
-        {/* Preferred positions selection */}
         <div className="mb-6">
-          <h2 className="text-xl font-semibold">Preferred Positions</h2>
+          <h2 className="text-xl font-semibold mb-2">Preferred Positions</h2>
           <div className="flex flex-wrap">
             {Object.values(PlayerPosition).map((position) => (
               <label key={position} className="mr-4 mb-2 flex items-center">
@@ -134,11 +134,10 @@ export default function PlayerProfilePage() {
           </div>
         </div>
 
-        {/* Submit button */}
         <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700">
           Update Profile
         </Button>
       </div>
-    </>
+    </div>
   );
 }
