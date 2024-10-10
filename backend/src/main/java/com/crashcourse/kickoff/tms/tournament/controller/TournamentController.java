@@ -3,6 +3,7 @@ package com.crashcourse.kickoff.tms.tournament.controller;
 import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.security.JwtUtil;
 import com.crashcourse.kickoff.tms.tournament.dto.*;
+import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
 
 import jakarta.validation.Valid;
@@ -124,4 +125,14 @@ public class TournamentController {
         List<Club> clubs = tournamentService.getAllClubsInTournament(id);
         return ResponseEntity.ok(clubs);
     }
+
+    @GetMapping("/{clubId}/tournaments")
+    public ResponseEntity<List<TournamentResponseDTO>> getTournamentsForClub(
+            @PathVariable Long clubId,
+            @RequestParam TournamentFilter filter) {
+        List<TournamentResponseDTO> tournaments = tournamentService.getTournamentsForClub(clubId, filter);
+        return ResponseEntity.ok(tournaments);
+    }
+
+
 }
