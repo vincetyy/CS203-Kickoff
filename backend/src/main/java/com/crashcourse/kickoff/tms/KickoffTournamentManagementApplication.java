@@ -83,8 +83,8 @@ public class KickoffTournamentManagementApplication {
 		TournamentService tournamentService = ctx.getBean(TournamentService.class);
 		TournamentCreateDTO tournament1DTO = new TournamentCreateDTO("Tournament 1", LocalDateTime.of(
             2021, 4, 24, 14, 33, 48), LocalDateTime.of(
-			2021,5, 24, 14, 33, 48), location1.getId(), 16, TournamentFormat.FIVE_SIDE, KnockoutFormat.SINGLE_ELIM, new ArrayList<Float>(), null, null, adminHostProfile);
-		tournamentService.createTournament(tournament1DTO);
+			2021,5, 24, 14, 33, 48), location1.getId(), 16, TournamentFormat.FIVE_SIDE, KnockoutFormat.SINGLE_ELIM, new ArrayList<Float>(), null, null);
+		tournamentService.createTournament(tournament1DTO, admin.getId());
 		
 	}
 }

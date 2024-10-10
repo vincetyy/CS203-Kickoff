@@ -86,6 +86,4 @@ public class TournamentCreateDTO {
     @Min(value = 0, message = "Maximum rank cannot be negative")
     private Integer maxRank;
 
-    // @NotNull(message = "Host is required")
-    private HostProfile host;
 }

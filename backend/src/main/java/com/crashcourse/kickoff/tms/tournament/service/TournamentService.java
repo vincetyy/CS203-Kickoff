@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface TournamentService {
 
-    TournamentResponseDTO createTournament(TournamentCreateDTO tournamentCreateDTO);
+    TournamentResponseDTO createTournament(TournamentCreateDTO tournamentCreateDTO, Long userIdFromToken);
 
     TournamentResponseDTO getTournamentById(Long id);
 
