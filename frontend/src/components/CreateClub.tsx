@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
 import axios from 'axios';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog"; 
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog"; 
 import { Club } from '../types/club';  
 import { useNavigate } from 'react-router-dom';
 
