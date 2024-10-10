@@ -221,21 +221,30 @@ const TournamentPage: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {selectedTournament.joinedClubs.map((club: Club) => (
-              <div key={club.id} className="bg-gray-700 rounded-lg p-4 flex items-center space-x-4">
-                <img 
-                  src={`https://picsum.photos/seed/${club.id}/100/100`} 
-                  alt={club.name} 
-                  className="w-16 h-16 rounded-full object-cover" 
-                />
-                <div>
-                  <h4 className="text-lg font-bold">{club.name}</h4>
+              <div key={club.id} className="bg-gray-700 rounded-lg p-4 flex items-center justify-between space-x-4">
+                <div className="flex items-center space-x-4">
+                  <img 
+                    src={`https://picsum.photos/seed/${club.id}/100/100`} 
+                    alt={club.name} 
+                    className="w-16 h-16 rounded-full object-cover" 
+                  />
+                  <div>
+                    <h4 className="text-lg font-bold">{club.name}</h4>
+                  </div>
                 </div>
+                {/* Conditionally render Delete button based on isHost */}
+                {isHost && (
+                  <button 
+                    onClick={() => handleDeleteClub(club.id)} 
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
             ))}
           </div>
         )}
-
-        
       </div>
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[600px] lg:max-w-[800px]">
