@@ -23,7 +23,7 @@ import ClubInfoModal from '../components/ClubInfoModal';
 import {  toast } from 'react-hot-toast';
 import { Club } from '../types/club';
 import { useNavigate } from 'react-router-dom';
-import CreateClub from './CreateClub';
+import CreateClub from '../components/CreateClub';
 
 enum PlayerPosition {
   POSITION_FORWARD = 'POSITION_FORWARD',
