@@ -12,6 +12,8 @@ import com.crashcourse.kickoff.tms.tournament.exception.*;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.repository.TournamentRepository;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
+import com.crashcourse.kickoff.tms.host.*;
+import com.crashcourse.kickoff.tms.host.HostProfileServiceImpl.*;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +33,13 @@ public class TournamentServiceImpl implements TournamentService {
     private final HostProfileRepository hostProfileRepository;
     private final TournamentRepository tournamentRepository;
     private final LocationService locationService;
+    private final HostProfileService hostProfileService;
+
     private final ClubService clubService;
 
     @Override
-    public TournamentResponseDTO createTournament(TournamentCreateDTO dto) {
-        Tournament tournament = mapToEntity(dto);
+    public TournamentResponseDTO createTournament(TournamentCreateDTO dto, Long userIdFromToken) {
+        Tournament tournament = mapToEntity(dto, userIdFromToken);
         Tournament savedTournament = tournamentRepository.save(tournament);
         return mapToResponseDTO(savedTournament);
     }
@@ -91,7 +95,7 @@ public class TournamentServiceImpl implements TournamentService {
      * @param dto TournamentCreateDTO
      * @return Tournament entity
      */
-    private Tournament mapToEntity(TournamentCreateDTO dto) {
+    private Tournament mapToEntity(TournamentCreateDTO dto, Long userIdFromToken) {
         Tournament tournament = new Tournament();
         tournament.setName(dto.getName());
         tournament.setStartDateTime(dto.getStartDateTime());
@@ -103,7 +107,12 @@ public class TournamentServiceImpl implements TournamentService {
         tournament.setPrizePool(dto.getPrizePool());
         tournament.setMinRank(dto.getMinRank());
         tournament.setMaxRank(dto.getMaxRank());
-        tournament.setHost(dto.getHost());
+        /*
+         * If you want i can add a custom exception ,im leaving this for now
+         */
+        HostProfile hostProfile = hostProfileRepository.findById(userIdFromToken)
+                            .orElseThrow(() -> new RuntimeException("HostProfile not found"));
+        tournament.setHost(hostProfile);
 
         return tournament;
     }

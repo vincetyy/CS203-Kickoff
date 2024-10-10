@@ -35,8 +35,11 @@ public class TournamentController {
      */
     @PostMapping
     public ResponseEntity<TournamentResponseDTO> createTournament(
-            @Valid @RequestBody TournamentCreateDTO tournamentCreateDTO) {
-        TournamentResponseDTO createdTournament = tournamentService.createTournament(tournamentCreateDTO);
+            @Valid @RequestBody TournamentCreateDTO tournamentCreateDTO,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+        token = token.substring(7);
+        Long userIdFromToken = jwtUtil.extractUserId(token);
+        TournamentResponseDTO createdTournament = tournamentService.createTournament(tournamentCreateDTO, userIdFromToken);
         return new ResponseEntity<>(createdTournament, HttpStatus.CREATED);
     }
 
