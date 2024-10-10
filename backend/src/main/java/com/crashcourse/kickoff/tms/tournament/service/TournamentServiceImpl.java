@@ -10,6 +10,7 @@ import com.crashcourse.kickoff.tms.location.model.*;
 import com.crashcourse.kickoff.tms.tournament.dto.*;
 import com.crashcourse.kickoff.tms.tournament.exception.*;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
+import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
 import com.crashcourse.kickoff.tms.tournament.repository.TournamentRepository;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
 import com.crashcourse.kickoff.tms.host.*;
@@ -205,5 +206,29 @@ public class TournamentServiceImpl implements TournamentService {
         }
         return false;
     }
-    
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TournamentResponseDTO> getTournamentsForClub(Long clubId, TournamentFilter filter) {
+        List<Tournament> tournaments;
+
+        switch (filter) {
+            case UPCOMING:
+                tournaments = tournamentRepository.findUpcomingTournamentsForClub(clubId);
+                break;
+            case CURRENT:
+                tournaments = tournamentRepository.findCurrentTournamentsForClub(clubId);
+                break;
+            case PAST:
+                tournaments = tournamentRepository.findPastTournamentsForClub(clubId);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid filter type");
+        }
+
+        return tournaments.stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
 }
