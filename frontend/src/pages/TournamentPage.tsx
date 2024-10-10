@@ -16,7 +16,7 @@ import { removeClubFromTournamentAsync, updateTournamentAsync } from '../store/t
 import { selectUserId } from '../store/userSlice';
 
 import UpdateTournament from '../components/UpdateTournament';
-import { TournamentUpdate } from '../types/tournamentUpdate'; // Import the update type
+import { TournamentUpdate } from '../types/tournament';
 
 const TournamentPage: React.FC = () => {
   const navigate = useNavigate();
@@ -31,10 +31,11 @@ const TournamentPage: React.FC = () => {
     name: '',
     startDateTime: '',
     endDateTime: '',
-    locationId: 0,
+    location: null,
     prizePool: [],
     minRank: 0,
     maxRank: 0,
+    joinedClubs: [],
   });
 
   // Open the dialog and set the club to be deleted
@@ -145,7 +146,7 @@ const TournamentPage: React.FC = () => {
         name: selectedTournament.name,
         startDateTime: selectedTournament.startDateTime,
         endDateTime: selectedTournament.endDateTime,
-        locationId: selectedTournament.location.id,
+        location: selectedTournament.location,
         prizePool: selectedTournament.prizePool,
         minRank: selectedTournament.minRank,
         maxRank: selectedTournament.maxRank,

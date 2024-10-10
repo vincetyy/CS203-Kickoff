@@ -9,17 +9,23 @@ export interface Club {
 }
 
 export interface Tournament {
-  id: number;
   name: string;
   startDateTime: string;
   endDateTime: string;
-  location: Location;
+  location: Location | null;
   maxTeams: number;
   tournamentFormat: string;
   knockoutFormat: string;
-  prizePool: number | null;
-  minRank: number | null;
-  maxRank: number | null;
-  joinedClubs: Club[];
-  over: boolean;
+  minRank: number;
+  maxRank: number;
+}
+
+export interface TournamentUpdate {
+  name: string;
+  startDateTime: string;
+  endDateTime: string;
+  locationId: number;
+  prizePool?: number[];
+  minRank?: number;
+  maxRank?: number;
 }

@@ -3,8 +3,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
-import { Club } from '../types/club';
+import { Location, TournamentUpdate } from '../types/tournament';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 interface UpdateTournamentProps {
   isOpen: boolean;
@@ -13,24 +14,37 @@ interface UpdateTournamentProps {
   onUpdate: (data: TournamentUpdate) => Promise<void>;
 }
 
-export interface TournamentUpdate {
-    name: string;
-    startDateTime: string;
-    endDateTime: string;
-    locationId: string;
-    prizePool?: number[];
-    minRank?: number;
-    maxRank?: number;
-    joinedClubs: Club[];
-  }
-
 const UpdateTournament: React.FC<UpdateTournamentProps> = ({ isOpen, onClose, initialData, onUpdate }) => {
   const [formData, setFormData] = useState<TournamentUpdate>(initialData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [isLoadingLocations, setIsLoadingLocations] = useState<boolean>(false);
+  const [locationsError, setLocationsError] = useState<string | null>(null);
+  const [locations, setLocations] = useState<Location[]>([]); // Added locations state
+
   useEffect(() => {
     setFormData(initialData);
   }, [initialData]);
+
+  useEffect(() => {
+    const fetchLocations = async () => {
+      setIsLoadingLocations(true);
+      setLocationsError(null);
+      try {
+        const response = await axios.get<Location[]>('http://localhost:8080/locations');
+        setLocations(response.data);
+      } catch (error: any) {
+        console.error('Error fetching locations:', error);
+        setLocationsError('Failed to load locations. Please try again.');
+      } finally {
+        setIsLoadingLocations(false);
+      }
+    };
+
+    if (isOpen) {
+      fetchLocations();
+    }
+  }, [isOpen]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -39,14 +53,14 @@ const UpdateTournament: React.FC<UpdateTournamentProps> = ({ isOpen, onClose, in
       ...prev,
       [name]: name.includes('DateTime') ? new Date(value).toISOString() :
                name.includes('Id') ? Number(value) :
-               name.includes('Rank') ? Number(value) : value
+               name.includes('Rank') ? (value === "" ? 0 : Number(value)) : value
     }));
   };
 
   const handleSelectChange = (name: keyof TournamentUpdate, value: string) => {
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value ? Number(value) : 0 // Ensure locationId is a number
     }));
   };
 
@@ -101,18 +115,30 @@ const UpdateTournament: React.FC<UpdateTournamentProps> = ({ isOpen, onClose, in
               />
             </div>
 
-            {/* Location ID */}
+            {/* Location Dropdown */}
             <div>
-              <label htmlFor="locationId" className="form-label">Location ID</label>
-              <Input
-                id="locationId"
-                name="locationId"
-                type="number"
-                value={formData.locationId}
-                onChange={handleInputChange}
-                className="form-input"
-                required
-              />
+              <label htmlFor="locationId" className="form-label">Location</label>
+              {isLoadingLocations ? (
+                <p>Loading locations...</p>
+              ) : locationsError ? (
+                <p className="text-red-500">{locationsError}</p>
+              ) : (
+                <Select
+                  value={formData.locationId}
+                  onValueChange={(value) => handleSelectChange('locationId', value)}
+                >
+                  <SelectTrigger className="select-trigger">
+                    <SelectValue placeholder="Select location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {locations.map(loc => (
+                      <SelectItem key={loc.id} value={loc.id.toString()}>
+                        {loc.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             {/* Start Date & Time */}
@@ -168,7 +194,7 @@ const UpdateTournament: React.FC<UpdateTournamentProps> = ({ isOpen, onClose, in
                 name="minRank"
                 type="number"
                 min="0"
-                value={formData.minRank ?? ''}
+                value={formData.minRank ?? 0}
                 onChange={handleInputChange}
                 className="form-input"
               />
@@ -182,7 +208,7 @@ const UpdateTournament: React.FC<UpdateTournamentProps> = ({ isOpen, onClose, in
                 name="maxRank"
                 type="number"
                 min="0"
-                value={formData.maxRank ?? ''}
+                value={formData.maxRank ?? 0}
                 onChange={handleInputChange}
                 className="form-input"
               />

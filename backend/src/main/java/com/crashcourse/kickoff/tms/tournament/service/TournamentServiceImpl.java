@@ -63,6 +63,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
+    @Transactional
     public TournamentResponseDTO updateTournament(Long id, TournamentUpdateDTO dto) {
         Tournament existingTournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + id));
