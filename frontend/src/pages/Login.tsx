@@ -2,6 +2,9 @@ import loginpageBackground from '@/assets/loginpage_background.png';
 import eyePassword from '@/assets/eyePassword.svg';
 import eyePasswordOff from '@/assets/eyePasswordOff.svg';
 
+import { useDispatch } from 'react-redux';
+import { setUserId } from '../store/userSlice';  // Import the action
+
 import {
     Input,
     Switch,
@@ -14,6 +17,7 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom';
 const Login = () => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [username, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
@@ -35,10 +39,14 @@ const Login = () => {
     
           // Handle the response after successful authentication
           if (response.status === 200) {
-            const token = response.data;  // Assuming the JWT is in the 'jwt' field of the response
+            console.log(response);
+            
+            const token = response.data.jwtToken;  // Assuming the JWT is in the 'jwt' field of the response
             localStorage.setItem('authToken', token);  // Store JWT in localStorage
             localStorage.setItem('username', username); 
             console.log('Login successful');
+
+            dispatch(setUserId(response.data.userId));
 
             navigate('/clubs');  
 

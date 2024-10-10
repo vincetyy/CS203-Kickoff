@@ -12,16 +12,72 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 
 import { fetchTournamentById, updateTournament } from '../services/tournamentService';
 import { Tournament, Club } from '../types/tournament';
-import { useDispatch } from 'react-redux';
-import { updateTournamentAsync } from '../store/tournamentSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { removeClubFromTournamentAsync, updateTournamentAsync } from '../store/tournamentSlice';
+import { selectUserId } from '../store/userSlice';
 
 
 const TournamentPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>()
 
+  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
+  const [clubToRemove, setClubToRemove] = useState<Club | null>(null);
+
+  // Open the dialog and set the club to be deleted
+  const handleOpenRemoveDialog = (club: Club) => {
+    setClubToRemove(club);  // Set the club to delete
+    setIsRemoveDialogOpen(true);   // Open the dialog
+  };
+
+  // Handle confirming the deletion
+  const handleConfirmRemove = () => {
+    if (clubToRemove) {
+      handleRemoveClub(clubToRemove.id); // Call the actual delete function with the club's id
+    }
+    setIsRemoveDialogOpen(false); // Close the dialog
+  };
+
+  const handleRemoveClub = async (clubId: number) => {
+    try {
+      // Dispatch the async thunk and unwrap the result to handle success or error
+
+      // Handle case where tournamentId is invalid
+      if (selectedTournament === null) {
+        toast.error('Invalid tournament');
+        return;
+      }
+
+      await dispatch(removeClubFromTournamentAsync({ tournamentId: selectedTournament.id, clubId })).unwrap();
+  
+      // Fetch the updated tournament data after removal
+      const updatedTournamentData = await fetchTournamentById(selectedTournament.id);
+  
+      // Assuming you have a setSelectedTournament state function to update the tournament details
+      setSelectedTournament(updatedTournamentData);
+  
+      // Close the dialog or perform other UI updates as necessary
+      setIsCreateDialogOpen(false);  // If you have a dialog, close it
+  
+      // Show a success toast notification
+      toast.success('Club removed successfully!', {
+        duration: 3000,
+        position: 'top-center',
+      });
+    } catch (error) {
+      // Handle error case
+      console.error('Failed to remove the club:', error);
+  
+      // Show error toast notification
+      toast.error('Failed to remove the club. Please try again.');
+    }
+  };
+
+  
+
   const { id } = useParams<{ id: string }>();
   const tournamentId = id ? parseInt(id, 10) : null;
+  const userId = useSelector(selectUserId);
 
   const tournamentFormatMap: { [key: string]: string } = {
     FIVE_SIDE: 'Five-a-side',
@@ -41,10 +97,7 @@ const TournamentPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null); 
   let isHost = false;
   if (selectedTournament) {
-    // hardcoded rn
-    isHost = selectedTournament.host.id === 1;
-    console.log(isHost);
-    
+    isHost = selectedTournament.host.id === userId;
   }
   // const [joinRole, setJoinRole] = useState<TournamentJoinRole | null>(null);
 
@@ -222,22 +275,56 @@ const TournamentPage: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {selectedTournament.joinedClubs.map((club: Club) => (
-              <div key={club.id} className="bg-gray-700 rounded-lg p-4 flex items-center space-x-4">
-                <img 
-                  src={`https://picsum.photos/seed/${club.id}/100/100`} 
-                  alt={club.name} 
-                  className="w-16 h-16 rounded-full object-cover" 
-                />
-                <div>
-                  <h4 className="text-lg font-bold">{club.name}</h4>
+              <div key={club.id} className="bg-gray-700 rounded-lg p-4 flex items-center justify-between space-x-4">
+                <div className="flex items-center space-x-4">
+                  <img 
+                    src={`https://picsum.photos/seed/${club.id}/100/100`} 
+                    alt={club.name} 
+                    className="w-16 h-16 rounded-full object-cover" 
+                  />
+                  <div>
+                    <h4 className="text-lg font-bold">{club.name}</h4>
+                  </div>
                 </div>
+                {/* Conditionally render Delete button based on isHost */}
+                {isHost && (
+                  <button 
+                    onClick={() => handleOpenRemoveDialog(club)} 
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                  >
+                    Remove
+                  </button>
+                )}
               </div>
             ))}
           </div>
         )}
-
-        
       </div>
+       {/* Delete confirmation dialog */}
+       <Dialog open={isRemoveDialogOpen} onOpenChange={setIsRemoveDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Remove {clubToRemove?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            <p>Are you sure you want to remove {clubToRemove?.name} from this tournament?</p>
+          </div>
+          <div className="flex flex-col sm:flex-row justify-between mt-4 space-y-2 sm:space-y-0 sm:space-x-2">
+            <button 
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 w-full" 
+              onClick={() => setIsRemoveDialogOpen(false)}
+            >
+              Cancel
+            </button>
+            <button 
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full"
+              onClick={handleConfirmRemove}
+            >
+              Confirm
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[600px] lg:max-w-[800px]">
           <DialogHeader>

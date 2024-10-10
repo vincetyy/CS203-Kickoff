@@ -25,3 +25,8 @@ export const updateTournament = async (tournamentId: number, tournamentData: Par
   const response = await api.put(`/tournaments/${tournamentId}`, tournamentData);
   return response.data;
 };
+
+export const removeClubFromTournament = async (tournamentId: number, clubId: number): Promise<void> => {
+  const response = await api.delete(`/tournaments/${tournamentId}/clubs/${clubId}`);
+  return response.data;
+};

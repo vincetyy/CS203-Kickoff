@@ -23,6 +23,9 @@ public interface TournamentService {
 
     List<Club> getAllClubsInTournament(Long id);
 
+    void removeClubFromTournament(Long tournamentId, Long clubId);
+
+    boolean isOwnerOfTournament(Long tournamentId, Long profileId);
     List<TournamentResponseDTO> getTournamentsForClub(Long clubId, TournamentFilter filter);
 
 }

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { fetchTournamentById, fetchTournaments, joinTournament, createTournament, updateTournament } from '../services/tournamentService';
+import { fetchTournamentById, fetchTournaments, joinTournament, createTournament, updateTournament, removeClubFromTournament } from '../services/tournamentService';
 import { Tournament } from '../types/tournament';
 
 export const fetchTournamentByIdAsync = createAsyncThunk(
@@ -34,6 +34,13 @@ export const updateTournamentAsync = createAsyncThunk(
   'tournaments/updateTournament',
   async ({ tournamentId, tournamentData }: { tournamentId: number; tournamentData: Partial<Tournament> }) => {
     return await updateTournament(tournamentId, tournamentData);
+  }
+);
+
+export const removeClubFromTournamentAsync = createAsyncThunk(
+  'tournaments/removeClubFromTournament',
+  async ({ tournamentId, clubId }: { tournamentId: number; clubId: number }) => {
+    return await removeClubFromTournament(tournamentId, clubId);
   }
 );
 
@@ -72,6 +79,12 @@ const tournamentSlice = createSlice({
         const index = state.tournaments.findIndex(tournament => tournament.id === updatedTournament.id);
         if (index !== -1) {
           state.tournaments[index] = updatedTournament;
+        }
+      }).addCase(removeClubFromTournamentAsync.fulfilled, (state, action) => {
+        const { tournamentId, clubId } = action.meta.arg;  // Get tournamentId and clubId from action
+        const tournament = state.tournaments.find(t => t.id === tournamentId);
+        if (tournament) {
+          tournament.joinedClubs = tournament.joinedClubs.filter(club => club.id !== clubId);  // Remove the club from the tournament
         }
       });
   },

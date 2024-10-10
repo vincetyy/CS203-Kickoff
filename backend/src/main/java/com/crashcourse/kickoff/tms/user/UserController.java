@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.crashcourse.kickoff.tms.security.JwtUtil;
 import com.crashcourse.kickoff.tms.user.dto.LoginDetails;
+import com.crashcourse.kickoff.tms.user.dto.LoginResponseDTO;
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
 import com.crashcourse.kickoff.tms.user.model.User;
 import com.crashcourse.kickoff.tms.user.service.UserService;
@@ -56,7 +57,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDetails loginDetails) throws Exception {
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginDetails loginDetails) throws Exception {
         try {
             // Authenticate the user
             authenticationManager.authenticate(
@@ -68,6 +69,12 @@ public class UserController {
         // Load user details and generate JWT token
         final User user = userService.loadUserByUsername(loginDetails.getUsername());
         final String jwt = jwtUtil.generateToken(user);
-        return ResponseEntity.ok(jwt);
+
+        // Assuming User has a getId() method to retrieve userId
+        Long userId = user.getId();
+
+        // Return both userId and jwtToken in the response
+        LoginResponseDTO loginResponse = new LoginResponseDTO(userId, jwt);
+        return ResponseEntity.ok(loginResponse);
     }
 }
