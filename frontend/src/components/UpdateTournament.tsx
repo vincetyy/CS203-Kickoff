@@ -52,22 +52,22 @@ const UpdateTournament: React.FC<UpdateTournamentProps> = ({ isOpen, onClose, in
     setFormData(prev => ({
       ...prev,
       [name]: name.includes('DateTime') ? new Date(value).toISOString() :
-               name.includes('Id') ? Number(value) :
                name.includes('Rank') ? (value === "" ? 0 : Number(value)) : value
     }));
   };
 
-  const handleSelectChange = (name: keyof TournamentUpdate, value: string) => {
+  const handleSelectChange = (value: string) => {
+    const selectedLocation = locations.find(loc => loc.id.toString() === value);
     setFormData(prev => ({
       ...prev,
-      [name]: value ? Number(value) : 0 // Ensure locationId is a number
+      location: selectedLocation || ({} as Location) // Fallback to empty object if not found
     }));
   };
 
   const handleSubmit = async () => {
     console.log(formData);
     // Basic client-side validation
-    if (!formData.name || !formData.startDateTime || !formData.endDateTime || !formData.locationId) {
+    if (!formData.name || !formData.startDateTime || !formData.endDateTime || !formData.location) {
       toast.error('Please fill in all required fields', {
         duration: 3000,
         position: 'top-center',
@@ -117,15 +117,15 @@ const UpdateTournament: React.FC<UpdateTournamentProps> = ({ isOpen, onClose, in
 
             {/* Location Dropdown */}
             <div>
-              <label htmlFor="locationId" className="form-label">Location</label>
+              <label htmlFor="location" className="form-label">Location</label>
               {isLoadingLocations ? (
                 <p>Loading locations...</p>
               ) : locationsError ? (
                 <p className="text-red-500">{locationsError}</p>
               ) : (
                 <Select
-                  value={formData.locationId}
-                  onValueChange={(value) => handleSelectChange('locationId', value)}
+                  value={formData.location?.id.toString() || ''}
+                  onValueChange={handleSelectChange}
                 >
                   <SelectTrigger className="select-trigger">
                     <SelectValue placeholder="Select location" />

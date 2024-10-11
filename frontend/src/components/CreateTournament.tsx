@@ -72,7 +72,7 @@ const CreateTournament: React.FC<CreateTournamentProps> = ({ isOpen, onClose }) 
       name,
       startDateTime,
       endDateTime,
-      locationId: location.id, // Send locationId instead of location object
+      location,
       maxTeams,
       tournamentFormat,
       knockoutFormat,

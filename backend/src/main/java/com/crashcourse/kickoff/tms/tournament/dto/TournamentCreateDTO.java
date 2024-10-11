@@ -42,8 +42,8 @@ public class TournamentCreateDTO {
     /**
      * Identifier for the location where the tournament will be held.
      */
-    @NotNull(message = "Location ID is required")
-    private Long locationId;
+    @NotNull(message = "Location is required")
+    private Location location;
 
     /**
      * Maximum number of teams that can participate.

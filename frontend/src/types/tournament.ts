@@ -24,7 +24,7 @@ export interface TournamentUpdate {
   name: string;
   startDateTime: string;
   endDateTime: string;
-  locationId: number;
+  location: Location;
   prizePool?: number[];
   minRank?: number;
   maxRank?: number;

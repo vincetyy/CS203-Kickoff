@@ -31,6 +31,7 @@ public class Tournament {
     private LocalDateTime endDateTime;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "location_id")
     private Location location;
 
     private Integer maxTeams = 0;
@@ -42,7 +43,7 @@ public class Tournament {
     private Integer maxRank;
 
     @ManyToOne
-    @JoinColumn(name = "tournament_id")
+    @JoinColumn(name = "host_id")
     private HostProfile host;
 
     @ManyToMany

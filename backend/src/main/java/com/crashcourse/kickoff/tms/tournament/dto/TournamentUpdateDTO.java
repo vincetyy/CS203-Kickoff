@@ -29,7 +29,7 @@ public class TournamentUpdateDTO {
     private LocalDateTime endDateTime;
 
     @NotNull(message = "Location ID is required")
-    private Long locationId;
+    private Location location;
 
     private List<@Positive(message = "Prize amount must be positive") Float> prizePool;
 
