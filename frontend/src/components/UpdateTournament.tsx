@@ -24,6 +24,8 @@ const UpdateTournament: React.FC<UpdateTournamentProps> = ({ isOpen, onClose, in
 
   useEffect(() => {
     setFormData(initialData);
+    console.log(initialData);
+    
   }, [initialData]);
 
   useEffect(() => {
@@ -124,7 +126,8 @@ const UpdateTournament: React.FC<UpdateTournamentProps> = ({ isOpen, onClose, in
                 <p className="text-red-500">{locationsError}</p>
               ) : (
                 <Select
-                  value={formData.location?.id.toString() || ''}
+                  defaultValue={formData.location ? formData.location.id.toString() : ''}
+                  defaultDisplayValue={formData.location ? formData.location.name : ''}
                   onValueChange={handleSelectChange}
                 >
                   <SelectTrigger className="select-trigger">

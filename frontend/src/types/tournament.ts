@@ -13,6 +13,7 @@ export interface Tournament {
   startDateTime: string;
   endDateTime: string;
   location: Location | null;
+  prizePool?: number[];
   maxTeams: number;
   tournamentFormat: string;
   knockoutFormat: string;
