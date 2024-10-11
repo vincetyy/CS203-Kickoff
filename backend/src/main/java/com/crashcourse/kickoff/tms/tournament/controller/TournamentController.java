@@ -86,7 +86,10 @@ public class TournamentController {
         }
         token = token.substring(7);
         Long userIdFromToken = jwtUtil.extractUserId(token);
-        if (id != userIdFromToken) {
+        
+        boolean isOwnerOfTournament = tournamentService.isOwnerOfTournament(id,userIdFromToken);
+
+        if (!isOwnerOfTournament) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to update this tournament");
         }
         TournamentResponseDTO updatedTournament = tournamentService.updateTournament(id, TournamentUpdateDTO);

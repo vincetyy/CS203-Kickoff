@@ -3,13 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
-import { AppDispatch, RootState } from '../store';
+import { AppDispatch } from '../store';
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 
-import { fetchTournamentById, updateTournament } from '../services/tournamentService';
+import { fetchTournamentById, } from '../services/tournamentService';
 import { Tournament, Club } from '../types/tournament';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeClubFromTournamentAsync, updateTournamentAsync } from '../store/tournamentSlice';
