@@ -15,7 +15,7 @@ public interface TournamentService {
 
     List<TournamentResponseDTO> getAllTournaments();
 
-    TournamentResponseDTO updateTournament(Long id, TournamentCreateDTO tournamentCreateDTO);
+    TournamentResponseDTO updateTournament(Long id, TournamentUpdateDTO tournamentCreateDTO);
 
     void deleteTournament(Long id);
 

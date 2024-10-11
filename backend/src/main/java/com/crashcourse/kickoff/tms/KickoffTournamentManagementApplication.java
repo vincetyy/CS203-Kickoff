@@ -74,16 +74,16 @@ public class KickoffTournamentManagementApplication {
 
 		// Location
 		LocationService locationService = ctx.getBean(LocationService.class);
-		Location location1 = new Location(null, "MBS");
+		Location location1 = new Location(null, "MBS", null);
 		locationService.createLocation(location1);
-		Location location2 = new Location(null, "Botanic Gardens");
+		Location location2 = new Location(null, "Botanic Gardens", null);
 		locationService.createLocation(location2);
 
 		// Tournament
 		TournamentService tournamentService = ctx.getBean(TournamentService.class);
 		TournamentCreateDTO tournament1DTO = new TournamentCreateDTO("Tournament 1", LocalDateTime.of(
             2021, 4, 24, 14, 33, 48), LocalDateTime.of(
-			2021,5, 24, 14, 33, 48), location1.getId(), 16, TournamentFormat.FIVE_SIDE, KnockoutFormat.SINGLE_ELIM, new ArrayList<Float>(), null, null);
+			2021,5, 24, 14, 33, 48), location1, 16, TournamentFormat.FIVE_SIDE, KnockoutFormat.SINGLE_ELIM, new ArrayList<Float>(), null, null);
 		tournamentService.createTournament(tournament1DTO, admin.getId());
 		
 	}

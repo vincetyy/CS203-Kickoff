@@ -2,9 +2,14 @@ package com.crashcourse.kickoff.tms.tournament.service;
 
 import com.crashcourse.kickoff.tms.club.*;
 import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
+
 import com.crashcourse.kickoff.tms.location.service.LocationService;
-import com.crashcourse.kickoff.tms.player.PlayerProfile;
 import com.crashcourse.kickoff.tms.location.model.*;
+import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
+
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
+import com.crashcourse.kickoff.tms.host.*;
+import com.crashcourse.kickoff.tms.host.HostProfileServiceImpl.*;
 
 import com.crashcourse.kickoff.tms.tournament.dto.*;
 import com.crashcourse.kickoff.tms.tournament.exception.*;
@@ -12,8 +17,7 @@ import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
 import com.crashcourse.kickoff.tms.tournament.repository.TournamentRepository;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
-import com.crashcourse.kickoff.tms.host.*;
-import com.crashcourse.kickoff.tms.host.HostProfileServiceImpl.*;
+
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +36,7 @@ import java.util.stream.Collectors;
 public class TournamentServiceImpl implements TournamentService {
     private final HostProfileRepository hostProfileRepository;
     private final TournamentRepository tournamentRepository;
+    private final LocationRepository locationRepository;
     private final LocationService locationService;
     private final HostProfileService hostProfileService;
     private final ClubRepository clubRepository;
@@ -63,17 +68,20 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public TournamentResponseDTO updateTournament(Long id, TournamentCreateDTO dto) {
+    @Transactional
+    public TournamentResponseDTO updateTournament(Long id, TournamentUpdateDTO dto) {
         Tournament existingTournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + id));
 
         existingTournament.setName(dto.getName());
         existingTournament.setStartDateTime(dto.getStartDateTime());
         existingTournament.setEndDateTime(dto.getEndDateTime());
-        existingTournament.setLocation(locationService.getLocationById(dto.getLocationId()));
-        existingTournament.setMaxTeams(dto.getMaxTeams());
-        existingTournament.setTournamentFormat(dto.getTournamentFormat());
-        existingTournament.setKnockoutFormat(dto.getKnockoutFormat());
+
+        Location location = locationRepository.findById(dto.getLocation().getId())
+            .orElseThrow(() -> new EntityNotFoundException("Location not found with id: " + dto.getLocation().getId()));
+        existingTournament.setLocation(location);
+        location.getTournaments().add(existingTournament);
+
         existingTournament.setPrizePool(dto.getPrizePool());
         existingTournament.setMinRank(dto.getMinRank());
         existingTournament.setMaxRank(dto.getMaxRank());
@@ -101,7 +109,12 @@ public class TournamentServiceImpl implements TournamentService {
         tournament.setName(dto.getName());
         tournament.setStartDateTime(dto.getStartDateTime());
         tournament.setEndDateTime(dto.getEndDateTime());
-        tournament.setLocation(locationService.getLocationById(dto.getLocationId()));
+
+        Location location = locationRepository.findById(dto.getLocation().getId())
+            .orElseThrow(() -> new EntityNotFoundException("Location not found with id: " + dto.getLocation().getId()));
+        tournament.setLocation(location);
+        location.getTournaments().add(tournament);
+
         tournament.setMaxTeams(dto.getMaxTeams());
         tournament.setTournamentFormat(dto.getTournamentFormat());
         tournament.setKnockoutFormat(dto.getKnockoutFormat());
