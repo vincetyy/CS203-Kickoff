@@ -34,9 +34,6 @@ export default function PlayerProfilePage() {
         const response = await fetchPlayerProfileById(userId);
         console.log("response from server: ", response);
 
-        const clubResponse = await getClubByPlayerId(userId);
-        console.log(clubResponse);
-        setClub(clubResponse);
         
         setPlayerProfile(response);
         setPreferredPositions(response.preferredPositions || []);
@@ -45,6 +42,13 @@ export default function PlayerProfilePage() {
       } catch (err) {
         console.error('Error fetching player profile:', err);
         setLoading(false);
+      }
+      try {
+        const clubResponse = await getClubByPlayerId(userId);
+        console.log(clubResponse);
+        setClub(clubResponse);
+      } catch (err) {
+        console.error('Error fetching club:', err);
       }
     };
 
