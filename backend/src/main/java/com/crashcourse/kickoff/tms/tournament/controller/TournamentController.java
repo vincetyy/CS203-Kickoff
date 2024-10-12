@@ -158,5 +158,16 @@ public class TournamentController {
         return ResponseEntity.ok(tournaments);
     }
 
+    @PutMapping("/{tournamentId}/availability")
+    public ResponseEntity<Void> updatePlayerAvailability(@RequestBody UpdatePlayerAvailabilityDTO dto) {
+        tournamentService.updatePlayerAvailability(dto);
+        return ResponseEntity.ok().build();
+    }
 
+    @GetMapping("/{tournamentId}/availability")
+    public ResponseEntity<List<PlayerAvailabilityDTO>> getPlayerAvailability(@PathVariable Long tournamentId) {
+        List<PlayerAvailabilityDTO> availabilities = tournamentService.getPlayerAvailabilityForTournament(tournamentId);
+        return ResponseEntity.ok(availabilities);
+    }
+    
 }

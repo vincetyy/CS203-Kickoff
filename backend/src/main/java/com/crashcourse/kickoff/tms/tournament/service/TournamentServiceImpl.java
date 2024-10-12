@@ -8,14 +8,14 @@ import com.crashcourse.kickoff.tms.location.model.*;
 import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
 
 import com.crashcourse.kickoff.tms.player.PlayerProfile;
+import com.crashcourse.kickoff.tms.player.respository.PlayerProfileRepository;
 import com.crashcourse.kickoff.tms.host.*;
 import com.crashcourse.kickoff.tms.host.HostProfileServiceImpl.*;
 
 import com.crashcourse.kickoff.tms.tournament.dto.*;
 import com.crashcourse.kickoff.tms.tournament.exception.*;
-import com.crashcourse.kickoff.tms.tournament.model.Tournament;
-import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
-import com.crashcourse.kickoff.tms.tournament.repository.TournamentRepository;
+import com.crashcourse.kickoff.tms.tournament.model.*;
+import com.crashcourse.kickoff.tms.tournament.repository.*;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
 
 
@@ -40,6 +40,9 @@ public class TournamentServiceImpl implements TournamentService {
     private final LocationService locationService;
     private final HostProfileService hostProfileService;
     private final ClubRepository clubRepository;
+    private final PlayerAvailabilityRepository playerAvailabilityRepository;
+    private final PlayerProfileRepository playerProfileRepository;
+
 
     private final ClubService clubService;
 
@@ -261,6 +264,33 @@ public class TournamentServiceImpl implements TournamentService {
         return tournaments.stream()
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updatePlayerAvailability(UpdatePlayerAvailabilityDTO dto) {
+        PlayerAvailability playerAvailability = playerAvailabilityRepository
+            .findByTournamentIdAndPlayerId(dto.getTournamentId(), dto.getPlayerId())
+            .orElseGet(() -> new PlayerAvailability());
+
+        playerAvailability.setTournament(tournamentRepository.findById(dto.getTournamentId())
+            .orElseThrow(() -> new EntityNotFoundException("Tournament not found")));
+        playerAvailability.setPlayer(playerProfileRepository.findById(dto.getPlayerId())
+            .orElseThrow(() -> new EntityNotFoundException("Player not found")));
+        playerAvailability.setAvailable(dto.isAvailable());
+
+        playerAvailabilityRepository.save(playerAvailability);
+    }
+
+    @Override
+    public List<PlayerAvailabilityDTO> getPlayerAvailabilityForTournament(Long tournamentId) {
+        List<PlayerAvailability> availabilities = playerAvailabilityRepository.findByTournamentId(tournamentId);
+        return availabilities.stream()
+            .map(availability -> new PlayerAvailabilityDTO(
+                availability.getPlayer().getId(),
+                availability.getPlayer().getUser().getUsername(),  // Assuming you want to return the player's username
+                availability.isAvailable()
+            ))
+            .collect(Collectors.toList());
     }
 
 }

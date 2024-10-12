@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.user.model.User;
+import com.crashcourse.kickoff.tms.tournament.model.PlayerAvailability;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -18,14 +19,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Data
@@ -33,6 +29,7 @@ import lombok.ToString;
     generator = ObjectIdGenerators.PropertyGenerator.class,
     property = "id")
 public class PlayerProfile {
+    
     @Id
     private Long id;
 
@@ -52,6 +49,10 @@ public class PlayerProfile {
     private List<PlayerPosition> preferredPositions;
 
     private String profileDescription;
+
+    @OneToMany(mappedBy = "player", cascade = jakarta.persistence.CascadeType.ALL) 
+    @JsonIgnore 
+    private List<PlayerAvailability> availabilities; 
 
     public boolean isFreeAgent() {
         return club == null;

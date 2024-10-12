@@ -16,14 +16,26 @@ export const applyToClubAsync = createAsyncThunk(
   }
 );
 
+const initialState = {
+  clubs: [] as Club[],          
+  selectedClubId: null as number | null, 
+  status: 'idle',
+  error: null as string | null,
+};
+
 const clubSlice = createSlice({
   name: 'clubs',
-  initialState: {
-    clubs: [] as Club[],
-    status: 'idle',
-    error: null as string | null,
+  initialState,
+  reducers: {
+    
+    setSelectedClubId: (state, action) => {
+      state.selectedClubId = action.payload;
+    },
+    
+    clearSelectedClubId: (state) => {
+      state.selectedClubId = null;
+    }
   },
-  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchClubsAsync.pending, (state) => {
@@ -38,9 +50,13 @@ const clubSlice = createSlice({
         state.error = action.error.message || null;
       })
       .addCase(applyToClubAsync.fulfilled, (state, action) => {
-        // Handle successful application if needed
+        
       });
   },
 });
+
+export const { setSelectedClubId, clearSelectedClubId } = clubSlice.actions;
+
+export const selectClubId = (state: any) => state.clubs.selectedClubId;
 
 export default clubSlice.reducer;

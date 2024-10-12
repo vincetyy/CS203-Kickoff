@@ -4,6 +4,8 @@ import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.tournament.dto.*;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
+import com.crashcourse.kickoff.tms.tournament.dto.PlayerAvailabilityDTO;
+import com.crashcourse.kickoff.tms.tournament.dto.UpdatePlayerAvailabilityDTO;
 
 import java.util.List;
 
@@ -28,4 +30,7 @@ public interface TournamentService {
     boolean isOwnerOfTournament(Long tournamentId, Long profileId);
     List<TournamentResponseDTO> getTournamentsForClub(Long clubId, TournamentFilter filter);
 
+    void updatePlayerAvailability(UpdatePlayerAvailabilityDTO dto); 
+
+    List<PlayerAvailabilityDTO> getPlayerAvailabilityForTournament(Long tournamentId);  
 }

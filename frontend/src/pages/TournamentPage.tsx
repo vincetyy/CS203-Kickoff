@@ -1,5 +1,3 @@
-// src/pages/TournamentPage.tsx
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
@@ -9,14 +7,15 @@ import { Button } from "../components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 
-import { fetchTournamentById, } from '../services/tournamentService';
-import { Tournament, Club } from '../types/tournament';
+import { Tournament, TournamentUpdate, Club, Location, HostProfile } from '../types/tournament';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeClubFromTournamentAsync, updateTournamentAsync } from '../store/tournamentSlice';
+import { PlayerAvailabilityDTO } from '../types/PlayerAvailability'; 
+import { fetchTournamentById, getPlayerAvailability, updatePlayerAvailability } from '../services/tournamentService';
 import { selectUserId } from '../store/userSlice';
+import { selectClubId } from '../store/clubSlice';
 
 import UpdateTournament from '../components/UpdateTournament';
-import { TournamentUpdate } from '../types/tournament';
 
 const TournamentPage: React.FC = () => {
   const navigate = useNavigate();
@@ -24,67 +23,23 @@ const TournamentPage: React.FC = () => {
 
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [clubToRemove, setClubToRemove] = useState<Club | null>(null);
+  const [availableCount, setAvailableCount] = useState(0); 
+  const [isAvailable, setIsAvailable] = useState<boolean | null>(null); 
 
   // State for Update Tournament Dialog
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
-  const [initialUpdateData, setInitialUpdateData] = useState<TournamentUpdate>({
-    name: '',
-    startDateTime: '',
-    endDateTime: '',
-    location: null,
-    prizePool: [],
-    minRank: 0,
-    maxRank: 0,
-    joinedClubs: [],
-  });
-
-  // Open the dialog and set the club to be deleted
-  const handleOpenRemoveDialog = (club: Club) => {
-    setClubToRemove(club);  // Set the club to delete
-    setIsRemoveDialogOpen(true);   // Open the dialog
-  };
-
-  // Handle confirming the deletion
-  const handleConfirmRemove = () => {
-    if (clubToRemove) {
-      handleRemoveClub(clubToRemove.id); // Call the actual delete function with the club's id
-    }
-    setIsRemoveDialogOpen(false); // Close the dialog
-  };
-
-  const handleRemoveClub = async (clubId: number) => {
-    try {
-      // Handle case where tournamentId is invalid
-      if (selectedTournament === null) {
-        toast.error('Invalid tournament');
-        return;
-      }
-
-      await dispatch(removeClubFromTournamentAsync({ tournamentId: selectedTournament.id, clubId })).unwrap();
-  
-      // Fetch the updated tournament data after removal
-      const updatedTournamentData = await fetchTournamentById(selectedTournament.id);
-  
-      // Update the tournament details
-      setSelectedTournament(updatedTournamentData);
-  
-      // Show a success toast notification
-      toast.success('Club removed successfully!', {
-        duration: 3000,
-        position: 'top-center',
-      });
-    } catch (error: any) {
-      // Handle error case
-      console.error('Failed to remove the club:', error);
-  
-      // Show error toast notification
-      toast.error('Failed to remove the club. Please try again.');
-    }
-  };
+  const [initialUpdateData, setInitialUpdateData] = useState<TournamentUpdate | null>(null);
 
   const { id } = useParams<{ id: string }>();
   const tournamentId = id ? parseInt(id, 10) : null;
   const userId = useSelector(selectUserId);
+  const clubId = useSelector(selectClubId);
+
+  const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
+  const [status, setStatus] = useState<'idle' | 'loading' | 'succeeded' | 'failed'>('idle');
+  const [error, setError] = useState<string | null>(null); 
+
+  const isHost = selectedTournament ? selectedTournament.host?.id === userId : false;
 
   const tournamentFormatMap: { [key: string]: string } = {
     FIVE_SIDE: 'Five-a-side',
@@ -96,16 +51,27 @@ const TournamentPage: React.FC = () => {
     DOUBLE_ELIM: 'Double Elimination'
   };
 
-  const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
-  const [status, setStatus] = useState<'idle' | 'loading' | 'succeeded' | 'failed'>('idle');
-  const [error, setError] = useState<string | null>(null); 
-  let isHost = false;
-  if (selectedTournament) {
-    isHost = selectedTournament.host.id === userId;
-  }
-
   const handleBackClick = () => {
     navigate('/tournaments'); // Navigate back to /tournaments
+  };
+
+  const handleOpenRemoveDialog = (club: Club) => {
+    setClubToRemove(club); // Set the club to be removed
+    setIsRemoveDialogOpen(true); // Open the confirmation dialog
+  };
+
+  const handleConfirmRemove = async () => {
+    if (clubToRemove && selectedTournament) {
+      await dispatch(removeClubFromTournamentAsync({ 
+        tournamentId: selectedTournament.id, 
+        clubId: clubToRemove.id 
+      })).unwrap();
+  
+      const updatedTournamentData = await fetchTournamentById(selectedTournament.id);
+      setSelectedTournament(updatedTournamentData);
+      toast.success('Club removed successfully');
+    }
+    setIsRemoveDialogOpen(false); // Close the dialog
   };
 
   useEffect(() => {
@@ -116,21 +82,42 @@ const TournamentPage: React.FC = () => {
     }
 
     const fetchData = async () => {
-      setStatus('loading');
-      setError(null);
       try {
         const tournament = await fetchTournamentById(tournamentId);
         setSelectedTournament(tournament);
-        setStatus('succeeded');
-      } catch (err: any) {
-        console.error('Failed to fetch tournament:', err);
-        setError(err.message || 'Failed to fetch tournament.');
-        setStatus('failed');
+
+        const availabilities = await getPlayerAvailability(tournamentId);
+        const clubAvailabilities = availabilities.filter(
+          (availability: PlayerAvailabilityDTO) => availability.isAvailable
+        );
+        setAvailableCount(clubAvailabilities.length); // Update the count of available club members
+      } catch (err) {
+        console.error('Error fetching tournament data:', err);
+        toast.error('Failed to load tournament data.');
       }
     };
 
     fetchData();
   }, [tournamentId]);
+
+  const handleAvailabilityUpdate = async (availability: boolean) => {
+    if (tournamentId === null || isNaN(tournamentId)) return;
+
+    try {
+      await updatePlayerAvailability({ tournamentId, playerId: userId, isAvailable: availability });
+      setIsAvailable(availability);
+
+      const updatedAvailability = await getPlayerAvailability(tournamentId);
+      const clubAvailabilities = updatedAvailability.filter(
+        (availability: PlayerAvailabilityDTO) => availability.isAvailable
+      );
+      setAvailableCount(clubAvailabilities.length); // Update the count
+      toast.success(`You have marked yourself as ${availability ? 'available' : 'not available'}.`);
+    } catch (err) {
+      console.error('Error updating availability:', err);
+      toast.error('Failed to update your availability.');
+    }
+  };
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { 
@@ -146,10 +133,10 @@ const TournamentPage: React.FC = () => {
         name: selectedTournament.name,
         startDateTime: selectedTournament.startDateTime,
         endDateTime: selectedTournament.endDateTime,
-        location: selectedTournament.location,
-        prizePool: selectedTournament.prizePool,
-        minRank: selectedTournament.minRank,
-        maxRank: selectedTournament.maxRank,
+        location: selectedTournament.location || null, // Handle possible null
+        prizePool: selectedTournament.prizePool || [],
+        minRank: selectedTournament.minRank || 0,
+        maxRank: selectedTournament.maxRank || 0,
       };
       setInitialUpdateData(initialData);
       setIsUpdateDialogOpen(true);
@@ -167,7 +154,6 @@ const TournamentPage: React.FC = () => {
       tournamentData: data
     })).unwrap();
 
-    // Fetch the updated tournament data
     const updatedTournamentData = await fetchTournamentById(tournamentId);
     setSelectedTournament(updatedTournamentData);
   };
@@ -188,7 +174,7 @@ const TournamentPage: React.FC = () => {
         </div>
         <div>
           <h2 className="text-xl lg:text-2xl font-bold">{selectedTournament.name}</h2>
-          <p className="text-sm lg:text-base">{selectedTournament.location.name}</p>
+          <p className="text-sm lg:text-base">{selectedTournament.location?.name || 'No location'}</p>
         </div>
       </div>
 
@@ -199,7 +185,7 @@ const TournamentPage: React.FC = () => {
           <div>
             <p><strong>Start Date & Time:</strong> {formatDate(selectedTournament.startDateTime)}</p>
             <p><strong>End Date & Time:</strong> {formatDate(selectedTournament.endDateTime)}</p>
-            <p><strong>Location:</strong> {selectedTournament.location.name}</p>
+            <p><strong>Location:</strong> {selectedTournament.location?.name || 'No location specified'}</p>
           </div>
           <div>
             <p><strong>Max Teams:</strong> {selectedTournament.maxTeams}</p>
@@ -214,11 +200,11 @@ const TournamentPage: React.FC = () => {
       {/* Joined Clubs */}
       <div className="bg-gray-800 rounded-lg p-6 mb-6">
         <h3 className="text-2xl font-semibold mb-4">Joined Clubs</h3>
-        {selectedTournament.joinedClubs.length === 0 ? (
+        {selectedTournament.joinedClubs && selectedTournament.joinedClubs.length === 0 ? (
           <p>No clubs have joined this tournament yet.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {selectedTournament.joinedClubs.map((club: Club) => (
+            {selectedTournament.joinedClubs?.map((club: Club) => (
               <div key={club.id} className="bg-gray-700 rounded-lg p-4 flex items-center justify-between space-x-4">
                 <div className="flex items-center space-x-4">
                   <img 
@@ -275,7 +261,7 @@ const TournamentPage: React.FC = () => {
       <UpdateTournament
         isOpen={isUpdateDialogOpen}
         onClose={() => setIsUpdateDialogOpen(false)}
-        initialData={initialUpdateData}
+        initialData={initialUpdateData!}
         onUpdate={handleUpdateTournament}
       />
 
@@ -297,3 +283,4 @@ const TournamentPage: React.FC = () => {
 };
 
 export default TournamentPage;
+z

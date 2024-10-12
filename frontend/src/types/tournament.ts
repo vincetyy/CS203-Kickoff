@@ -8,7 +8,13 @@ export interface Club {
   name: string;
 }
 
+export interface HostProfile {
+  id: number;
+  name: string;
+}
+
 export interface Tournament {
+  id: number;
   name: string;
   startDateTime: string;
   endDateTime: string;
@@ -19,6 +25,8 @@ export interface Tournament {
   knockoutFormat: string;
   minRank: number;
   maxRank: number;
+  joinedClubs?: Club[];
+  host?: HostProfile;  
 }
 
 export interface TournamentUpdate {
@@ -29,4 +37,6 @@ export interface TournamentUpdate {
   prizePool?: number[];
   minRank?: number;
   maxRank?: number;
+  joinedClubs?: Club[];
+  host?: HostProfile;
 }
