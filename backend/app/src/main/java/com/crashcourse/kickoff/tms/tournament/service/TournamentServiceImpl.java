@@ -7,9 +7,6 @@ import com.crashcourse.kickoff.tms.location.service.LocationService;
 import com.crashcourse.kickoff.tms.location.model.*;
 import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
 
-import com.crashcourse.kickoff.tms.player.PlayerProfile;
-import com.crashcourse.kickoff.tms.host.*;
-import com.crashcourse.kickoff.tms.host.HostProfileServiceImpl.*;
 
 import com.crashcourse.kickoff.tms.tournament.dto.*;
 import com.crashcourse.kickoff.tms.tournament.exception.*;
@@ -34,11 +31,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class TournamentServiceImpl implements TournamentService {
-    private final HostProfileRepository hostProfileRepository;
     private final TournamentRepository tournamentRepository;
     private final LocationRepository locationRepository;
     private final LocationService locationService;
-    private final HostProfileService hostProfileService;
     private final ClubRepository clubRepository;
 
     private final ClubService clubService;
@@ -104,7 +99,7 @@ public class TournamentServiceImpl implements TournamentService {
      * @param dto TournamentCreateDTO
      * @return Tournament entity
      */
-    private Tournament mapToEntity(TournamentCreateDTO dto, Long userIdFromToken) {
+    private Tournament mapToEntity(TournamentCreateDTO dto, Long host) {
         Tournament tournament = new Tournament();
         tournament.setName(dto.getName());
         tournament.setStartDateTime(dto.getStartDateTime());
@@ -124,9 +119,8 @@ public class TournamentServiceImpl implements TournamentService {
         /*
          * If you want i can add a custom exception ,im leaving this for now
          */
-        HostProfile hostProfile = hostProfileRepository.findById(userIdFromToken)
-                            .orElseThrow(() -> new RuntimeException("HostProfile not found"));
-        tournament.setHost(hostProfile);
+
+        tournament.setHost(host);
 
         return tournament;
     }
@@ -232,9 +226,7 @@ public class TournamentServiceImpl implements TournamentService {
         Optional<Tournament> tournamentOpt = tournamentRepository.findById(tournamentId);
         if (tournamentOpt.isPresent()) {
             Tournament tournament = tournamentOpt.get();
-            System.out.println(profileId);
-            System.out.println(tournament.getHost().getId());
-            return tournament.getHost().getId().equals(profileId);
+            return tournament.getHost().equals(profileId);
         }
         return false;
     }

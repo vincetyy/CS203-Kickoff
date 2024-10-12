@@ -1,7 +1,6 @@
 package com.crashcourse.kickoff.tms.club.model;
 
 import com.crashcourse.kickoff.tms.club.Club;
-import com.crashcourse.kickoff.tms.player.PlayerProfile;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -20,8 +19,7 @@ public class ClubInvitation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private PlayerProfile playerProfile;  // The player receiving the invitation
+    private Long playerId;  // The player receiving the invitation
 
     @ManyToOne
     private Club club;  // The club sending the invitation

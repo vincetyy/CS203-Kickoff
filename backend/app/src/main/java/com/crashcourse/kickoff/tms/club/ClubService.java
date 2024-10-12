@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
 import com.crashcourse.kickoff.tms.club.model.ClubInvitation;
-import com.crashcourse.kickoff.tms.player.PlayerProfile;
 
 import jakarta.validation.Valid;
 
@@ -37,7 +36,7 @@ public interface ClubService {
 
     List<ClubInvitation> getPlayerInvitations(Long playerId) throws Exception;
 
-    boolean isCaptain(Long clubId, PlayerProfile player);
+    boolean isCaptain(Long clubId, Long playerId);
 
-    List<PlayerProfile> getPlayers(Long clubId);
+    List<Long> getPlayers(Long clubId);
 }

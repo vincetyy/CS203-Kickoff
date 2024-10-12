@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ClubInvitationRepository extends JpaRepository<ClubInvitation, Long> {
-    List<ClubInvitation> findByPlayerProfileIdAndStatus(Long playerId, ApplicationStatus status);
+    List<ClubInvitation> findByPlayerIdAndStatus(Long playerId, ApplicationStatus status);
 }

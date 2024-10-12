@@ -18,11 +18,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.crashcourse.kickoff.tms.club.dto.CaptainTransferRequest;
-import com.crashcourse.kickoff.tms.club.dto.ClubCreationRequest;
-import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
-import com.crashcourse.kickoff.tms.player.PlayerProfile;
-import com.crashcourse.kickoff.tms.player.dto.PlayerInviteRequest;
+import com.crashcourse.kickoff.tms.club.dto.*;
 import com.crashcourse.kickoff.tms.security.JwtUtil;
 
 import jakarta.validation.Valid;
@@ -135,7 +131,7 @@ public class ClubController {
     @GetMapping("/{clubId}/players")
     public ResponseEntity<?> getPlayersFromClub(@PathVariable Long clubId) {
         try {
-            List<PlayerProfile> players = clubService.getPlayers(clubId);
+            List<Long> players = clubService.getPlayers(clubId);
             return new ResponseEntity<>(players, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

@@ -7,23 +7,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.club.ClubService;
-import com.crashcourse.kickoff.tms.host.HostProfile;
-import com.crashcourse.kickoff.tms.host.HostProfileService;
 import com.crashcourse.kickoff.tms.location.model.Location;
 import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
 import com.crashcourse.kickoff.tms.location.service.LocationService;
-import com.crashcourse.kickoff.tms.player.PlayerProfile;
-import com.crashcourse.kickoff.tms.player.service.PlayerProfileService;
 import com.crashcourse.kickoff.tms.security.SecurityConfig;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentCreateDTO;
 import com.crashcourse.kickoff.tms.tournament.model.KnockoutFormat;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFormat;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
-import com.crashcourse.kickoff.tms.user.UserRepository;
-import com.crashcourse.kickoff.tms.user.model.User;
-import com.crashcourse.kickoff.tms.user.service.UserService;
-import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
+
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -38,33 +31,12 @@ public class KickoffTournamentManagementApplication {
 	}
 
 	private static void initialiseMockData(ApplicationContext ctx) {
-		// User
-		UserService userService = ctx.getBean(UserService.class);
-		PlayerProfileService playerProfileService = ctx.getBean(PlayerProfileService.class);
-		HostProfileService hostProfileService = ctx.getBean(HostProfileService.class);
-		BCryptPasswordEncoder encoder = ctx.getBean(BCryptPasswordEncoder.class);
-
-		// Creating admin
-		NewUserDTO adminDTO = new NewUserDTO("admin", "admin@email.com", "password",
-				new String[] { "POSITION_Goalkeeper", "POSITION_Midfielder" }, "player");
-		User admin = userService.addUser(adminDTO);
-		admin.setRoles(SecurityConfig.getAllRolesAsSet());
-		admin = userService.getUserById(admin.getId());
-		HostProfile adminHostProfile = hostProfileService.addHostProfile(admin);
-		System.out.println("[Add admin]: " + admin.getUsername());
-
-		// Creating dummy
-		NewUserDTO dummyUserDTO = new NewUserDTO("dummyUser", "user@email.com", "password",
-				new String[] { "POSITION_Goalkeeper", "POSITION_Midfielder" }, "player");
-		User dummy = userService.addUser(dummyUserDTO);
-		System.out.println("[Add dummy user]: " + dummy.getUsername());
-
 		// Club
 		ClubService clubService = ctx.getBean(ClubService.class);
-		Club newClub = new Club(null, "My New Club", 500, 50, playerProfileService.getPlayerProfile(admin.getId()), new ArrayList<PlayerProfile>(), new ArrayList<Tournament>(), "Club DESCRIPTION", new ArrayList<PlayerProfile>());
+		Club newClub = new Club(null, "My New Club", 500, 50, 1L, new ArrayList<Long>(), new ArrayList<Tournament>(), "Club DESCRIPTION", new ArrayList<Long>());
 		
 		try {
-			clubService.createClub(newClub, admin.getId());
+			clubService.createClub(newClub, 1L);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("Gone case");
@@ -84,7 +56,7 @@ public class KickoffTournamentManagementApplication {
 		TournamentCreateDTO tournament1DTO = new TournamentCreateDTO("Tournament 1", LocalDateTime.of(
             2021, 4, 24, 14, 33, 48), LocalDateTime.of(
 			2021,5, 24, 14, 33, 48), location1, 16, TournamentFormat.FIVE_SIDE, KnockoutFormat.SINGLE_ELIM, new ArrayList<Float>(), null, null);
-		tournamentService.createTournament(tournament1DTO, admin.getId());
+		tournamentService.createTournament(tournament1DTO, 1L);
 		
 	}
 }

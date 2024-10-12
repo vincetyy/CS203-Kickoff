@@ -3,8 +3,6 @@ package com.crashcourse.kickoff.tms.club.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import com.crashcourse.kickoff.tms.user.model.*;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 

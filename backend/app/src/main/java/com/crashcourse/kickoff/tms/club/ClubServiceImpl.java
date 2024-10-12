@@ -19,8 +19,6 @@ import com.crashcourse.kickoff.tms.club.repository.ClubInvitationRepository;
 import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
 import com.crashcourse.kickoff.tms.club.repository.PlayerApplicationRepository;
 import com.crashcourse.kickoff.tms.player.PlayerPosition;
-import com.crashcourse.kickoff.tms.player.PlayerProfile;
-import com.crashcourse.kickoff.tms.player.respository.PlayerProfileRepository;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -33,9 +31,6 @@ public class ClubServiceImpl implements ClubService {
     private ClubRepository clubRepository;
 
     @Autowired
-    private PlayerProfileRepository playerProfileRepository;
-
-    @Autowired
     private PlayerApplicationRepository applicationRepository;
 
     @Autowired
@@ -44,9 +39,9 @@ public class ClubServiceImpl implements ClubService {
     // jparepository has automatically implemented crud methods
     @Transactional
     public Club createClub(@Valid Club club, Long creatorId) throws Exception {
-        // Find the PlayerProfile by ID
-        PlayerProfile creator = playerProfileRepository.findById(creatorId)
-        .orElseThrow(() -> new RuntimeException("PlayerProfile not found"));
+        // // Find the PlayerProfile by ID
+        // PlayerProfile creator = playerProfileRepository.findById(creatorId)
+        // .orElseThrow(() -> new RuntimeException("PlayerProfile not found"));
 
         // club name not unique
         if (clubRepository.findByName(club.getName()).isPresent()) {
@@ -54,7 +49,7 @@ public class ClubServiceImpl implements ClubService {
         }
 
         // set the player who created the club as the captain
-        club.setCaptain(creator);
+        club.setCaptainId(creatorId);
         clubRepository.save(club);
 
         // player count exceeds the limit
@@ -87,24 +82,24 @@ public class ClubServiceImpl implements ClubService {
 
     // to transfer captain status to another player in the club
     public Club transferCaptaincy(Long clubId, Long currentCaptainId, Long newCaptainId) throws Exception {
-        PlayerProfile currentCaptain = playerProfileRepository.findById(currentCaptainId)
-        .orElseThrow(() -> new RuntimeException("currentCaptain not found"));
+        // PlayerProfile currentCaptain = playerProfileRepository.findById(currentCaptainId)
+        // .orElseThrow(() -> new RuntimeException("currentCaptain not found"));
 
-        PlayerProfile newCaptain = playerProfileRepository.findById(newCaptainId)
-        .orElseThrow(() -> new RuntimeException("newCaptain not found"));
+        // PlayerProfile newCaptain = playerProfileRepository.findById(newCaptainId)
+        // .orElseThrow(() -> new RuntimeException("newCaptain not found"));
         
         Club club = clubRepository.findById(clubId).orElseThrow(() -> 
             new ClubNotFoundException("Club with ID " + clubId + " not found"));
     
-        if (!club.getCaptain().equals(currentCaptain)) {
+        if (!club.getCaptainId().equals(currentCaptainId)) {
             throw new Exception("Only the current captain can transfer the captaincy.");
         }
     
-        if (!club.getPlayers().contains(newCaptain)) {
+        if (!club.getPlayers().contains(newCaptainId)) {
             throw new Exception("The new captain must be a player in the club.");
         }
     
-        club.setCaptain(newCaptain);
+        club.setCaptainId(newCaptainId);
         return clubRepository.save(club);
     }
 
@@ -134,8 +129,8 @@ public class ClubServiceImpl implements ClubService {
 
     // add a player to club
     public Club addPlayerToClub(Long clubId, Long playerId) throws Exception {
-        PlayerProfile player = playerProfileRepository.findById(playerId)
-        .orElseThrow(() -> new RuntimeException("PlayerProfile not found"));
+        // PlayerProfile player = playerProfileRepository.findById(playerId)
+        // .orElseThrow(() -> new RuntimeException("PlayerProfile not found"));
 
         Club club = clubRepository.findById(clubId).orElseThrow(() -> 
             new ClubNotFoundException("Club with ID " + clubId + " not found"));
@@ -144,27 +139,23 @@ public class ClubServiceImpl implements ClubService {
             throw new PlayerLimitExceededException(String.format("A club cannot have more than %d players", Club.MAX_PLAYERS_IN_CLUB));
         }
 
-        if (club.getPlayers().contains(player)) {
+        if (club.getPlayers().contains(playerId)) {
             throw new Exception("Player is already a member of this club");
         }
 
-        club.getPlayers().add(player);  
-        player.setClub(club);
+        club.getPlayers().add(playerId);  
 
         clubRepository.save(club);
-        playerProfileRepository.save(player);
         return club;
     }
 
     // remove a player from club
     public Club removePlayerFromClub(Long clubId, Long playerId) throws Exception {
-        PlayerProfile player = playerProfileRepository.findById(playerId)
-        .orElseThrow(() -> new RuntimeException("PlayerProfile not found"));
         
         Club club = clubRepository.findById(clubId).orElseThrow(() -> 
             new ClubNotFoundException("Club with ID " + clubId + " not found"));
 
-        boolean removed = club.getPlayers().remove(player);
+        boolean removed = club.getPlayers().remove(playerId);
         if (!removed) {
             throw new Exception("Player is not a member of this club");
         }
@@ -175,15 +166,11 @@ public class ClubServiceImpl implements ClubService {
     public void applyToClub(PlayerApplicationDTO applicationDTO) throws Exception {
         // Fetch the club by ID
 
+        Long playerId = applicationDTO.getPlayerId(); 
+        
         System.out.println("Club ID: " + applicationDTO.getClubId());
-        System.out.println("PlayerProfile ID: " + applicationDTO.getPlayerProfileId());
-
         Club club = clubRepository.findById(applicationDTO.getClubId())
                 .orElseThrow(() -> new ClubNotFoundException("Club with ID " + applicationDTO.getClubId() + " not found"));
-    
-        // Fetch the PlayerProfile by playerId
-        PlayerProfile playerProfile = playerProfileRepository.findById(applicationDTO.getPlayerProfileId())
-                .orElseThrow(() -> new RuntimeException("PlayerProfile not found"));
     
         // Check if the club is full
         if (club.getPlayers().size() >= Club.MAX_PLAYERS_IN_CLUB) {
@@ -193,14 +180,14 @@ public class ClubServiceImpl implements ClubService {
         }
     
         // Check if the user has already applied to this club
-        if (applicationRepository.existsByPlayerProfileAndClub(playerProfile, club)) {  // Use 'User' instead of 'PlayerProfile'
+        if (applicationRepository.existsByPlayerIdAndClub(playerId, club)) {  // Use 'User' instead of 'PlayerProfile'
             throw new PlayerAlreadyAppliedException("Player has already applied to this club");
         }
     
         // Create a new PlayerApplication
         PlayerApplication application = new PlayerApplication();
         application.setClub(club);
-        application.setPlayerProfile(playerProfile);  // Set the User, not the PlayerProfile
+        application.setPlayerId(playerId);  
         application.setDesiredPosition(applicationDTO.getDesiredPosition());
         application.setStatus(ApplicationStatus.PENDING);
     
@@ -217,29 +204,23 @@ public class ClubServiceImpl implements ClubService {
     }
 
     @Override
-    public boolean isCaptain(Long clubId, PlayerProfile player) {
+    public boolean isCaptain(Long clubId, Long playerId) {
         Club club = clubRepository.findById(clubId).orElse(null);
-        return club != null && club.getCaptain().equals(player);
+        return club != null && club.getCaptainId().equals(playerId);
     }
 
     @Override
     public Club invitePlayerToClub(Long clubId, Long playerId, Long captainId) throws Exception {
         Club club = clubRepository.findById(clubId)
                 .orElseThrow(() -> new ClubNotFoundException("Club not found with ID: " + clubId));
-        
-        PlayerProfile captain = playerProfileRepository.findById(captainId)
-                .orElseThrow(() -> new Exception("Captain not found with ID: " + captainId));
 
-        if (!club.getCaptain().equals(captain)) {
+        if (!club.getCaptainId().equals(captainId)) {
             throw new Exception("Only the club captain can invite players.");
         }
 
-        PlayerProfile invitedPlayer = playerProfileRepository.findById(playerId)
-                .orElseThrow(() -> new Exception("Player not found with ID: " + playerId));
-
         ClubInvitation invitation = new ClubInvitation();
         invitation.setClub(club);
-        invitation.setPlayerProfile(invitedPlayer);
+        invitation.setPlayerId(playerId);
         invitation.setStatus(ApplicationStatus.PENDING);
         invitation.setInviteSentDate(LocalDateTime.now());
 
@@ -249,9 +230,6 @@ public class ClubServiceImpl implements ClubService {
     }
 
     public Club acceptInvite(Long playerId, Long clubId) throws Exception {
-        PlayerProfile player = playerProfileRepository.findById(playerId)
-            .orElseThrow(() -> new Exception("PlayerProfile not found with id: " + playerId));
-
         Club club = clubRepository.findById(clubId)
             .orElseThrow(() -> new Exception("Club not found with id: " + clubId));
 
@@ -259,22 +237,20 @@ public class ClubServiceImpl implements ClubService {
             throw new PlayerLimitExceededException(String.format("A club cannot have more than %d players", Club.MAX_PLAYERS_IN_CLUB));
         }
 
-        club.getPlayers().add(player);
-        player.setClub(club);
+        club.getPlayers().add(playerId);
 
         clubRepository.save(club);
-        playerProfileRepository.save(player);
 
         return club;
     }
 
     @Override
     public List<ClubInvitation> getPlayerInvitations(Long playerId) throws Exception {
-        return clubInvitationRepository.findByPlayerProfileIdAndStatus(playerId, ApplicationStatus.PENDING);
+        return clubInvitationRepository.findByPlayerIdAndStatus(playerId, ApplicationStatus.PENDING);
     }
 
     @Override
-    public List<PlayerProfile> getPlayers(Long clubId) {
+    public List<Long> getPlayers(Long clubId) {
         Optional<Club> clubOptional = clubRepository.findById(clubId);
         if (!clubOptional.isPresent()) {
             throw new ClubNotFoundException("Club with ID " + clubId + " not found");
@@ -286,16 +262,14 @@ public class ClubServiceImpl implements ClubService {
 
     public void applyToClub(Long clubId, Long playerId, PlayerPosition desiredPosition) throws Exception {
         Optional<Club> clubOpt = clubRepository.findById(clubId);
-        Optional<PlayerProfile> playerOpt = playerProfileRepository.findById(playerId);
     
-        if (clubOpt.isPresent() && playerOpt.isPresent()) {
+        if (clubOpt.isPresent()) {
             Club club = clubOpt.get();
-            PlayerProfile player = playerOpt.get();
     
             // Create a new application
             PlayerApplication application = new PlayerApplication();
             application.setClub(club);
-            application.setPlayerProfile(player);
+            application.setPlayerId(playerId);
             application.setDesiredPosition(desiredPosition);
             application.setStatus(ApplicationStatus.PENDING);
     

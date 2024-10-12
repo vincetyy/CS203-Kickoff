@@ -1,4 +1,4 @@
-package com.crashcourse.kickoff.tms.user.model;
+package com.crashcourse.kickoff.tms.security;
 
 public enum Role {
     ROLE_ADMIN,

@@ -3,8 +3,6 @@ package com.crashcourse.kickoff.tms.club;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.crashcourse.kickoff.tms.player.PlayerProfile;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,20 +16,15 @@ public class ClubProfile {
     private String name;
     private String clubDescription;
     private double elo;
-    private PlayerProfile captain;
-    private List<String> playerNames;
-    private List<PlayerProfile> players;
+    private Long captainId;
+    private List<Long> players;
 
     public ClubProfile(Club club) {
-        System.out.println(club.getCaptain());
         this.id = club.getId();
         this.name = club.getName();
         this.clubDescription = club.getClubDescription();
         this.elo = club.getElo();
-        this.captain = club.getCaptain();
-        this.playerNames = club.getPlayers().stream()
-                .map(player -> player.getUser().getUsername())
-                .collect(Collectors.toList());
+        this.captainId = club.getCaptainId();
         this.players = club.getPlayers();
     }
 

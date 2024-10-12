@@ -3,7 +3,6 @@ package com.crashcourse.kickoff.tms.club;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.crashcourse.kickoff.tms.player.PlayerProfile;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -53,15 +52,9 @@ public class Club {
     private double elo;
     private double ratingDeviation;
 
-    @JsonIgnore
-    @OneToOne
-    @JoinColumn(name = "captain")
-    private PlayerProfile captain;
+    private Long captainId;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "club", cascade = CascadeType.ALL)
-    @Size(max = MAX_PLAYERS_IN_CLUB, message = "A club cannot have more than " +  MAX_PLAYERS_IN_CLUB + " players")
-    private List<PlayerProfile> players = new ArrayList<>();
+    private List<Long> players = new ArrayList<>();
 
     @JsonIgnore
     @ManyToMany(mappedBy = "joinedClubs")
@@ -69,11 +62,5 @@ public class Club {
 
     private String clubDescription;
 
-    @ManyToMany
-    @JoinTable(
-        name = "club_applicants",
-        joinColumns = @JoinColumn(name = "club_id"),
-        inverseJoinColumns = @JoinColumn(name = "player_id")
-    )
-    private List<PlayerProfile> applicants = new ArrayList<>();
+    private List<Long> applicants = new ArrayList<>();
 }

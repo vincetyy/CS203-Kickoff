@@ -1,7 +1,6 @@
 package com.crashcourse.kickoff.tms.club.dto;
 
 import com.crashcourse.kickoff.tms.club.Club;
-import com.crashcourse.kickoff.tms.user.model.*;
 
 import lombok.Getter;
 import lombok.Setter;

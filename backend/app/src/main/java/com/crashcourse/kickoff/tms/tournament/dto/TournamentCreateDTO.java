@@ -1,6 +1,5 @@
 package com.crashcourse.kickoff.tms.tournament.dto;
 
-import com.crashcourse.kickoff.tms.host.HostProfile;
 import com.crashcourse.kickoff.tms.location.model.*;
 import com.crashcourse.kickoff.tms.tournament.model.*;
 

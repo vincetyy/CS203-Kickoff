@@ -4,18 +4,18 @@ import com.crashcourse.kickoff.tms.player.PlayerPosition;
 
 public class PlayerApplicationDTO {
 
-    private Long playerProfileId;
+    private Long playerId;
     private Long clubId;
     private PlayerPosition desiredPosition;
 
     // Constructors, getters, and setters
 
-    public Long getPlayerProfileId() {
-        return playerProfileId;
+    public Long getPlayerId() {
+        return playerId;
     }
 
-    public void setPlayerProfileId(Long playerProfileId) {
-        this.playerProfileId = playerProfileId;
+    public void setPlayerId(Long playerId) {
+        this.playerId = playerId;
     }
 
     public Long getClubId() {
