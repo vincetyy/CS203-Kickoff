@@ -1,10 +1,8 @@
 import axios from 'axios';
 import '../utils/axiosSetup'; 
 
-const API_BASE_URL = 'http://localhost:8080';
-
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: import.meta.env.VITE_DEFAULT_BASE_URL, // Default base URL (can be overridden per request)
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',

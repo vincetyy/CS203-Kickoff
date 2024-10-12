@@ -10,6 +10,7 @@ import javax.crypto.SecretKey;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.security.core.GrantedAuthority;
 
 import com.crashcourse.kickoff.tms.user.model.User;
 
@@ -72,6 +73,10 @@ public class JwtUtil {
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getId()); // Add userId to the claims
+        claims.put("roles", user.getAuthorities()
+                                .stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .collect(Collectors.toList())); // Add roles to the claims
         return createToken(claims, user.getUsername());
     }
 

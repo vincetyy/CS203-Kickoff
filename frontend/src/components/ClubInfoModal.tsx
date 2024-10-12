@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ClubProfile } from '../types/club';
 import { Button } from './ui/button';
 import { useNavigate } from 'react-router-dom';
+import { fetchPlayerProfileById } from '../services/profileService';
 
 interface ClubInfoModalProps {
   clubId: number;
@@ -11,6 +12,8 @@ interface ClubInfoModalProps {
 
 const ClubInfoModal: React.FC<ClubInfoModalProps> = ({ clubId }) => {
   const [club, setClub] = useState<ClubProfile | null>(null);
+
+  const [captain, setCaptain] = useState("");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -18,8 +21,11 @@ const ClubInfoModal: React.FC<ClubInfoModalProps> = ({ clubId }) => {
   useEffect(() => {
     const fetchClub = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/clubs/${clubId}`);
-        setClub(response.data);
+        const clubResponse = await axios.get(`http://localhost:8080/clubs/${clubId}`);
+        setClub(clubResponse.data);
+
+        const captainResponse = await fetchPlayerProfileById(clubResponse.data.captainId);
+        setCaptain(captainResponse.user.username);
       } catch (err: any) {
         console.error('Error fetching club info:', err);
         setError('Failed to fetch club information.');
@@ -58,7 +64,7 @@ const ClubInfoModal: React.FC<ClubInfoModalProps> = ({ clubId }) => {
       <p className="text-lg mb-4">{club.description || 'No description available.'}</p>
       <div className="flex items-center mb-4">
         <div className="mr-4">
-          <strong>Captain:</strong> {club.captain.user.username || 'No captain assigned.'}
+          <strong>Captain:</strong> {captain || 'No captain assigned.'}
         </div>
         <div>
           <strong>ELO:</strong> {club.elo ? club.elo.toFixed(2) : 'N/A'}

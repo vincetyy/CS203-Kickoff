@@ -46,21 +46,20 @@ public class PlayerProfileController {
         return playerProfileService.getPlayerProfiles();
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<?> getPlayerProfileByUsername(@PathVariable String username,
+    @GetMapping("/{playerId}")
+    public ResponseEntity<?> getPlayerProfile(@PathVariable Long playerId,
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
-                if (token == null || !token.startsWith("Bearer ")) {
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization token is missing or invalid" + token);
-                }
-                token = token.substring(7);
-        Long userIdFromUsername = userService.loadUserByUsername(username).getId();
-        // Extract the userId from the token using JwtUtil
-        Long userIdFromToken = jwtUtil.extractUserId(token);
-        if (!userIdFromUsername.equals(userIdFromToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to view this profile");
-        }
+        // if (token == null || !token.startsWith("Bearer ")) {
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization token is missing or invalid" + token);
+        // }
+        // token = token.substring(7);
+        // // Extract the userId from the token using JwtUtil
+        // Long userIdFromToken = jwtUtil.extractUserId(token);
+        // if (!userIdFromUsername.equals(userIdFromToken)) {
+        //     return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to view this profile");
+        // }
 
-        PlayerProfile playerProfile = playerProfileService.getPlayerProfile(userIdFromUsername);
+        PlayerProfile playerProfile = playerProfileService.getPlayerProfile(playerId);
         if (playerProfile == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("PlayerProfile not found");
         }

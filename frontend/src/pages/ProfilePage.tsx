@@ -5,18 +5,22 @@ import { Button } from '../components/ui/button';
 import { PlayerPosition, PlayerProfile } from '../types/profile';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { toast } from 'react-hot-toast';
-import { fetchPlayerProfileByUsername, updatePlayerProfile } from '../services/profileService';
+import { fetchPlayerProfileById, updatePlayerProfile } from '../services/profileService';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUserId } from '../store/userSlice';
+
 
 export default function PlayerProfilePage() {
+  const userId = useSelector(selectUserId);
+
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile | null>(null);
   const [preferredPositions, setPreferredPositions] = useState<PlayerPosition[]>([]);
   const [profileDescription, setProfileDescription] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const username = localStorage.getItem('username');
 
   useEffect(() => {
-    if (!username) {
+    if (!userId) {
       setError('User not logged in');
       setLoading(false);
       return;
@@ -24,7 +28,7 @@ export default function PlayerProfilePage() {
 
     const fetchPlayerProfile = async () => {
       try {
-        const response = await fetchPlayerProfileByUsername(username);
+        const response = await fetchPlayerProfileById(userId);
         console.log("response from server: ", response);
         setPlayerProfile(response);
         setPreferredPositions(response.preferredPositions || []);
@@ -37,7 +41,7 @@ export default function PlayerProfilePage() {
     };
 
     fetchPlayerProfile();
-  }, [username]);
+  }, [userId]);
 
   const handlePreferredPositionsChange = (position: PlayerPosition) => {
     setPreferredPositions((prevPositions) =>
