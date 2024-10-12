@@ -1,13 +1,21 @@
 import api from './api';
-import { PlayerProfile } from '../types/club';
-import { PlayerPosition } from '../types/profile';
+import { PlayerProfile, PlayerPosition } from '../types/profile';
 
-export const fetchPlayerProfileByUsername = async (username: string): Promise<PlayerProfile> => {
-  const response = await api.get(`/playerProfiles/${username}`);
+// Set the base URL at the top of the file (from environment variable or a hardcoded value)
+const playerProfileBaseURL = import.meta.env.VITE_PLAYER_PROFILE_BASE_URL || 'http://localhost:8081';
+
+// Fetch player profile by username
+export const fetchPlayerProfileById = async (id: string): Promise<PlayerProfile> => {
+  const response = await api.get(`/playerProfiles/${id}`, {
+    baseURL: playerProfileBaseURL // Use the baseURL set at the top
+  });
   return response.data;
 };
 
+// Update player profile
 export const updatePlayerProfile = async (playerId: number, preferredPositions: PlayerPosition[], profileDescription: string): Promise<any> => {
-  const response = await api.post(`playerProfiles/${playerId}/update`, { preferredPositions, profileDescription });
+  const response = await api.put(`/playerProfiles/${playerId}/update`, { preferredPositions, profileDescription }, {
+    baseURL: playerProfileBaseURL // Use the baseURL set at the top
+  });
   return response.data;
 };

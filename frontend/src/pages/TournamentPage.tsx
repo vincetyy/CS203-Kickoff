@@ -101,7 +101,10 @@ const TournamentPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null); 
   let isHost = false;
   if (selectedTournament) {
-    isHost = selectedTournament.host.id === userId;
+    console.log(selectedTournament);
+    console.log(userId);
+    
+    isHost = selectedTournament.host === userId;
   }
 
   const handleBackClick = () => {

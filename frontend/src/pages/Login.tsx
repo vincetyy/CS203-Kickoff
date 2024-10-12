@@ -32,7 +32,7 @@ const Login = () => {
         event.preventDefault();
         try {
           // Make the POST request with Basic Authentication
-          const response = await axios.post('http://localhost:8080/users/login', {
+          const response = await axios.post('http://localhost:8081/users/login', {
             username,
             password,
         });
