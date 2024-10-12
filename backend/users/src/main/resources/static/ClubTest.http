@@ -1,0 +1,72 @@
+### Check all clubs
+GET http://localhost:8080/clubs
+Authorization: Basic admin:password
+
+### Create a new club, please add a PlayerProfile 
+### to admin in PlayerTest.http first
+POST http://localhost:8080/clubs
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+  "club": {
+    "name": "My New Club",
+    "elo": 1000,
+    "ratingDeviation": 50
+  },
+  "creatorId": 1  
+}
+
+### Create a new club, please add a PlayerProfile 
+### to normal user in PlayerTest.http first
+POST http://localhost:8080/clubs
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+  "club": {
+    "name": "My New Club 2",
+    "elo": 500,
+    "ratingDeviation": 25
+  },
+  "creatorId": 2
+}
+
+### Get a specific club by ID
+GET http://localhost:8080/clubs/1
+Authorization: Basic admin:password
+
+### Apply to a club
+POST http://localhost:8080/clubs/1/apply
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+  "playerProfileId": 1,
+  "desiredPosition": "POSITION_FORWARD"
+}
+
+
+### Invite a Player to Club
+POST http://localhost:8080/clubs/1/invite
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+  "playerId": 2,
+  "captainId": 1
+}
+
+### Accept the invitation for player to join club 1
+POST http://localhost:8080/players/2/acceptInvitation
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+    "clubId": 1  
+}
+
+
+### Get players from clubID
+GET http://localhost:8080/clubs/1/players
+Authorization: Basic admin:password
