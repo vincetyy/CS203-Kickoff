@@ -158,11 +158,18 @@ public class TournamentController {
         return ResponseEntity.ok(tournaments);
     }
 
-    @PutMapping("/{tournamentId}/availability")
+    @PutMapping("/availability")
     public ResponseEntity<Void> updatePlayerAvailability(@RequestBody UpdatePlayerAvailabilityDTO dto) {
-        tournamentService.updatePlayerAvailability(dto);
-        return ResponseEntity.ok().build();
+        System.out.println("Received DTO: " + dto); 
+        try {
+            tournamentService.updatePlayerAvailability(dto);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
+
 
     @GetMapping("/{tournamentId}/availability")
     public ResponseEntity<List<PlayerAvailabilityDTO>> getPlayerAvailability(@PathVariable Long tournamentId) {

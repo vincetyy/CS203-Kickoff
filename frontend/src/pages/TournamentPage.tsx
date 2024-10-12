@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Tournament, TournamentUpdate, Club, Location, HostProfile } from '../types/tournament';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeClubFromTournamentAsync, updateTournamentAsync } from '../store/tournamentSlice';
-import { PlayerAvailabilityDTO } from '../types/PlayerAvailability'; 
+import { PlayerAvailabilityDTO } from '../types/playerAvailability'; 
 import { fetchTournamentById, getPlayerAvailability, updatePlayerAvailability } from '../services/tournamentService';
 import { selectUserId } from '../store/userSlice';
 import { selectClubId } from '../store/clubSlice';
@@ -29,6 +29,7 @@ const TournamentPage: React.FC = () => {
   // State for Update Tournament Dialog
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [initialUpdateData, setInitialUpdateData] = useState<TournamentUpdate | null>(null);
+  const [isAvailabilityDialogOpen, setIsAvailabilityDialogOpen] = useState(false);
 
   const { id } = useParams<{ id: string }>();
   const tournamentId = id ? parseInt(id, 10) : null;
@@ -52,12 +53,12 @@ const TournamentPage: React.FC = () => {
   };
 
   const handleBackClick = () => {
-    navigate('/tournaments'); // Navigate back to /tournaments
+    navigate('/tournaments');
   };
 
   const handleOpenRemoveDialog = (club: Club) => {
-    setClubToRemove(club); // Set the club to be removed
-    setIsRemoveDialogOpen(true); // Open the confirmation dialog
+    setClubToRemove(club);
+    setIsRemoveDialogOpen(true);
   };
 
   const handleConfirmRemove = async () => {
@@ -71,7 +72,7 @@ const TournamentPage: React.FC = () => {
       setSelectedTournament(updatedTournamentData);
       toast.success('Club removed successfully');
     }
-    setIsRemoveDialogOpen(false); // Close the dialog
+    setIsRemoveDialogOpen(false);
   };
 
   useEffect(() => {
@@ -83,6 +84,7 @@ const TournamentPage: React.FC = () => {
 
     const fetchData = async () => {
       try {
+        setStatus('loading');
         const tournament = await fetchTournamentById(tournamentId);
         setSelectedTournament(tournament);
 
@@ -90,10 +92,13 @@ const TournamentPage: React.FC = () => {
         const clubAvailabilities = availabilities.filter(
           (availability: PlayerAvailabilityDTO) => availability.isAvailable
         );
-        setAvailableCount(clubAvailabilities.length); // Update the count of available club members
+        setAvailableCount(clubAvailabilities.length);
+        setStatus('succeeded');
       } catch (err) {
         console.error('Error fetching tournament data:', err);
         toast.error('Failed to load tournament data.');
+        setStatus('failed');
+        setError('Failed to load tournament data.');
       }
     };
 
@@ -101,24 +106,37 @@ const TournamentPage: React.FC = () => {
   }, [tournamentId]);
 
   const handleAvailabilityUpdate = async (availability: boolean) => {
-    if (tournamentId === null || isNaN(tournamentId)) return;
-
+    if (tournamentId === null || isNaN(tournamentId)) {
+      toast.error('Invalid tournament ID.');
+      return;
+    }
+  
     try {
-      await updatePlayerAvailability({ tournamentId, playerId: userId, isAvailable: availability });
+      const payload = {
+        tournamentId: tournamentId as number,
+        playerId: userId as number,
+        isAvailable: availability  
+      };
+  
+      console.log('Updating availability: ', payload); 
+      await updatePlayerAvailability(payload);  
+  
       setIsAvailable(availability);
-
+  
       const updatedAvailability = await getPlayerAvailability(tournamentId);
       const clubAvailabilities = updatedAvailability.filter(
         (availability: PlayerAvailabilityDTO) => availability.isAvailable
       );
-      setAvailableCount(clubAvailabilities.length); // Update the count
+      setAvailableCount(clubAvailabilities.length);
+  
       toast.success(`You have marked yourself as ${availability ? 'available' : 'not available'}.`);
     } catch (err) {
       console.error('Error updating availability:', err);
       toast.error('Failed to update your availability.');
     }
   };
-
+  
+  
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { 
       year: 'numeric', month: 'long', day: 'numeric', 
@@ -133,7 +151,7 @@ const TournamentPage: React.FC = () => {
         name: selectedTournament.name,
         startDateTime: selectedTournament.startDateTime,
         endDateTime: selectedTournament.endDateTime,
-        location: selectedTournament.location || null, // Handle possible null
+        location: selectedTournament.location || null,
         prizePool: selectedTournament.prizePool || [],
         minRank: selectedTournament.minRank || 0,
         maxRank: selectedTournament.maxRank || 0,
@@ -148,7 +166,6 @@ const TournamentPage: React.FC = () => {
       throw new Error('Invalid tournament data.');
     }
 
-    // Dispatch the update action
     await dispatch(updateTournamentAsync({ 
       tournamentId: selectedTournament.id,
       tournamentData: data
@@ -216,7 +233,6 @@ const TournamentPage: React.FC = () => {
                     <h4 className="text-lg font-bold">{club.name}</h4>
                   </div>
                 </div>
-                {/* Conditionally render Delete button based on isHost */}
                 {isHost && (
                   <button 
                     onClick={() => handleOpenRemoveDialog(club)} 
@@ -265,22 +281,60 @@ const TournamentPage: React.FC = () => {
         onUpdate={handleUpdateTournament}
       />
 
-      {/* Back and Update Buttons */}
+      <Dialog open={isAvailabilityDialogOpen} onOpenChange={setIsAvailabilityDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Indicate Availability</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p>Are you available to participate in this tournament?</p>
+            <div className="flex space-x-3">
+              <Button
+                className="bg-green-500 hover:bg-green-600 w-full"
+                onClick={() => {
+                  handleAvailabilityUpdate(true);
+                  setIsAvailabilityDialogOpen(false);
+                }}
+              >
+                Available
+              </Button>
+              <Button
+                className="bg-red-500 hover:bg-red-600 w-full"
+                onClick={() => {
+                  handleAvailabilityUpdate(false);
+                  setIsAvailabilityDialogOpen(false);
+                }}
+              >
+                Not Available
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Back, Update, and Indicate Availability Buttons */}
       <div className="flex space-x-3 mb-4">
-        {isHost &&
-          <Button 
-            type="button" 
-            onClick={handleUpdateClick} 
+        {isHost && (
+          <Button
+            type="button"
+            onClick={handleUpdateClick}
             className="bg-blue-600 hover:bg-blue-700"
           >
             Update Tournament
           </Button>
-        }
-        <Button onClick={handleBackClick}>Back to Tournaments</Button>
+        )}
+
+        <Button
+          onClick={() => setIsAvailabilityDialogOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700"
+        >
+          Indicate Availability
+        </Button>
+
+        <Button onClick={handleBackClick}>Back to  Tournaments</Button>
       </div>
     </>
   );
 };
 
 export default TournamentPage;
-z

@@ -268,17 +268,25 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public void updatePlayerAvailability(UpdatePlayerAvailabilityDTO dto) {
+        Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
+            .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + dto.getTournamentId()));
+        
+        PlayerProfile player = playerProfileRepository.findById(dto.getPlayerId())
+            .orElseThrow(() -> new EntityNotFoundException("Player not found with id: " + dto.getPlayerId()));
+
         PlayerAvailability playerAvailability = playerAvailabilityRepository
             .findByTournamentIdAndPlayerId(dto.getTournamentId(), dto.getPlayerId())
-            .orElseGet(() -> new PlayerAvailability());
+            .orElse(new PlayerAvailability());
 
-        playerAvailability.setTournament(tournamentRepository.findById(dto.getTournamentId())
-            .orElseThrow(() -> new EntityNotFoundException("Tournament not found")));
-        playerAvailability.setPlayer(playerProfileRepository.findById(dto.getPlayerId())
-            .orElseThrow(() -> new EntityNotFoundException("Player not found")));
+        playerAvailability.setTournament(tournament);
+        playerAvailability.setPlayer(player);
         playerAvailability.setAvailable(dto.isAvailable());
 
-        playerAvailabilityRepository.save(playerAvailability);
+        try {
+            playerAvailabilityRepository.save(playerAvailability);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update player availability: " + e.getMessage(), e);
+        }
     }
 
     @Override

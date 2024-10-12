@@ -1,6 +1,6 @@
 import api from './api';
 import { Tournament } from '../types/tournament';
-import { PlayerAvailabilityDTO, UpdatePlayerAvailabilityDTO } from '../types/PlayerAvailability';
+import { PlayerAvailabilityDTO, UpdatePlayerAvailabilityDTO } from '../types/playerAvailability';
 
 // Fetch a specific tournament by its ID
 export const fetchTournamentById = async (tournamentId: number): Promise<Tournament> => {
