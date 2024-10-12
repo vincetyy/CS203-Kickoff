@@ -6,14 +6,17 @@ import { PlayerPosition, PlayerProfile } from '../types/profile';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { toast } from 'react-hot-toast';
 import { fetchPlayerProfileById, updatePlayerProfile } from '../services/profileService';
+import { getClubByPlayerId } from '../services/clubService';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUserId } from '../store/userSlice';
+import { Club } from '../types/club';
 
 
 export default function PlayerProfilePage() {
   const userId = useSelector(selectUserId);
 
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile | null>(null);
+  const [club, setClub] = useState<Club | null>(null);
   const [preferredPositions, setPreferredPositions] = useState<PlayerPosition[]>([]);
   const [profileDescription, setProfileDescription] = useState('');
   const [loading, setLoading] = useState(true);
@@ -30,6 +33,11 @@ export default function PlayerProfilePage() {
       try {
         const response = await fetchPlayerProfileById(userId);
         console.log("response from server: ", response);
+
+        const clubResponse = await getClubByPlayerId(userId);
+        console.log(clubResponse);
+        setClub(clubResponse);
+        
         setPlayerProfile(response);
         setPreferredPositions(response.preferredPositions || []);
         setProfileDescription(response.profileDescription || '');
@@ -94,16 +102,16 @@ export default function PlayerProfilePage() {
 
         <div className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Club Information</h2>
-          {playerProfile.club ? (
+          {club ? (
             <div className="flex items-center">
               <img
-                src={`https://picsum.photos/seed/${playerProfile.club.id}/400/300`}
-                alt={`${playerProfile.club.name} logo`}
+                src={`https://picsum.photos/seed/${club.id}/400/300`}
+                alt={`${club.name} logo`}
                 className="w-16 h-16 rounded-full object-cover mr-4"
               />
               <div>
-                <p className="font-semibold">{playerProfile.club.name}</p>
-                <p className="text-sm text-gray-400">ELO: {playerProfile.club.elo.toFixed(2)}</p>
+                <p className="font-semibold">{club.name}</p>
+                <p className="text-sm text-gray-400">ELO: {club.elo.toFixed(2)}</p>
               </div>
             </div>
           ) : (

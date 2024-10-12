@@ -71,7 +71,6 @@ public class PlayerProfileController {
     @PreAuthorize("@playerProfileService.isOwner(#id, authentication.name)")
     public ResponseEntity<?> updatePlayerProfile(@PathVariable Long id, @RequestBody PlayerProfileUpdateDTO playerProfileUpdateDTO) {
         PlayerProfile playerProfile = playerProfileService.getPlayerProfile(id);
-
         if (playerProfile == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("PlayerProfile not found");
         }

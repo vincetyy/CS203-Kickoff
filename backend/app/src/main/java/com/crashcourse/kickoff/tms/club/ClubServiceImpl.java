@@ -280,4 +280,8 @@ public class ClubServiceImpl implements ClubService {
             throw new Exception("Club or Player not found.");
         }
     }
+
+    public Optional<Club> getClubByPlayerId(Long playerId) {
+        return clubRepository.findClubByPlayerId(playerId);
+    }
 }

@@ -14,7 +14,7 @@ export const fetchPlayerProfileById = async (id: string): Promise<PlayerProfile>
 
 // Update player profile
 export const updatePlayerProfile = async (playerId: number, preferredPositions: PlayerPosition[], profileDescription: string): Promise<any> => {
-  const response = await api.post(`/playerProfiles/${playerId}/update`, { preferredPositions, profileDescription }, {
+  const response = await api.put(`/playerProfiles/${playerId}/update`, { preferredPositions, profileDescription }, {
     baseURL: playerProfileBaseURL // Use the baseURL set at the top
   });
   return response.data;

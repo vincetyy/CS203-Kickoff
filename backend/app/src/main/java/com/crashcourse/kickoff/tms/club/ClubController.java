@@ -149,4 +149,11 @@ public class ClubController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+
+    @GetMapping("/player/{playerId}")
+    public ResponseEntity<Club> getClubByPlayerId(@PathVariable Long playerId) {
+        return clubService.getClubByPlayerId(playerId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

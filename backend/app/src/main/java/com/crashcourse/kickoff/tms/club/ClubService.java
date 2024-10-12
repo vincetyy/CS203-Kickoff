@@ -39,4 +39,6 @@ public interface ClubService {
     boolean isCaptain(Long clubId, Long playerId);
 
     List<Long> getPlayers(Long clubId);
+
+    Optional<Club> getClubByPlayerId(Long playerId);
 }
