@@ -1,14 +1,15 @@
 package com.crashcourse.kickoff.tms.location.service;
 
-import com.crashcourse.kickoff.tms.location.model.Location;
-import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
-import com.crashcourse.kickoff.tms.location.service.LocationService;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import com.crashcourse.kickoff.tms.location.model.Location;
+import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
+
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Implementation of the LocationService interface.
