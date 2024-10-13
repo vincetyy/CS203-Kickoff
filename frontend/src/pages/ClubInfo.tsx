@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { Button } from '../components/ui/button';
 import { ClubProfile } from '../types/club';
+import { PlayerProfile } from '../types/profile';
 import {
   Dialog,
   DialogContent,
@@ -17,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
+import { fetchPlayerProfileById } from '../services/profileService';
 
 enum PlayerPosition {
   POSITION_FORWARD = 'POSITION_FORWARD',
@@ -28,6 +30,8 @@ enum PlayerPosition {
 const ClubInfo: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [club, setClub] = useState<ClubProfile | null>(null);
+  const [captain, setCaptain] = useState<PlayerProfile | null>(null);
+  const [players, setPlayers] = useState<PlayerProfile[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,8 +41,18 @@ const ClubInfo: React.FC = () => {
   useEffect(() => {
     const fetchClub = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/clubs/${id}`);
-        setClub(response.data);
+        const clubResponse = await axios.get(`http://localhost:8080/clubs/${id}`);
+        setClub(clubResponse.data);
+        
+        const captainResponse = await fetchPlayerProfileById(clubResponse.data.captainId);
+        setCaptain(captainResponse);
+
+        const playerIds = clubResponse.data.players; // Assuming clubResponse.data.players is an array of player IDs
+        const playerProfiles = await Promise.all(playerIds.map((playerId: number) => fetchPlayerProfileById(playerId)));
+        console.log(playerProfiles);
+        
+        // Store the player profiles in state
+        setPlayers(playerProfiles);
       } catch (err: any) {
         console.error('Error fetching club info:', err);
         setError('Failed to fetch club information.');
@@ -98,7 +112,7 @@ const ClubInfo: React.FC = () => {
       <p className="text-lg mb-4">{club.description || 'No description available.'}</p>
       <div className="flex items-center mb-4">
         <div className="mr-4">
-          <strong>Captain:</strong> {club.captain.user.username || 'No captain assigned.'}
+          <strong>Captain:</strong> {captain.user.username || 'No captain assigned.'}
         </div>
         <div>
           <strong>ELO:</strong> {club.elo ? club.elo.toFixed(2) : 'N/A'}
@@ -109,9 +123,13 @@ const ClubInfo: React.FC = () => {
       <div className="mb-4">
         <h2 className="text-2xl font-semibold mb-2">Players in the Club</h2>
         <ul className="list-disc list-inside mt-2">
-          {club.playerNames.map((playerName: string, index: number) => (
-            <li key={index}>{playerName}</li>
-          ))}
+        {players ? (
+          players.map((player, index) => (
+            <li key={index}>{player.user.username}</li>
+          ))
+        ) : (
+          <p>Loading player profiles...</p>
+        )}
         </ul>
       </div>
 

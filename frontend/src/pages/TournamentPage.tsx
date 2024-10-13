@@ -54,6 +54,17 @@ const TournamentPage: React.FC = () => {
     DOUBLE_ELIM: 'Double Elimination'
   };
 
+  const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
+  const [status, setStatus] = useState<'idle' | 'loading' | 'succeeded' | 'failed'>('idle');
+  const [error, setError] = useState<string | null>(null); 
+  let isHost = false;
+  if (selectedTournament) {
+    console.log(selectedTournament);
+    console.log(userId);
+    
+    isHost = selectedTournament.host === userId;
+  }
+
   const handleBackClick = () => {
     navigate('/tournaments');
   };
