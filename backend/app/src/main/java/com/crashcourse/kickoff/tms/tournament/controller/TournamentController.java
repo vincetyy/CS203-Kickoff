@@ -1,6 +1,7 @@
 package com.crashcourse.kickoff.tms.tournament.controller;
 
 import com.crashcourse.kickoff.tms.club.Club;
+import com.crashcourse.kickoff.tms.club.ClubService;
 import com.crashcourse.kickoff.tms.security.JwtUtil;
 import com.crashcourse.kickoff.tms.tournament.dto.*;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
@@ -119,7 +120,7 @@ public class TournamentController {
      * @return ResponseEntity with the new Tournament data and HTTP status.
      */
     @PostMapping("/join")
-    public ResponseEntity<TournamentResponseDTO> joinTournamentAsClub(
+    public ResponseEntity<?> joinTournamentAsClub(
             @Valid @RequestBody TournamentJoinDTO tournamentJoinDTO,
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
         TournamentResponseDTO joinedTournament = tournamentService.joinTournamentAsClub(tournamentJoinDTO);
@@ -130,7 +131,7 @@ public class TournamentController {
         token = token.substring(7);
         Long userIdFromToken = jwtUtil.extractUserId(token);
         
-        boolean isCaptain = clubService.isCaptain(tournamentJoinDTO.clubId, userIdFromToken);
+        boolean isCaptain = clubService.isCaptain(tournamentJoinDTO.getClubId(), userIdFromToken);
 
         if (!isCaptain) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only the captain can join tournaments");
