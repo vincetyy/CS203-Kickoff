@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 public class TournamentController {
 
     private final TournamentService tournamentService;
+    private final ClubService clubService;
     private final JwtUtil jwtUtil; // final for constructor injection
 
     /**
@@ -119,8 +120,22 @@ public class TournamentController {
      */
     @PostMapping("/join")
     public ResponseEntity<TournamentResponseDTO> joinTournamentAsClub(
-            @Valid @RequestBody TournamentJoinDTO tournamentJoinDTO) {
+            @Valid @RequestBody TournamentJoinDTO tournamentJoinDTO,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
         TournamentResponseDTO joinedTournament = tournamentService.joinTournamentAsClub(tournamentJoinDTO);
+
+        if (token == null || !token.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization token is missing or invalid" + token);
+        }
+        token = token.substring(7);
+        Long userIdFromToken = jwtUtil.extractUserId(token);
+        
+        boolean isCaptain = clubService.isCaptain(tournamentJoinDTO.clubId, userIdFromToken);
+
+        if (!isCaptain) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only the captain can join tournaments");
+        }
+
         return new ResponseEntity<>(joinedTournament, HttpStatus.CREATED);
     }
 

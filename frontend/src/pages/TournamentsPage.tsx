@@ -12,10 +12,12 @@ import TournamentCard from '../components/TournamentCard'
 import CreateTournament from '../components/CreateTournament'
 import { Tournament } from '../types/tournament'
 import { selectClubId } from '../store/clubSlice';
+import { fetchUserClubAsync } from '../store/userSlice'
 
 
 export default function TournamentsPage() {
   const dispatch = useDispatch<AppDispatch>()
+  const { userClub } = useSelector((state: RootState) => state.user);
   const { tournaments, status, error } = useSelector((state: RootState) => state.tournaments)
   const [filteredTournaments, setFilteredTournaments] = useState<Tournament[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -27,6 +29,7 @@ export default function TournamentsPage() {
 
   useEffect(() => {
     dispatch(fetchTournamentsAsync())
+    dispatch(fetchUserClubAsync());
   }, [dispatch])
 
   useEffect(() => {
@@ -69,7 +72,7 @@ export default function TournamentsPage() {
 
     try {
       const result = await dispatch(joinTournamentAsync({ 
-        clubId: 1, // Hardcoded club ID
+        clubId: userClub.id, // Hardcoded club ID
         tournamentId: selectedTournament.id 
       })).unwrap()
       
@@ -168,7 +171,10 @@ export default function TournamentsPage() {
             teams={`${tournament.joinedClubs?.length || 0}/${tournament.maxTeams}`}  // Ensure joinedClubs is defined
             image={`https://picsum.photos/seed/${tournament.id}/400/300`}
           >
-            <Button onClick={() => handleJoin(tournament)}>Join</Button>
+            { userClub &&
+              <Button onClick={() => handleJoin(tournament)}>Join</Button>
+            }
+            
           </TournamentCard>
         
         ))}

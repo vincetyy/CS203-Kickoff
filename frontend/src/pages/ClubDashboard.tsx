@@ -5,7 +5,12 @@ import { toast } from 'react-hot-toast';
 import { Button } from '../components/ui/button';
 import { ClubProfile } from '../types/club';
 import PlayerProfileCard from '../components/PlayerProfileCard';
-import { PlayerPosition } from '../types/profile';
+import { PlayerPosition, PlayerProfile } from '../types/profile';
+import { AppDispatch, RootState } from '../store';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchClubsAsync } from '../store/clubSlice';
+import { fetchUserClubAsync } from '../store/userSlice';
+import { fetchPlayerProfileById } from '../services/profileService';
 
 enum TournamentFilter {
   UPCOMING = 'UPCOMING',
@@ -37,24 +42,39 @@ export interface ClubProfile {
     captain: Player;  // Captain is a Player
     players: Player[];  // List of players
 }
+interface ClubDashboardProps {
+  id: number;
+}
 
-const ClubDashboard: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const [club, setClub] = useState<ClubProfile | null>(null);
+
+const ClubDashboard: React.FC<ClubDashboardProps> = ({ id }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [tournamentFilter, setTournamentFilter] = useState<TournamentFilter>(TournamentFilter.UPCOMING);
 
+  const [club, setClub] = useState<ClubProfile | null>(null);
+  const [captain, setCaptain] = useState<PlayerProfile | null>(null);
+  const [players, setPlayers] = useState<PlayerProfile[] | null>(null);
+
   useEffect(() => {
     const fetchClub = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/clubs/${id}`);
-        console.log('Club data:', response.data);
-        setClub(response.data);
+        const clubResponse = await axios.get(`http://localhost:8080/clubs/${id}`);
+        setClub(clubResponse.data);
+        
+        const captainResponse = await fetchPlayerProfileById(clubResponse.data.captainId);
+        setCaptain(captainResponse);
+
+        const playerIds = clubResponse.data.players; // Assuming clubResponse.data.players is an array of player IDs
+        const playerProfiles = await Promise.all(playerIds.map((playerId: number) => fetchPlayerProfileById(playerId)));
+        console.log(playerProfiles);
+        
+        // Store the player profiles in state
+        setPlayers(playerProfiles);
       } catch (err: any) {
         console.error('Error fetching club info:', err);
-        setError(err.response?.data?.message || 'Failed to fetch club information.');
+        setError('Failed to fetch club information.');
       } finally {
         setLoading(false);
       }
@@ -104,10 +124,10 @@ const ClubDashboard: React.FC = () => {
         className="w-full h-48 object-cover mb-4 rounded"
       />
       <h1 className="text-3xl font-bold mb-4">{club.name}</h1>
-      <p className="text-lg mb-4">{club.clubDescription || 'No description available.'}</p>
+      <p className="text-lg mb-4">{club.description || 'No description available.'}</p>
       <div className="flex items-center mb-4">
         <div className="mr-4">
-          <strong>Captain:</strong> {club.captain?.user?.username || 'No captain assigned.'}
+          <strong>Captain:</strong> {captain.user.username || 'No captain assigned.'}
         </div>
         <div>
           <strong>ELO:</strong> {club.elo ? club.elo.toFixed(2) : 'N/A'}
@@ -118,17 +138,12 @@ const ClubDashboard: React.FC = () => {
       <div className="mb-4">
         <h2 className="text-2xl font-semibold mb-2">Players in the Club</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {allPlayers && allPlayers.length > 0 ? (
-            allPlayers.map((player: Player) => (
-              <PlayerProfileCard
-                key={player.id}
-                id={player.id}
-                name={player?.user?.username || 'Unknown Player'}
-                preferredPosition={player.preferredPositions?.[0]}
-              />
+          {players ? (
+            players.map((player, index) => (
+              <li key={index}>{player.user.username}</li>
             ))
           ) : (
-            <p>No players in this club.</p>
+            <p>Loading player profiles...</p>
           )}
         </div>
       </div>

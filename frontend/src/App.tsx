@@ -4,12 +4,11 @@ import LandingPage from './pages/LandingPage';
 import ProfilePage from './pages/ProfilePage';
 import TournamentsPage from './pages/TournamentsPage';
 import TournamentPage from './pages/TournamentPage';
-import ClubPage from './pages/ClubPage';
+import Club from './pages/Club';
 import LeaderboardsPage from './pages/LeaderboardsPage';
 import Login from './pages/Login.tsx';
 import Signup from './pages/Signup.tsx';
 import ClubInfo from './pages/ClubInfo';
-import ClubDashboard from './pages/ClubDashboard';
 
 function App() {
   return (
@@ -20,12 +19,11 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/tournaments" element={<TournamentsPage />} />
           <Route path="/tournaments/:id" element={<TournamentPage />} />
-          <Route path="/clubs" element={<ClubPage />} />
+          <Route path="/clubs" element={<Club />} />
           <Route path="/leaderboards" element={<LeaderboardsPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/clubs/:id" element={<ClubInfo />} />
-          <Route path="/clubs/:id/dashboard" element={<ClubDashboard />} />
         </Route>
       </Routes>
     </Router>
