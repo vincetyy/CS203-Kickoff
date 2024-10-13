@@ -1,7 +1,7 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import clubReducer from './clubSlice';
 import tournamentReducer from './tournamentSlice';
-import userReducer from './userSlice';
+import userReducer from './userSlice';  // Assuming userSlice now contains userClub as well
 
 // Import redux-persist modules
 import {
@@ -16,11 +16,11 @@ import {
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
 
-// Persist configuration for the user slice (userId is likely stored here)
+// Persist configuration for the user slice (persist userId and userClub)
 const userPersistConfig = {
   key: 'user',
-  storage, // This will use localStorage to persist the state
-  whitelist: ['userId'], // Optionally, specify the fields from the user slice that you want to persist
+  storage, 
+  whitelist: ['userId', 'userClub'], // Persist both userId and userClub
 };
 
 // Combine your reducers
