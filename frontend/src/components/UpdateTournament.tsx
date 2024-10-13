@@ -15,7 +15,16 @@ interface UpdateTournamentProps {
 }
 
 const UpdateTournament: React.FC<UpdateTournamentProps> = ({ isOpen, onClose, initialData, onUpdate }) => {
-  const [formData, setFormData] = useState<TournamentUpdate>(initialData);
+  const [formData, setFormData] = useState<TournamentUpdate>({
+    name: initialData?.name || '', 
+    startDateTime: initialData?.startDateTime || '', 
+    endDateTime: initialData?.endDateTime || '',
+    location: initialData?.location || null, 
+    prizePool: initialData?.prizePool || [],
+    minRank: initialData?.minRank || 0,
+    maxRank: initialData?.maxRank || 0,
+    host: initialData?.host || undefined, 
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [isLoadingLocations, setIsLoadingLocations] = useState<boolean>(false);
@@ -23,11 +32,21 @@ const UpdateTournament: React.FC<UpdateTournamentProps> = ({ isOpen, onClose, in
   const [locations, setLocations] = useState<Location[]>([]); // Added locations state
 
   useEffect(() => {
-    setFormData(initialData);
-    console.log(initialData);
-    
+    if (initialData) {
+      setFormData({
+        name: initialData.name || '', 
+        startDateTime: initialData.startDateTime || '',
+        endDateTime: initialData.endDateTime || '',
+        location: initialData.location || null,
+        prizePool: initialData.prizePool || [],
+        minRank: initialData.minRank || 0,
+        maxRank: initialData.maxRank || 0,
+        host: initialData.host || undefined,
+      });
+    }
   }, [initialData]);
 
+  // Fetch locations for the location dropdown
   useEffect(() => {
     const fetchLocations = async () => {
       setIsLoadingLocations(true);
@@ -50,7 +69,6 @@ const UpdateTournament: React.FC<UpdateTournamentProps> = ({ isOpen, onClose, in
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-
     setFormData(prev => ({
       ...prev,
       [name]: name.includes('DateTime') ? new Date(value).toISOString() :
@@ -95,6 +113,7 @@ const UpdateTournament: React.FC<UpdateTournamentProps> = ({ isOpen, onClose, in
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

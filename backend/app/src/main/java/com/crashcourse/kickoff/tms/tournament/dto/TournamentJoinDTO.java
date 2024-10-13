@@ -33,4 +33,6 @@ public class TournamentJoinDTO {
     @NotNull(message = "Tournament ID is required")
     @Min(value = 1, message = "Tournament ID must be greater than 0")
     private Long tournamentId;
+
+
 }

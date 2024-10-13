@@ -2,25 +2,18 @@ package com.crashcourse.kickoff.tms.tournament.service;
 
 import com.crashcourse.kickoff.tms.club.*;
 import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
-
 import com.crashcourse.kickoff.tms.location.service.LocationService;
-import com.crashcourse.kickoff.tms.location.model.*;
+import com.crashcourse.kickoff.tms.location.model.Location;
 import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
-
-
 import com.crashcourse.kickoff.tms.tournament.dto.*;
 import com.crashcourse.kickoff.tms.tournament.exception.*;
-import com.crashcourse.kickoff.tms.tournament.model.Tournament;
-import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
-import com.crashcourse.kickoff.tms.tournament.repository.TournamentRepository;
-import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
-
+import com.crashcourse.kickoff.tms.tournament.model.*;
+import com.crashcourse.kickoff.tms.tournament.repository.*;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,10 +24,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class TournamentServiceImpl implements TournamentService {
+    
     private final TournamentRepository tournamentRepository;
     private final LocationRepository locationRepository;
     private final LocationService locationService;
     private final ClubRepository clubRepository;
+    private final PlayerAvailabilityRepository playerAvailabilityRepository;
 
     private final ClubService clubService;
 
@@ -253,6 +248,49 @@ public class TournamentServiceImpl implements TournamentService {
         return tournaments.stream()
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public PlayerAvailability updatePlayerAvailability(PlayerAvailabilityDTO dto) {
+        Long clubId = dto.getClubId();
+        
+        if (clubId == null) {
+            throw new RuntimeException("You must join a club before indicating availability.");
+        }
+        
+        Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
+            .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + dto.getTournamentId()));
+        
+        PlayerAvailability playerAvailability = playerAvailabilityRepository
+            .findByTournamentIdAndPlayerId(dto.getTournamentId(), dto.getPlayerId())
+            .orElse(new PlayerAvailability());
+
+        playerAvailability.setTournament(tournament);
+        playerAvailability.setPlayerId(dto.getPlayerId());
+        playerAvailability.setClubId(clubId);
+        playerAvailability.setAvailable(dto.isAvailable());
+
+        try {
+            playerAvailabilityRepository.save(playerAvailability);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update player availability: " + e.getMessage(), e);
+        }
+
+        return playerAvailability;
+    }
+
+
+    @Override
+    public List<PlayerAvailabilityDTO> getPlayerAvailabilityForTournament(Long tournamentId) {
+        List<PlayerAvailability> availabilities = playerAvailabilityRepository.findByTournamentId(tournamentId);
+        return availabilities.stream()
+            .map(availability -> new PlayerAvailabilityDTO(
+                tournamentId,
+                availability.getPlayerId(),
+                availability.getClubId(), 
+                availability.isAvailable()
+            ))
+            .collect(Collectors.toList());
     }
 
 }

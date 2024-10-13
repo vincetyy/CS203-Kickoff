@@ -1,6 +1,7 @@
 package com.crashcourse.kickoff.tms.tournament.controller;
 
 import com.crashcourse.kickoff.tms.club.Club;
+import com.crashcourse.kickoff.tms.club.ClubService;
 import com.crashcourse.kickoff.tms.security.JwtUtil;
 import com.crashcourse.kickoff.tms.tournament.dto.*;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
@@ -15,6 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 /**
  * REST Controller for managing Tournaments.
@@ -26,6 +30,7 @@ import java.util.List;
 public class TournamentController {
 
     private final TournamentService tournamentService;
+    private final ClubService clubService;
     private final JwtUtil jwtUtil; // final for constructor injection
 
     /**
@@ -115,9 +120,23 @@ public class TournamentController {
      * @return ResponseEntity with the new Tournament data and HTTP status.
      */
     @PostMapping("/join")
-    public ResponseEntity<TournamentResponseDTO> joinTournamentAsClub(
-            @Valid @RequestBody TournamentJoinDTO tournamentJoinDTO) {
+    public ResponseEntity<?> joinTournamentAsClub(
+            @Valid @RequestBody TournamentJoinDTO tournamentJoinDTO,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
         TournamentResponseDTO joinedTournament = tournamentService.joinTournamentAsClub(tournamentJoinDTO);
+
+        if (token == null || !token.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization token is missing or invalid" + token);
+        }
+        token = token.substring(7);
+        Long userIdFromToken = jwtUtil.extractUserId(token);
+        
+        boolean isCaptain = clubService.isCaptain(tournamentJoinDTO.getClubId(), userIdFromToken);
+
+        if (!isCaptain) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only the captain can join tournaments");
+        }
+
         return new ResponseEntity<>(joinedTournament, HttpStatus.CREATED);
     }
 
@@ -158,5 +177,22 @@ public class TournamentController {
         return ResponseEntity.ok(tournaments);
     }
 
+    @PutMapping("/availability")
+    public ResponseEntity<?> updatePlayerAvailability(@RequestBody PlayerAvailabilityDTO dto) {
+
+        Long tournamentId = dto.getTournamentId();
+        Long playerId = dto.getPlayerId();
+        Long clubId = dto.getClubId(); 
+        boolean available = dto.isAvailable();
+        PlayerAvailabilityDTO playerAvailabilityDTO = new PlayerAvailabilityDTO(tournamentId, playerId, clubId, available);
+        tournamentService.updatePlayerAvailability(playerAvailabilityDTO);
+        return ResponseEntity.ok(tournamentService.updatePlayerAvailability(playerAvailabilityDTO));
+    }
+
+    @GetMapping("/{tournamentId}/availability")
+    public ResponseEntity<List<PlayerAvailabilityDTO>> getPlayerAvailability(@PathVariable Long tournamentId) {
+        List<PlayerAvailabilityDTO> availabilities = tournamentService.getPlayerAvailabilityForTournament(tournamentId);
+        return ResponseEntity.ok(availabilities);
+    }
 
 }

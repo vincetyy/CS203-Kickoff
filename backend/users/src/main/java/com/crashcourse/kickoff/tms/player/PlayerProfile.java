@@ -17,14 +17,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Data
@@ -32,6 +27,7 @@ import lombok.ToString;
     generator = ObjectIdGenerators.PropertyGenerator.class,
     property = "id")
 public class PlayerProfile {
+    
     @Id
     private Long id;
 

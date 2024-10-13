@@ -7,12 +7,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-/*
- * Responsible for instantiating an object only
- * based on provided data, not handling logic
- */
 @Entity
 @Data
 @AllArgsConstructor
@@ -51,12 +48,14 @@ public class Tournament {
     )
     private List<Club> joinedClubs = new ArrayList<>();
 
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL)  
+    private List<PlayerAvailability> playerAvailabilities = new ArrayList<>();  
+
     public String getFormat() {
         return tournamentFormat.toString();
     }
-    
+
     public String getLocationName() {
         return location.getName();
     }
-    
 }
