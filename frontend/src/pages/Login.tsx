@@ -16,8 +16,10 @@ import axios from 'axios';
 
 import { toast } from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom';
+import { fetchUserClubAsync } from '../store/userSlice';
+import { AppDispatch } from '../store';
 const Login = () => {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const [username, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
@@ -47,6 +49,9 @@ const Login = () => {
             console.log('Login successful');
 
             dispatch(setUserId(response.data.userId));
+
+            // Fetch the user's club using fetchUserClubAsync thunk
+            dispatch(fetchUserClubAsync());
 
             navigate('/clubs');  
 

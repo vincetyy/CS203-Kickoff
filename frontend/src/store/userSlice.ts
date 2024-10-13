@@ -1,31 +1,70 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { getClubByPlayerId } from '../services/clubService'; // Adjust the path to your service function
+import { Club } from '../types/club';
 
-// Define the initial state of the slice
+// Initial state for the user slice
 const initialState = {
-  userId: null as string | null, // Initially, userId is null
+  userId: null as number | null,
+  userClub: null as Club | null,  // Store the user's club
+  status: 'idle' as 'idle' | 'loading' | 'succeeded' | 'failed',
+  error: null as string | null,
 };
+
+// Async thunk to fetch the user's club by userId
+export const fetchUserClubAsync = createAsyncThunk(
+  'user/fetchUserClub', // Action type
+  async (_, { getState, rejectWithValue }) => {
+    const state = getState() as { user: typeof initialState };  // Access the state
+    const userId = state.user.userId;
+
+    if (!userId) {
+      return rejectWithValue('User is not logged in or userId is missing');
+    }
+
+    try {
+      const club = await getClubByPlayerId(userId);  // Call the API to get the club
+      return club;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch user club');
+    }
+  }
+);
 
 // Create the user slice
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    // Action to set the userId in the state
     setUserId: (state, action) => {
       state.userId = action.payload;
     },
-    // Action to clear the userId from the state (e.g., when user logs out)
-    clearUserId: (state) => {
+    clearUser: (state) => {
       state.userId = null;
+      state.userClub = null;
+      state.status = 'idle';
+      state.error = null;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUserClubAsync.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchUserClubAsync.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.userClub = action.payload;  // Store the fetched club in the state
+      })
+      .addCase(fetchUserClubAsync.rejected, (state, action) => {
+        state.status = 'failed';
+        state.userClub = null;
+        state.error = action.payload as string;
+      });
   },
 });
 
-// Export the actions to set and clear userId
-export const { setUserId, clearUserId } = userSlice.actions;
-
+// Export the actions and reducer
+export const { setUserId, clearUser } = userSlice.actions;
 // Selector to retrieve the userId from the Redux store
 export const selectUserId = (state: any) => state.user.userId;
 
-// Export the reducer to be included in the Redux store
 export default userSlice.reducer;

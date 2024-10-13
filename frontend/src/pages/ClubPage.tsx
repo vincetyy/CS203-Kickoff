@@ -24,6 +24,7 @@ import {  toast } from 'react-hot-toast';
 import { Club } from '../types/club';
 import { useNavigate } from 'react-router-dom';
 import CreateClub from '../components/CreateClub';
+import { fetchUserClubAsync } from '../store/userSlice';
 
 enum PlayerPosition {
   POSITION_FORWARD = 'POSITION_FORWARD',
@@ -37,6 +38,7 @@ export default function ClubPage() {
   const { clubs, status, error } = useSelector(
     (state: RootState) => state.clubs
   );
+  const { userClub } = useSelector((state: RootState) => state.user);
   const [filteredClubs, setFilteredClubs] = useState<Club[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClub, setSelectedClub] = useState<Club | null>(null);
@@ -48,6 +50,7 @@ export default function ClubPage() {
 
   useEffect(() => {
     dispatch(fetchClubsAsync());
+    dispatch(fetchUserClubAsync());
   }, [dispatch]);
 
   useEffect(() => {
@@ -171,9 +174,11 @@ export default function ClubPage() {
           {/* Additional filters can be added here */}
         </div>
 
-        <Button onClick={handleCreateClubClick} className="bg-blue-600 hover:bg-blue-700 w-full lg:w-auto">
-          Create Club
-        </Button>
+        { !userClub &&
+          <Button onClick={handleCreateClubClick} className="bg-blue-600 hover:bg-blue-700 w-full lg:w-auto">
+            Create Club
+          </Button>
+        }
       </div>
 
       {/* Club Cards */}
