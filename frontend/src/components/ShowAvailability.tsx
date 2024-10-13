@@ -26,12 +26,10 @@ export default function ShowAvailability({ availabilities, currentUserId }: Show
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {availabilities.map((availability) => (
             <PlayerProfileCard
-            key={availability.playerId}
-            id={availability.playerId}
-            name={availability.playerName}
-            availability={availability.available}
-            isCurrentUser={availability.playerId === currentUserId}  // This prop tells if the player is the current user
-          />
+              key={availability.playerId}
+              id={availability.playerId} 
+              availability={availability.available} 
+            />
           ))}
         </div>
       )}

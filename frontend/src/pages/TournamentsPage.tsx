@@ -11,6 +11,8 @@ import { toast } from 'react-hot-toast'
 import TournamentCard from '../components/TournamentCard'
 import CreateTournament from '../components/CreateTournament'
 import { Tournament } from '../types/tournament'
+import { selectClubId } from '../store/clubSlice';
+
 
 export default function TournamentsPage() {
   const dispatch = useDispatch<AppDispatch>()
@@ -55,6 +57,8 @@ export default function TournamentsPage() {
     setKnockoutFormatFilter(value === 'ALL' ? null : value);
   };
 
+  const clubId = useSelector(selectClubId); 
+
   const handleJoin = (tournament: Tournament) => {
     setSelectedTournament(tournament)
     setIsDialogOpen(true)
@@ -81,9 +85,9 @@ export default function TournamentsPage() {
 
       // Update the specific tournament in the state
       const updatedTournaments = tournaments.map(t => 
-        t.id === selectedTournament.id ? { ...t, joinedClubs: [...t.joinedClubs, { id: 1 }] } : t
-      )
-      dispatch({ type: 'tournaments/updateTournaments', payload: updatedTournaments })
+        t.id === selectedTournament.id ? { ...t, joinedClubs: [...(t.joinedClubs || []), { id: clubId }] } : t
+      );
+      dispatch({ type: 'tournaments/updateTournaments', payload: updatedTournaments });
 
     } catch (err: any) {
       console.error('Error joining tournament:', err)
@@ -161,11 +165,12 @@ export default function TournamentsPage() {
             startDate={new Date(tournament.startDateTime).toLocaleDateString()}
             endDate={new Date(tournament.endDateTime).toLocaleDateString()}
             format={tournament.tournamentFormat}
-            teams={`${tournament.joinedClubs.length}/${tournament.maxTeams}`}
+            teams={`${tournament.joinedClubs?.length || 0}/${tournament.maxTeams}`}  // Ensure joinedClubs is defined
             image={`https://picsum.photos/seed/${tournament.id}/400/300`}
           >
             <Button onClick={() => handleJoin(tournament)}>Join</Button>
           </TournamentCard>
+        
         ))}
       </div>
 

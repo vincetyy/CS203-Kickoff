@@ -1,6 +1,5 @@
 package com.crashcourse.kickoff.tms.tournament.model;
 
-import com.crashcourse.kickoff.tms.player.PlayerProfile;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlayerAvailability {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,9 +17,8 @@ public class PlayerAvailability {
     @JoinColumn(name = "tournament_id", nullable = false)
     private Tournament tournament;
 
-    @ManyToOne
-    @JoinColumn(name = "player_id", nullable = false)
-    private PlayerProfile player;
-
-    private boolean isAvailable;
+    @Column(name = "player_id", nullable = false)
+    private Long playerId; 
+    
+    private boolean available; 
 }

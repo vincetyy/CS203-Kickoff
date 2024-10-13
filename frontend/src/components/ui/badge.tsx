@@ -1,7 +1,7 @@
 import * as React from "react";
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "success" | "destructive"; // Only the variants you need
+  variant?: "success" | "destructive"; 
 }
 
 function Badge({ className = "", variant = "success", ...props }: BadgeProps) {
@@ -17,7 +17,6 @@ function Badge({ className = "", variant = "success", ...props }: BadgeProps) {
       ? "bg-red-500 text-white hover:bg-red-600 border-transparent"
       : "";
 
-  // Combine the base classes, variant classes, and any additional classes passed in
   const combinedClasses = `${baseClasses} ${variantClasses} ${className}`;
 
   return <div className={combinedClasses} {...props} />;

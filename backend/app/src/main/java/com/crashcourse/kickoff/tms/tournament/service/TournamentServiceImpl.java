@@ -2,24 +2,18 @@ package com.crashcourse.kickoff.tms.tournament.service;
 
 import com.crashcourse.kickoff.tms.club.*;
 import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
-
 import com.crashcourse.kickoff.tms.location.service.LocationService;
-import com.crashcourse.kickoff.tms.location.model.*;
+import com.crashcourse.kickoff.tms.location.model.Location;
 import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
-
-
 import com.crashcourse.kickoff.tms.tournament.dto.*;
 import com.crashcourse.kickoff.tms.tournament.exception.*;
 import com.crashcourse.kickoff.tms.tournament.model.*;
 import com.crashcourse.kickoff.tms.tournament.repository.*;
-import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
-
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,13 +24,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class TournamentServiceImpl implements TournamentService {
+    
     private final TournamentRepository tournamentRepository;
     private final LocationRepository locationRepository;
     private final LocationService locationService;
     private final ClubRepository clubRepository;
     private final PlayerAvailabilityRepository playerAvailabilityRepository;
-    private final PlayerProfileRepository playerProfileRepository;
-
 
     private final ClubService clubService;
 
@@ -258,7 +251,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public void updatePlayerAvailability(UpdatePlayerAvailabilityDTO dto) {
+    public void updatePlayerAvailability(PlayerAvailabilityDTO dto) {
         Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
             .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + dto.getTournamentId()));
         

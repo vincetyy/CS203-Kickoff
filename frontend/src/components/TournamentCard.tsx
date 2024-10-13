@@ -3,13 +3,14 @@ import { Card, CardContent, CardFooter } from "./ui/card"
 import { useNavigate } from "react-router-dom"
 
 interface TournamentCardProps {
-  name: string
-  startDate: string
-  endDate: string
-  format: string
-  teams: string
-  image: string
-  children?: React.ReactNode
+  id: number;
+  name: string;
+  startDate: string;
+  endDate: string;
+  format: string;
+  teams: string;
+  image: string;
+  children?: React.ReactNode;
 }
 
 const formatTournamentFormat = (format: string): string => {

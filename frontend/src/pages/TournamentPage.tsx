@@ -54,17 +54,6 @@ const TournamentPage: React.FC = () => {
     DOUBLE_ELIM: 'Double Elimination'
   };
 
-  const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
-  const [status, setStatus] = useState<'idle' | 'loading' | 'succeeded' | 'failed'>('idle');
-  const [error, setError] = useState<string | null>(null); 
-  let isHost = false;
-  if (selectedTournament) {
-    console.log(selectedTournament);
-    console.log(userId);
-    
-    isHost = selectedTournament.host === userId;
-  }
-
   const handleBackClick = () => {
     navigate('/tournaments');
   };
@@ -103,7 +92,7 @@ const TournamentPage: React.FC = () => {
 
         const availabilities = await getPlayerAvailability(tournamentId);
         setAvailabilities(availabilities);
-        setAvailableCount(availabilities.filter(a => a.isAvailable).length);
+        setAvailableCount(availabilities.filter(a => a.available).length);
         setStatus('succeeded');
       } catch (err) {
         console.error('Error fetching tournament data:', err);
@@ -135,7 +124,7 @@ const TournamentPage: React.FC = () => {
       // Refetch or update availabilities after the change
       const updatedAvailabilities = [...(await getPlayerAvailability(tournamentId))];
       setAvailabilities(updatedAvailabilities);
-      setAvailableCount(updatedAvailabilities.filter(a => a.isAvailable).length); 
+      setAvailableCount(updatedAvailabilities.filter(a => a.available).length); 
   
       toast.success(`You have marked yourself as ${availability ? 'available' : 'not available'}.`);
     } catch (err) {

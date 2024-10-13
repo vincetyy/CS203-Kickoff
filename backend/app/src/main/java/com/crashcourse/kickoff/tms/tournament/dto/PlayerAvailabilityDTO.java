@@ -6,7 +6,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PlayerAvailabilityDTO {
+    private Long tournamentId;  
     private Long playerId;
-    private String playerName;
     private boolean isAvailable;
 }

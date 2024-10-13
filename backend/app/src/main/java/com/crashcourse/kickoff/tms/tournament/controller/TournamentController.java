@@ -13,7 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.MediaType;
 
 import java.util.List;
 
@@ -159,17 +158,27 @@ public class TournamentController {
         return ResponseEntity.ok(tournaments);
     }
 
-    @PutMapping(value = "/availability", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updatePlayerAvailability(@RequestBody UpdatePlayerAvailabilityDTO dto) {
-        System.out.println("Received DTO: " + dto);
-        tournamentService.updatePlayerAvailability(dto);
+    @PutMapping(value = "/availability")
+    public ResponseEntity<Void> updatePlayerAvailability(@RequestBody PlayerAvailabilityDTO dto) {
+        Long tournamentId = dto.getTournamentId();
+        Long playerId = dto.getPlayerId();
+        boolean available = dto.isAvailable();
+
+        tournamentService.updatePlayerAvailability(tournamentId, playerId, available);
+
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{tournamentId}/availability")
-    public ResponseEntity<List<PlayerAvailabilityDTO>> getPlayerAvailability(@PathVariable Long tournamentId) {
-        List<PlayerAvailabilityDTO> availabilities = tournamentService.getPlayerAvailabilityForTournament(tournamentId);
-        return ResponseEntity.ok(availabilities);
+    @Override
+    public List<PlayerAvailabilityDTO> getPlayerAvailabilityForTournament(Long tournamentId) {
+        List<PlayerAvailability> availabilities = playerAvailabilityRepository.findByTournamentId(tournamentId);
+
+        return availabilities.stream()
+            .map(availability -> new PlayerAvailabilityDTO(
+                availability.getPlayerId(),    
+                availability.isAvailable()
+            ))
+            .collect(Collectors.toList());
     }
-    
+
 }
