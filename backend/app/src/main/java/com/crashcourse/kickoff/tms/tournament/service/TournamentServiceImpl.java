@@ -252,17 +252,22 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public PlayerAvailability updatePlayerAvailability(PlayerAvailabilityDTO dto) {
-        System.out.println(dto);
+        Long clubId = dto.getClubId();
+        
+        if (clubId == null) {
+            throw new RuntimeException("You must join a club before indicating availability.");
+        }
+        
         Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
             .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + dto.getTournamentId()));
         
-
         PlayerAvailability playerAvailability = playerAvailabilityRepository
             .findByTournamentIdAndPlayerId(dto.getTournamentId(), dto.getPlayerId())
             .orElse(new PlayerAvailability());
 
         playerAvailability.setTournament(tournament);
         playerAvailability.setPlayerId(dto.getPlayerId());
+        playerAvailability.setClubId(clubId);
         playerAvailability.setAvailable(dto.isAvailable());
 
         try {
@@ -274,6 +279,7 @@ public class TournamentServiceImpl implements TournamentService {
         return playerAvailability;
     }
 
+
     @Override
     public List<PlayerAvailabilityDTO> getPlayerAvailabilityForTournament(Long tournamentId) {
         List<PlayerAvailability> availabilities = playerAvailabilityRepository.findByTournamentId(tournamentId);
@@ -281,6 +287,7 @@ public class TournamentServiceImpl implements TournamentService {
             .map(availability -> new PlayerAvailabilityDTO(
                 tournamentId,
                 availability.getPlayerId(),
+                availability.getClubId(), 
                 availability.isAvailable()
             ))
             .collect(Collectors.toList());

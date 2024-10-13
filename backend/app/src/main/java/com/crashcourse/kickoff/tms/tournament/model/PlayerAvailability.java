@@ -21,6 +21,9 @@ public class PlayerAvailability {
 
     @Column(name = "player_id", nullable = false)
     private Long playerId; 
+
+    @Column(name = "club_id", nullable = false)
+    private Long clubId;  
     
     private boolean available; 
 }

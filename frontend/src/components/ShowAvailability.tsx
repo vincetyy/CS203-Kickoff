@@ -5,11 +5,13 @@ import { PlayerAvailabilityDTO } from '../types/playerAvailability';
 interface ShowAvailabilityProps {
   availabilities: PlayerAvailabilityDTO[];
   currentUserId: number;
+  currentUserClubId?: number;
 }
 
-export default function ShowAvailability({ availabilities }: ShowAvailabilityProps) {
-  const totalPlayers = availabilities.length;
-  const availablePlayers = availabilities.filter((a) => a.available).length;
+export default function ShowAvailability({ availabilities, currentUserId, currentUserClubId }: ShowAvailabilityProps) { // Destructure currentUserClubId here
+  const filteredAvailabilities = availabilities.filter(a => a.clubId === currentUserClubId);
+  const totalPlayers = filteredAvailabilities.length;
+  const availablePlayers = filteredAvailabilities.filter((a) => a.available).length;
   const unavailablePlayers = totalPlayers - availablePlayers;
 
   return (
@@ -20,11 +22,11 @@ export default function ShowAvailability({ availabilities }: ShowAvailabilityPro
         <p>Available: {availablePlayers}</p>
         <p>Not Available: {unavailablePlayers}</p>
       </div>
-      {availabilities.length === 0 ? (
+      {filteredAvailabilities.length === 0 ? (
         <p>No player from your club has indicated availability yet.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {availabilities.map((availability) => (
+          {filteredAvailabilities.map((availability) => (
             <PlayerProfileCard
               key={availability.playerId}
               id={availability.playerId} 

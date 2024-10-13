@@ -164,8 +164,9 @@ public class TournamentController {
 
         Long tournamentId = dto.getTournamentId();
         Long playerId = dto.getPlayerId();
+        Long clubId = dto.getClubId(); 
         boolean available = dto.isAvailable();
-        PlayerAvailabilityDTO playerAvailabilityDTO = new PlayerAvailabilityDTO(tournamentId, playerId, available);
+        PlayerAvailabilityDTO playerAvailabilityDTO = new PlayerAvailabilityDTO(tournamentId, playerId, clubId, available);
         tournamentService.updatePlayerAvailability(playerAvailabilityDTO);
         return ResponseEntity.ok(tournamentService.updatePlayerAvailability(playerAvailabilityDTO));
     }

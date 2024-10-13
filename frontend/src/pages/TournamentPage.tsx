@@ -14,8 +14,8 @@ import { PlayerAvailabilityDTO } from '../types/playerAvailability';
 import ShowAvailability from '../components/ShowAvailability';
 import AvailabilityButton from '../components/AvailabilityButton'; 
 import { fetchTournamentById, getPlayerAvailability, updatePlayerAvailability } from '../services/tournamentService';
-import { selectUserId } from '../store/userSlice';
-import { selectClubId } from '../store/clubSlice';
+import { getClubByPlayerId } from '../services/clubService' 
+import { selectUserId } from '../store/userSlice'
 
 import UpdateTournament from '../components/UpdateTournament';
 
@@ -36,7 +36,9 @@ const TournamentPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const tournamentId = id ? parseInt(id, 10) : null;
   const userId = useSelector(selectUserId);
-  const clubId = useSelector(selectClubId);
+  const [clubId, setClubId] = useState<number | null>(null) 
+  console.log('clubId:', clubId);
+
 
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'succeeded' | 'failed'>('idle');
@@ -105,16 +107,41 @@ const TournamentPage: React.FC = () => {
     fetchData();
   }, [tournamentId]);
 
+  useEffect(() => {
+    const fetchClubId = async () => {
+      if (userId) {
+        try {
+          const club = await getClubByPlayerId(userId);
+          if (club && club.id) {
+            setClubId(club.id);  // Store the fetched clubId
+          } else {
+            toast.error("You are not associated with any club.");
+          }
+        } catch (error) {
+          toast.error("Failed to fetch club information.");
+        }
+      }
+    };
+
+    fetchClubId();
+  }, [userId]);
+
   const handleAvailabilityUpdate = async (availability: boolean) => {
     if (tournamentId === null || isNaN(tournamentId)) {
       toast.error('Invalid tournament ID.');
       return;
     }
   
+    if (!clubId) {
+      toast.error("You must be part of a club to mark availability.");
+      return;
+    }
+
     try {
       const payload = {
-        tournamentId: tournamentId as number,
-        playerId: userId as number,
+        tournamentId: tournamentId,
+        playerId: userId,
+        clubId: clubId,  // Use the fetched clubId
         available: availability  
       };
   
@@ -122,7 +149,7 @@ const TournamentPage: React.FC = () => {
       await updatePlayerAvailability(payload);
   
       // Refetch or update availabilities after the change
-      const updatedAvailabilities = [...(await getPlayerAvailability(tournamentId))];
+      const updatedAvailabilities = await getPlayerAvailability(tournamentId);
       setAvailabilities(updatedAvailabilities);
       setAvailableCount(updatedAvailabilities.filter(a => a.available).length); 
   
@@ -245,7 +272,11 @@ const TournamentPage: React.FC = () => {
       </div>
         
       {/* Show Availability */}
-      <ShowAvailability availabilities={availabilities} currentUserId={userId} />
+      <ShowAvailability 
+        availabilities={availabilities} 
+        currentUserId={userId} 
+        currentUserClubId={clubId !== null ? clubId : undefined} 
+      />
 
       {/* Remove Confirmation Dialog */}
       <Dialog open={isRemoveDialogOpen} onOpenChange={setIsRemoveDialogOpen}>

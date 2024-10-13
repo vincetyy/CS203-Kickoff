@@ -8,5 +8,6 @@ import lombok.*;
 public class PlayerAvailabilityDTO {
     private Long tournamentId;  
     private Long playerId;
+    private Long clubId;
     private boolean isAvailable;
 }
