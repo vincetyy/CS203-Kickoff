@@ -1,9 +1,11 @@
 package com.crashcourse.kickoff.tms.tournament.dto;
 
-import lombok.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 /**
@@ -31,7 +33,7 @@ public class TournamentResponseDTO {
     private Integer minRank;
     private Integer maxRank;
 
-    private List<ClubDTO> joinedClubs;
+    private List<Long> joinedClubsIds;
     private Long host;
 
     /**
@@ -45,14 +47,14 @@ public class TournamentResponseDTO {
         private String name;
     }
 
-    /**
-     * Inner DTO for Club data.
-     */
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ClubDTO {
-        private Long id;
-        private String name;
-    }
+    // /**
+    //  * Inner DTO for Club data.
+    //  */
+    // @Data
+    // @NoArgsConstructor
+    // @AllArgsConstructor
+    // public static class ClubDTO {
+    //     private Long id;
+    //     private String name;
+    // }
 }

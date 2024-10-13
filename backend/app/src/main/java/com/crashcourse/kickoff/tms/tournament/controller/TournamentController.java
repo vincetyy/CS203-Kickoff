@@ -1,24 +1,32 @@
 package com.crashcourse.kickoff.tms.tournament.controller;
 
-import com.crashcourse.kickoff.tms.club.Club;
-import com.crashcourse.kickoff.tms.club.ClubService;
+import java.util.List;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.crashcourse.kickoff.tms.security.JwtUtil;
-import com.crashcourse.kickoff.tms.tournament.dto.*;
+import com.crashcourse.kickoff.tms.tournament.dto.PlayerAvailabilityDTO;
+import com.crashcourse.kickoff.tms.tournament.dto.TournamentCreateDTO;
+import com.crashcourse.kickoff.tms.tournament.dto.TournamentJoinDTO;
+import com.crashcourse.kickoff.tms.tournament.dto.TournamentResponseDTO;
+import com.crashcourse.kickoff.tms.tournament.dto.TournamentUpdateDTO;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.stream.Collectors;
 
 /**
  * REST Controller for managing Tournaments.
@@ -30,7 +38,6 @@ import java.util.stream.Collectors;
 public class TournamentController {
 
     private final TournamentService tournamentService;
-    private final ClubService clubService;
     private final JwtUtil jwtUtil; // final for constructor injection
 
     /**
@@ -82,7 +89,7 @@ public class TournamentController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateTournament(
             @PathVariable Long id,
-            @Valid @RequestBody TournamentUpdateDTO TournamentUpdateDTO,
+            @Valid @RequestBody TournamentUpdateDTO tournamentUpdateDTO,
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token
             ) {
 
@@ -97,7 +104,7 @@ public class TournamentController {
         if (!isOwnerOfTournament) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to update this tournament");
         }
-        TournamentResponseDTO updatedTournament = tournamentService.updateTournament(id, TournamentUpdateDTO);
+        TournamentResponseDTO updatedTournament = tournamentService.updateTournament(id, tournamentUpdateDTO);
         return ResponseEntity.ok(updatedTournament);
     }
 
@@ -123,19 +130,16 @@ public class TournamentController {
     public ResponseEntity<?> joinTournamentAsClub(
             @Valid @RequestBody TournamentJoinDTO tournamentJoinDTO,
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
-        TournamentResponseDTO joinedTournament = tournamentService.joinTournamentAsClub(tournamentJoinDTO);
-
         if (token == null || !token.startsWith("Bearer ")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization token is missing or invalid" + token);
         }
-        token = token.substring(7);
-        Long userIdFromToken = jwtUtil.extractUserId(token);
-        
-        boolean isCaptain = clubService.isCaptain(tournamentJoinDTO.getClubId(), userIdFromToken);
 
-        if (!isCaptain) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only the captain can join tournaments");
-        }
+        /*
+            NOTE: i removed check on whether the user is the captain
+            this is because i have to remove clubservice instance var to remove club dependency
+            i think we can handle this in the front end, but im not sure, will note down
+        */
+        TournamentResponseDTO joinedTournament = tournamentService.joinTournamentAsClub(tournamentJoinDTO);
 
         return new ResponseEntity<>(joinedTournament, HttpStatus.CREATED);
     }
@@ -146,9 +150,9 @@ public class TournamentController {
      * @return ResponseEntity with the list of clubs for a given tournament.
      */
     @GetMapping("/{id}/clubs")
-    public ResponseEntity<List<Club>> getClubsInTournament(@PathVariable Long id) {
-        List<Club> clubs = tournamentService.getAllClubsInTournament(id);
-        return ResponseEntity.ok(clubs);
+    public ResponseEntity<List<Long>> getClubsInTournament(@PathVariable Long id) {
+        List<Long> clubIds = tournamentService.getAllClubsInTournament(id);
+        return ResponseEntity.ok(clubIds);
     }
 
     @DeleteMapping("/{tournamentId}/clubs/{clubId}")
@@ -157,6 +161,10 @@ public class TournamentController {
             @PathVariable Long clubId,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         
+        if (token == null || !token.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
         token = token.substring(7); // Remove "Bearer " from token
         Long userIdFromToken = jwtUtil.extractUserId(token);
 
@@ -169,6 +177,7 @@ public class TournamentController {
         tournamentService.removeClubFromTournament(tournamentId, clubId);
         return ResponseEntity.noContent().build();
     }
+    
     @GetMapping("/{clubId}/tournaments")
     public ResponseEntity<List<TournamentResponseDTO>> getTournamentsForClub(
             @PathVariable Long clubId,

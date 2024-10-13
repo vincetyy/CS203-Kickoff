@@ -1,11 +1,14 @@
 package com.crashcourse.kickoff.tms.tournament.service;
 
-import com.crashcourse.kickoff.tms.club.Club;
-import com.crashcourse.kickoff.tms.tournament.dto.*;
-import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
-import com.crashcourse.kickoff.tms.tournament.model.PlayerAvailability;
-
 import java.util.List;
+
+import com.crashcourse.kickoff.tms.tournament.dto.PlayerAvailabilityDTO;
+import com.crashcourse.kickoff.tms.tournament.dto.TournamentCreateDTO;
+import com.crashcourse.kickoff.tms.tournament.dto.TournamentJoinDTO;
+import com.crashcourse.kickoff.tms.tournament.dto.TournamentResponseDTO;
+import com.crashcourse.kickoff.tms.tournament.dto.TournamentUpdateDTO;
+import com.crashcourse.kickoff.tms.tournament.model.PlayerAvailability;
+import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
 
 public interface TournamentService {
 
@@ -21,7 +24,7 @@ public interface TournamentService {
 
     TournamentResponseDTO joinTournamentAsClub(TournamentJoinDTO tournamentJoinDTO);
 
-    List<Club> getAllClubsInTournament(Long id);
+    List<Long> getAllClubsInTournament(Long id);
 
     void removeClubFromTournament(Long tournamentId, Long clubId);
 

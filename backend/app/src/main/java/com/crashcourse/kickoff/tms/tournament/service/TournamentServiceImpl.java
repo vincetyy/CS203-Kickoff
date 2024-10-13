@@ -1,21 +1,30 @@
 package com.crashcourse.kickoff.tms.tournament.service;
 
-import com.crashcourse.kickoff.tms.club.*;
-import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
-import com.crashcourse.kickoff.tms.location.service.LocationService;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.crashcourse.kickoff.tms.location.model.Location;
 import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
-import com.crashcourse.kickoff.tms.tournament.dto.*;
-import com.crashcourse.kickoff.tms.tournament.exception.*;
-import com.crashcourse.kickoff.tms.tournament.model.*;
-import com.crashcourse.kickoff.tms.tournament.repository.*;
+import com.crashcourse.kickoff.tms.location.service.LocationService;
+import com.crashcourse.kickoff.tms.tournament.dto.PlayerAvailabilityDTO;
+import com.crashcourse.kickoff.tms.tournament.dto.TournamentCreateDTO;
+import com.crashcourse.kickoff.tms.tournament.dto.TournamentJoinDTO;
+import com.crashcourse.kickoff.tms.tournament.dto.TournamentResponseDTO;
+import com.crashcourse.kickoff.tms.tournament.dto.TournamentUpdateDTO;
+import com.crashcourse.kickoff.tms.tournament.exception.ClubAlreadyJoinedException;
+import com.crashcourse.kickoff.tms.tournament.exception.TournamentFullException;
+import com.crashcourse.kickoff.tms.tournament.model.PlayerAvailability;
+import com.crashcourse.kickoff.tms.tournament.model.Tournament;
+import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
+import com.crashcourse.kickoff.tms.tournament.repository.PlayerAvailabilityRepository;
+import com.crashcourse.kickoff.tms.tournament.repository.TournamentRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Implementation of TournamentService.
@@ -28,10 +37,7 @@ public class TournamentServiceImpl implements TournamentService {
     private final TournamentRepository tournamentRepository;
     private final LocationRepository locationRepository;
     private final LocationService locationService;
-    private final ClubRepository clubRepository;
     private final PlayerAvailabilityRepository playerAvailabilityRepository;
-
-    private final ClubService clubService;
 
     @Override
     public TournamentResponseDTO createTournament(TournamentCreateDTO dto, Long userIdFromToken) {
@@ -132,9 +138,8 @@ public class TournamentServiceImpl implements TournamentService {
                 tournament.getLocation().getName()
         );
 
-        List<TournamentResponseDTO.ClubDTO> clubDTOs = tournament.getJoinedClubs().stream()
-                .map(club -> new TournamentResponseDTO.ClubDTO(club.getId(), club.getName()))
-                .collect(Collectors.toList());
+        List<Long> clubIds = tournament.getJoinedClubIds().stream()
+            .collect(Collectors.toList());
 
         return new TournamentResponseDTO(
                 tournament.getId(),
@@ -149,7 +154,7 @@ public class TournamentServiceImpl implements TournamentService {
                 tournament.getPrizePool(),
                 tournament.getMinRank(),
                 tournament.getMaxRank(),
-                clubDTOs,
+                clubIds,
                 tournament.getHost()
         );
     }
@@ -167,38 +172,33 @@ public class TournamentServiceImpl implements TournamentService {
         Tournament tournament = tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + tournamentId));
 
-        Long clubId = dto.getClubId();
-        Club club = clubService.getClubById(clubId)
-                .orElseThrow(() -> new EntityNotFoundException("Club not found with id: " + clubId));
-        
+        Long clubId = dto.getClubId(); // do i need to handle if clubId is null? 
 
-        if (tournament.getJoinedClubs() != null && tournament.getJoinedClubs().contains(club)) {
+        if (tournament.getJoinedClubIds() != null && tournament.getJoinedClubIds().contains(clubId)) {
             throw new ClubAlreadyJoinedException("Club has already joined the tournament.");
         }
-        if (tournament.getJoinedClubs().size() >= tournament.getMaxTeams()) {
+
+        if (tournament.getJoinedClubIds().size() >= tournament.getMaxTeams()) {
             throw new TournamentFullException("Tournament is already full.");
         }
 
-        tournament.getJoinedClubs().add(club);
+        tournament.getJoinedClubIds().add(clubId);
 
         Tournament updatedTournament = tournamentRepository.save(tournament);
         return mapToResponseDTO(updatedTournament);
-    } 
+    }
 
     public void removeClubFromTournament(Long tournamentId, Long clubId) {
         Tournament tournament = tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new RuntimeException("Tournament not found"));
         
-        Club club = clubRepository.findById(clubId)
-                .orElseThrow(() -> new RuntimeException("Club not found"));
-
-        // Ensure the club is part of the tournament
-        if (!tournament.getJoinedClubs().contains(club)) {
+        // check clubId is part of the tournament
+        if (!tournament.getJoinedClubIds().contains(clubId)) {
             throw new RuntimeException("Club is not part of the tournament");
         }
 
         // Remove the club from the tournament
-        tournament.getJoinedClubs().remove(club);
+        tournament.getJoinedClubIds().remove(clubId);
         
         // Save the tournament after modification
         tournamentRepository.save(tournament);
@@ -210,10 +210,10 @@ public class TournamentServiceImpl implements TournamentService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<Club> getAllClubsInTournament(Long id) {
+    public List<Long> getAllClubsInTournament(Long id) {
         Tournament tournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + id));
-        return tournament.getJoinedClubs();
+        return tournament.getJoinedClubIds();
     }
 
     // check if the username in the claim is indeed the profile id in the request variable

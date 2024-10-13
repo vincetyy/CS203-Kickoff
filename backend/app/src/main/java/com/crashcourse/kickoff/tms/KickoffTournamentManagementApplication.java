@@ -1,25 +1,18 @@
 package com.crashcourse.kickoff.tms;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.crashcourse.kickoff.tms.club.Club;
-import com.crashcourse.kickoff.tms.club.ClubService;
 import com.crashcourse.kickoff.tms.location.model.Location;
-import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
 import com.crashcourse.kickoff.tms.location.service.LocationService;
-import com.crashcourse.kickoff.tms.security.SecurityConfig;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentCreateDTO;
 import com.crashcourse.kickoff.tms.tournament.model.KnockoutFormat;
-import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFormat;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
-
-
-import java.time.LocalDateTime;
-import java.util.*;
 
 @SpringBootApplication
 public class KickoffTournamentManagementApplication {
@@ -31,19 +24,6 @@ public class KickoffTournamentManagementApplication {
 	}
 
 	private static void initialiseMockData(ApplicationContext ctx) {
-		// Club
-		ClubService clubService = ctx.getBean(ClubService.class);
-		Club newClub = new Club(null, "My New Club", 500, 50, 1L, new ArrayList<Long>(), new ArrayList<Tournament>(), "Club DESCRIPTION", new ArrayList<Long>());
-		
-		try {
-			clubService.createClub(newClub, 1L);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("Gone case");
-		}
-		System.out.println("[Add club]: " + newClub.getName());
-
-
 		// Location
 		LocationService locationService = ctx.getBean(LocationService.class);
 		Location location1 = new Location(null, "MBS", null);
