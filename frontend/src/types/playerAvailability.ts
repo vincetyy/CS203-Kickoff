@@ -1,7 +1,7 @@
 export interface PlayerAvailabilityDTO {
     playerId: number;
     playerName: string;
-    isAvailable: boolean;
+    available: boolean;
   }
   
   export interface UpdatePlayerAvailabilityDTO {

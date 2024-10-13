@@ -9,7 +9,7 @@ interface ShowAvailabilityProps {
 
 export default function ShowAvailability({ availabilities, currentUserId }: ShowAvailabilityProps) {
   const totalPlayers = availabilities.length;
-  const availablePlayers = availabilities.filter((a) => a.isAvailable).length;
+  const availablePlayers = availabilities.filter((a) => a.available).length;
   const unavailablePlayers = totalPlayers - availablePlayers;
 
   return (
@@ -29,7 +29,7 @@ export default function ShowAvailability({ availabilities, currentUserId }: Show
             key={availability.playerId}
             id={availability.playerId}
             name={availability.playerName}
-            availability={availability.isAvailable}
+            availability={availability.available}
             isCurrentUser={availability.playerId === currentUserId}  // This prop tells if the player is the current user
           />
           ))}
