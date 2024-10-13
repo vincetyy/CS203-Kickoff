@@ -8,7 +8,7 @@ interface ShowAvailabilityProps {
   currentUserClubId?: number;
 }
 
-export default function ShowAvailability({ availabilities, currentUserId, currentUserClubId }: ShowAvailabilityProps) { // Destructure currentUserClubId here
+export default function ShowAvailability({ availabilities, currentUserId, currentUserClubId }: ShowAvailabilityProps) {
   const filteredAvailabilities = availabilities.filter(a => a.clubId === currentUserClubId);
   const totalPlayers = filteredAvailabilities.length;
   const availablePlayers = filteredAvailabilities.filter((a) => a.available).length;
@@ -29,8 +29,8 @@ export default function ShowAvailability({ availabilities, currentUserId, curren
           {filteredAvailabilities.map((availability) => (
             <PlayerProfileCard
               key={availability.playerId}
-              id={availability.playerId} 
-              availability={availability.available} 
+              id={availability.playerId}
+              availability={availability.available}
             />
           ))}
         </div>

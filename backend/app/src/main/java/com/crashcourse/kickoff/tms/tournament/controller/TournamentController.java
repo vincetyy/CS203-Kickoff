@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -172,8 +174,22 @@ public class TournamentController {
     }
 
     @GetMapping("/{tournamentId}/availability")
-    public List<PlayerAvailabilityDTO> getPlayerAvailabilityForTournament(@PathVariable Long tournamentId) {
-        return tournamentService.getPlayerAvailabilityForTournament(tournamentId);
+    public ResponseEntity<Map<String, Object>> getPlayerAvailabilityForTournament(
+            @PathVariable Long tournamentId,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+        token = token.substring(7);
+        Long userIdFromToken = jwtUtil.extractUserId(token);
+        
+        PlayerProfile currentPlayer = playerProfileRepository.findById(userIdFromToken)
+            .orElseThrow(() -> new EntityNotFoundException("Player not found"));
+        
+        List<PlayerAvailabilityDTO> availabilities = tournamentService.getPlayerAvailabilityForTournament(tournamentId);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("availabilities", availabilities);
+        response.put("currentUserClubId", currentPlayer.getClub().getId());
+        
+        return ResponseEntity.ok(response);
     }
 
 }
