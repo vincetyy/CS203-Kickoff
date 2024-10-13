@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.MediaType;
 
 import java.util.List;
 
@@ -158,18 +159,12 @@ public class TournamentController {
         return ResponseEntity.ok(tournaments);
     }
 
-    @PutMapping("/availability")
+    @PutMapping(value = "/availability", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updatePlayerAvailability(@RequestBody UpdatePlayerAvailabilityDTO dto) {
-        System.out.println("Received DTO: " + dto); 
-        try {
-            tournamentService.updatePlayerAvailability(dto);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+        System.out.println("Received DTO: " + dto);
+        tournamentService.updatePlayerAvailability(dto);
+        return ResponseEntity.ok().build();
     }
-
 
     @GetMapping("/{tournamentId}/availability")
     public ResponseEntity<List<PlayerAvailabilityDTO>> getPlayerAvailability(@PathVariable Long tournamentId) {

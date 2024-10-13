@@ -11,6 +11,8 @@ import { Tournament, TournamentUpdate, Club, Location, HostProfile } from '../ty
 import { useDispatch, useSelector } from 'react-redux';
 import { removeClubFromTournamentAsync, updateTournamentAsync } from '../store/tournamentSlice';
 import { PlayerAvailabilityDTO } from '../types/playerAvailability'; 
+import ShowAvailability from '../components/ShowAvailability';
+import AvailabilityButton from '../components/AvailabilityButton'; 
 import { fetchTournamentById, getPlayerAvailability, updatePlayerAvailability } from '../services/tournamentService';
 import { selectUserId } from '../store/userSlice';
 import { selectClubId } from '../store/clubSlice';
@@ -23,12 +25,12 @@ const TournamentPage: React.FC = () => {
 
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [clubToRemove, setClubToRemove] = useState<Club | null>(null);
-  const [availableCount, setAvailableCount] = useState(0); 
-  const [isAvailable, setIsAvailable] = useState<boolean | null>(null); 
 
   // State for Update Tournament Dialog
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [initialUpdateData, setInitialUpdateData] = useState<TournamentUpdate | null>(null);
+  const [availabilities, setAvailabilities] = useState<PlayerAvailabilityDTO[]>([]);
+  const [availableCount, setAvailableCount] = useState(0); 
   const [isAvailabilityDialogOpen, setIsAvailabilityDialogOpen] = useState(false);
 
   const { id } = useParams<{ id: string }>();
@@ -89,10 +91,8 @@ const TournamentPage: React.FC = () => {
         setSelectedTournament(tournament);
 
         const availabilities = await getPlayerAvailability(tournamentId);
-        const clubAvailabilities = availabilities.filter(
-          (availability: PlayerAvailabilityDTO) => availability.isAvailable
-        );
-        setAvailableCount(clubAvailabilities.length);
+        setAvailabilities(availabilities);
+        setAvailableCount(availabilities.filter(a => a.isAvailable).length);
         setStatus('succeeded');
       } catch (err) {
         console.error('Error fetching tournament data:', err);
@@ -118,23 +118,20 @@ const TournamentPage: React.FC = () => {
         isAvailable: availability  
       };
   
-      console.log('Updating availability: ', payload); 
-      await updatePlayerAvailability(payload);  
+      console.log('Updating availability: ', payload);
+      await updatePlayerAvailability(payload);
   
-      setIsAvailable(availability);
-  
-      const updatedAvailability = await getPlayerAvailability(tournamentId);
-      const clubAvailabilities = updatedAvailability.filter(
-        (availability: PlayerAvailabilityDTO) => availability.isAvailable
-      );
-      setAvailableCount(clubAvailabilities.length);
+      // Refetch or update availabilities after the change
+      const updatedAvailabilities = [...(await getPlayerAvailability(tournamentId))];
+      setAvailabilities(updatedAvailabilities);
+      setAvailableCount(updatedAvailabilities.filter(a => a.isAvailable).length); 
   
       toast.success(`You have marked yourself as ${availability ? 'available' : 'not available'}.`);
     } catch (err) {
       console.error('Error updating availability:', err);
       toast.error('Failed to update your availability.');
     }
-  };
+  };  
   
   
   const formatDate = (dateString: string) => {
@@ -246,6 +243,9 @@ const TournamentPage: React.FC = () => {
           </div>
         )}
       </div>
+        
+      {/* Show Availability */}
+      <ShowAvailability availabilities={availabilities} currentUserId={userId} />
 
       {/* Remove Confirmation Dialog */}
       <Dialog open={isRemoveDialogOpen} onOpenChange={setIsRemoveDialogOpen}>
@@ -281,33 +281,16 @@ const TournamentPage: React.FC = () => {
         onUpdate={handleUpdateTournament}
       />
 
+      {/* Availability Button Dialog */}
       <Dialog open={isAvailabilityDialogOpen} onOpenChange={setIsAvailabilityDialogOpen}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Indicate Availability</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <p>Are you available to participate in this tournament?</p>
-            <div className="flex space-x-3">
-              <Button
-                className="bg-green-500 hover:bg-green-600 w-full"
-                onClick={() => {
-                  handleAvailabilityUpdate(true);
-                  setIsAvailabilityDialogOpen(false);
-                }}
-              >
-                Available
-              </Button>
-              <Button
-                className="bg-red-500 hover:bg-red-600 w-full"
-                onClick={() => {
-                  handleAvailabilityUpdate(false);
-                  setIsAvailabilityDialogOpen(false);
-                }}
-              >
-                Not Available
-              </Button>
-            </div>
+          <div>
+          <AvailabilityButton
+            onAvailabilitySelect={(availability: boolean) => {
+              handleAvailabilityUpdate(availability);  
+              setIsAvailabilityDialogOpen(false);  
+            }}
+          />
           </div>
         </DialogContent>
       </Dialog>
