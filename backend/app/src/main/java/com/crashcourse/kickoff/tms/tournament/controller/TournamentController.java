@@ -174,22 +174,9 @@ public class TournamentController {
     }
 
     @GetMapping("/{tournamentId}/availability")
-    public ResponseEntity<Map<String, Object>> getPlayerAvailabilityForTournament(
-            @PathVariable Long tournamentId,
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
-        token = token.substring(7);
-        Long userIdFromToken = jwtUtil.extractUserId(token);
-        
-        PlayerProfile currentPlayer = playerProfileRepository.findById(userIdFromToken)
-            .orElseThrow(() -> new EntityNotFoundException("Player not found"));
-        
+    public ResponseEntity<List<PlayerAvailabilityDTO>> getPlayerAvailability(@PathVariable Long tournamentId) {
         List<PlayerAvailabilityDTO> availabilities = tournamentService.getPlayerAvailabilityForTournament(tournamentId);
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("availabilities", availabilities);
-        response.put("currentUserClubId", currentPlayer.getClub().getId());
-        
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(availabilities);
     }
 
 }
