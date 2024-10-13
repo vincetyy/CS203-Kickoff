@@ -251,19 +251,18 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public void updatePlayerAvailability(PlayerAvailabilityDTO dto) {
+    public PlayerAvailability updatePlayerAvailability(PlayerAvailabilityDTO dto) {
+        System.out.println(dto);
         Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
             .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + dto.getTournamentId()));
         
-        PlayerProfile player = playerProfileRepository.findById(dto.getPlayerId())
-            .orElseThrow(() -> new EntityNotFoundException("Player not found with id: " + dto.getPlayerId()));
 
         PlayerAvailability playerAvailability = playerAvailabilityRepository
             .findByTournamentIdAndPlayerId(dto.getTournamentId(), dto.getPlayerId())
             .orElse(new PlayerAvailability());
 
         playerAvailability.setTournament(tournament);
-        playerAvailability.setPlayer(player);
+        playerAvailability.setPlayerId(dto.getPlayerId());
         playerAvailability.setAvailable(dto.isAvailable());
 
         try {
@@ -271,6 +270,8 @@ public class TournamentServiceImpl implements TournamentService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to update player availability: " + e.getMessage(), e);
         }
+
+        return playerAvailability;
     }
 
     @Override
@@ -278,8 +279,8 @@ public class TournamentServiceImpl implements TournamentService {
         List<PlayerAvailability> availabilities = playerAvailabilityRepository.findByTournamentId(tournamentId);
         return availabilities.stream()
             .map(availability -> new PlayerAvailabilityDTO(
-                availability.getPlayer().getId(),
-                availability.getPlayer().getUser().getUsername(),  // Assuming you want to return the player's username
+                tournamentId,
+                availability.getPlayerId(),
                 availability.isAvailable()
             ))
             .collect(Collectors.toList());

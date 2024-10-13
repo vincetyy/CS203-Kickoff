@@ -46,6 +46,7 @@ export const getPlayerAvailability = async (tournamentId: number): Promise<Playe
 
 // Update a player's availability for a tournament
 export const updatePlayerAvailability = async (data: UpdatePlayerAvailabilityDTO): Promise<void> => {
+
   const response = await api.put(`/tournaments/availability`, data);
   return response.data;
 };

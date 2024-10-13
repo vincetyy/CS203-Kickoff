@@ -7,6 +7,6 @@ export interface PlayerAvailabilityDTO {
   export interface UpdatePlayerAvailabilityDTO {
     tournamentId: number;
     playerId: number;
-    isAvailable: boolean;
+    available: boolean;
   }
   

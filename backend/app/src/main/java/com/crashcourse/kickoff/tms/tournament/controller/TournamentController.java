@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * REST Controller for managing Tournaments.
@@ -158,27 +159,20 @@ public class TournamentController {
         return ResponseEntity.ok(tournaments);
     }
 
-    @PutMapping(value = "/availability")
-    public ResponseEntity<Void> updatePlayerAvailability(@RequestBody PlayerAvailabilityDTO dto) {
+    @PutMapping("/availability")
+    public ResponseEntity<?> updatePlayerAvailability(@RequestBody PlayerAvailabilityDTO dto) {
+
         Long tournamentId = dto.getTournamentId();
         Long playerId = dto.getPlayerId();
         boolean available = dto.isAvailable();
-
-        tournamentService.updatePlayerAvailability(tournamentId, playerId, available);
-
-        return ResponseEntity.ok().build();
+        PlayerAvailabilityDTO playerAvailabilityDTO = new PlayerAvailabilityDTO(tournamentId, playerId, available);
+        tournamentService.updatePlayerAvailability(playerAvailabilityDTO);
+        return ResponseEntity.ok(tournamentService.updatePlayerAvailability(playerAvailabilityDTO));
     }
 
-    @Override
-    public List<PlayerAvailabilityDTO> getPlayerAvailabilityForTournament(Long tournamentId) {
-        List<PlayerAvailability> availabilities = playerAvailabilityRepository.findByTournamentId(tournamentId);
-
-        return availabilities.stream()
-            .map(availability -> new PlayerAvailabilityDTO(
-                availability.getPlayerId(),    
-                availability.isAvailable()
-            ))
-            .collect(Collectors.toList());
+    @GetMapping("/{tournamentId}/availability")
+    public List<PlayerAvailabilityDTO> getPlayerAvailabilityForTournament(@PathVariable Long tournamentId) {
+        return tournamentService.getPlayerAvailabilityForTournament(tournamentId);
     }
 
 }

@@ -3,6 +3,7 @@ package com.crashcourse.kickoff.tms.tournament.service;
 import com.crashcourse.kickoff.tms.club.Club;
 import com.crashcourse.kickoff.tms.tournament.dto.*;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
+import com.crashcourse.kickoff.tms.tournament.model.PlayerAvailability;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ public interface TournamentService {
 
     List<TournamentResponseDTO> getTournamentsForClub(Long clubId, TournamentFilter filter);
 
-    void updatePlayerAvailability(Long tournamentId, Long playerId, boolean available);  
+    PlayerAvailability updatePlayerAvailability(PlayerAvailabilityDTO dto);  
 
     List<PlayerAvailabilityDTO> getPlayerAvailabilityForTournament(Long tournamentId);
 }

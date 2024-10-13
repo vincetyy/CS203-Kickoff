@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { act, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 import { AppDispatch } from '../store';
@@ -115,7 +115,7 @@ const TournamentPage: React.FC = () => {
       const payload = {
         tournamentId: tournamentId as number,
         playerId: userId as number,
-        isAvailable: availability  
+        available: availability  
       };
   
       console.log('Updating availability: ', payload);

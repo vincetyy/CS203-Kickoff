@@ -3,7 +3,6 @@ package com.crashcourse.kickoff.tms.player;
 import java.util.List;
 
 import com.crashcourse.kickoff.tms.user.model.User;
-import com.crashcourse.kickoff.tms.tournament.model.PlayerAvailability;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;

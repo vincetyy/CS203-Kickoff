@@ -2,6 +2,7 @@ package com.crashcourse.kickoff.tms.tournament.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Data
@@ -13,6 +14,7 @@ public class PlayerAvailability {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "tournament_id", nullable = false)
     private Tournament tournament;

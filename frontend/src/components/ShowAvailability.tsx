@@ -7,7 +7,7 @@ interface ShowAvailabilityProps {
   currentUserId: number;
 }
 
-export default function ShowAvailability({ availabilities, currentUserId }: ShowAvailabilityProps) {
+export default function ShowAvailability({ availabilities }: ShowAvailabilityProps) {
   const totalPlayers = availabilities.length;
   const availablePlayers = availabilities.filter((a) => a.available).length;
   const unavailablePlayers = totalPlayers - availablePlayers;
