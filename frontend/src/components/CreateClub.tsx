@@ -23,7 +23,7 @@ const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreate
 
   const fetchPlayersForClub = async (clubId: number) => {
     try {
-      const response = await axios.get(`http://localhost:8080/clubs/${clubId}/players`);
+      const response = await axios.get(`http://localhost:8082/clubs/${clubId}/players`);
       return response.data;  
     } catch (err: any) {
       console.error('Error fetching players:', err);
@@ -49,7 +49,7 @@ const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreate
     try {
       setLoading(true);
 
-      const createClubResponse = await axios.post('http://localhost:8080/clubs/create-club', clubData, {
+      const createClubResponse = await axios.post('http://localhost:8082/clubs/create-club', clubData, {
         headers: {
           'Content-Type': 'application/json',
         },

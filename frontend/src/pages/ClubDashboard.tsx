@@ -60,7 +60,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ id }) => {
   useEffect(() => {
     const fetchClub = async () => {
       try {
-        const clubResponse = await axios.get(`http://localhost:8080/clubs/${id}`);
+        const clubResponse = await axios.get(`http://localhost:8082/clubs/${id}`);
         setClub(clubResponse.data);
         
         const captainResponse = await fetchPlayerProfileById(clubResponse.data.captainId);
