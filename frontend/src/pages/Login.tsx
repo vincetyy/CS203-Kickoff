@@ -48,8 +48,7 @@ const Login = () => {
             localStorage.setItem('username', username); 
             console.log('Login successful');
 
-            dispatch(setUser({ userId: 1, username: 'JohnDoe' }));
-
+            dispatch(setUser({ userId: response.data.userId, username: username }));
             // Fetch the user's club using fetchUserClubAsync thunk
             dispatch(fetchUserClubAsync());
 
