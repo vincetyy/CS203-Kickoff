@@ -17,14 +17,14 @@ import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 @Repository
 public interface TournamentRepository extends JpaRepository<Tournament, Long> {
     // Find upcoming tournaments for a specific club
-    @Query("SELECT t FROM Tournament t JOIN t.joinedClubIds c WHERE c = :clubId AND t.startDateTime > CURRENT_TIMESTAMP")
+    @Query("SELECT t FROM Tournament t WHERE :clubId MEMBER OF t.joinedClubIds AND t.startDateTime > CURRENT_TIMESTAMP")
     List<Tournament> findUpcomingTournamentsForClub(@Param("clubId") Long clubId);
 
     // Find current tournaments for a specific club
-    @Query("SELECT t FROM Tournament t JOIN t.joinedClubIds c WHERE c = :clubId AND t.startDateTime <= CURRENT_TIMESTAMP AND t.endDateTime >= CURRENT_TIMESTAMP")
+    @Query("SELECT t FROM Tournament t WHERE :clubId MEMBER OF t.joinedClubIds AND t.startDateTime <= CURRENT_TIMESTAMP AND t.endDateTime >= CURRENT_TIMESTAMP")
     List<Tournament> findCurrentTournamentsForClub(@Param("clubId") Long clubId);
 
     // Find past tournaments for a specific club
-    @Query("SELECT t FROM Tournament t JOIN t.joinedClubIds c WHERE c = :clubId AND t.endDateTime < CURRENT_TIMESTAMP")
+    @Query("SELECT t FROM Tournament t WHERE :clubId MEMBER OF t.joinedClubIds AND t.endDateTime < CURRENT_TIMESTAMP")
     List<Tournament> findPastTournamentsForClub(@Param("clubId") Long clubId);
 }

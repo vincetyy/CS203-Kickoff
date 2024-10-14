@@ -1,6 +1,6 @@
 ### User
 ### Check users
-GET http://localhost:8080/users
+GET http://localhost:8082/users
 Authorization: Basic admin password
 
 ### Creates new "normal" user (not admin)

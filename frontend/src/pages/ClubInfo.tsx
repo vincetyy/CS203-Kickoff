@@ -37,6 +37,7 @@ const ClubInfo: React.FC = () => {
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedPosition, setSelectedPosition] = useState<PlayerPosition | null>(null);
+  
 
   useEffect(() => {
     const fetchClub = async () => {
@@ -71,8 +72,8 @@ const ClubInfo: React.FC = () => {
     }
 
     try {
-      const userId = 1; // Replace with actual player ID
-      await axios.post(`http://localhost:8080/clubs/${id}/apply`, {
+      const userId = 2; // Replace with actual player ID
+      await axios.post(`http://localhost:8082/clubs/${id}/apply`, {
         playerId: userId,
         desiredPosition: selectedPosition,
       });

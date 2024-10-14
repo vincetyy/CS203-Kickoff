@@ -7,6 +7,9 @@ import java.util.List;
 import com.crashcourse.kickoff.tms.location.model.Location;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -48,6 +51,9 @@ public class Tournament {
 
     private Long host;
 
+    @ElementCollection
+    @CollectionTable(name = "tournament_club_ids", joinColumns = @JoinColumn(name = "tournament_id"))
+    @Column(name = "club_id")
     private List<Long> joinedClubIds = new ArrayList<>();
 
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL)  

@@ -19,7 +19,7 @@ import io.jsonwebtoken.security.Keys;
 public class JwtUtil {
     private final Dotenv dotenv = Dotenv.load();
     private final String JWT_SECRET_KEY = dotenv.get("JWT_SECRET_KEY"); 
-    private final long jwtExpirationInMillis = 300000; 
+    private final long jwtExpirationInMillis = 3600000; // 1 hour in milliseconds
 
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(JWT_SECRET_KEY); 
