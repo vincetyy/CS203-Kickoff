@@ -33,6 +33,8 @@ export default function TournamentsPage() {
   }, [dispatch])
 
   useEffect(() => {
+    console.log(tournaments);
+    
     let results = tournaments.filter(tournament =>
       tournament.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -88,7 +90,7 @@ export default function TournamentsPage() {
 
       // Update the specific tournament in the state
       const updatedTournaments = tournaments.map(t => 
-        t.id === selectedTournament.id ? { ...t, joinedClubs: [...(t.joinedClubs || []), { id: clubId }] } : t
+        t.id === selectedTournament.id ? { ...t, joinedClubsIds: [...(t.joinedClubsIds || []), { id: clubId }] } : t
       );
       dispatch({ type: 'tournaments/updateTournaments', payload: updatedTournaments });
 
@@ -168,7 +170,7 @@ export default function TournamentsPage() {
             startDate={new Date(tournament.startDateTime).toLocaleDateString()}
             endDate={new Date(tournament.endDateTime).toLocaleDateString()}
             format={tournament.tournamentFormat}
-            teams={`${tournament.joinedClubs?.length || 0}/${tournament.maxTeams}`}  // Ensure joinedClubs is defined
+            teams={`${tournament.joinedClubsIds?.length || 0}/${tournament.maxTeams}`}  // Ensure joinedClubs is defined
             image={`https://picsum.photos/seed/${tournament.id}/400/300`}
           >
             { userClub &&

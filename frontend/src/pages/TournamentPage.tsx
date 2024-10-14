@@ -14,14 +14,20 @@ import { PlayerAvailabilityDTO } from '../types/playerAvailability';
 import ShowAvailability from '../components/ShowAvailability';
 import AvailabilityButton from '../components/AvailabilityButton'; 
 import { fetchTournamentById, getPlayerAvailability, updatePlayerAvailability } from '../services/tournamentService';
-import { getClubByPlayerId } from '../services/clubService' 
-import { selectUserId } from '../store/userSlice'
+import { getClubByPlayerId, getClubProfileById } from '../services/clubService' 
+import { fetchUserClubAsync, selectUserId,  } from '../store/userSlice'
 
 import UpdateTournament from '../components/UpdateTournament';
+import { ClubProfile } from '../types/club';
+import { selectClubId } from '../store/clubSlice';
 
 const TournamentPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(fetchUserClubAsync());
+  }, [dispatch])
 
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [clubToRemove, setClubToRemove] = useState<Club | null>(null);
@@ -32,12 +38,12 @@ const TournamentPage: React.FC = () => {
   const [availabilities, setAvailabilities] = useState<PlayerAvailabilityDTO[]>([]);
   const [availableCount, setAvailableCount] = useState(0); 
   const [isAvailabilityDialogOpen, setIsAvailabilityDialogOpen] = useState(false);
+  const [joinedClubsProfiles, setJoinedClubsProfiles] = useState<ClubProfile[] | null>(null);
 
   const { id } = useParams<{ id: string }>();
   const tournamentId = id ? parseInt(id, 10) : null;
   const userId = useSelector(selectUserId);
-  const [clubId, setClubId] = useState<number | null>(null) 
-  console.log('clubId:', clubId);
+  const clubId = useSelector(selectClubId); 
 
 
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
@@ -92,6 +98,16 @@ const TournamentPage: React.FC = () => {
         const tournament = await fetchTournamentById(tournamentId);
         setSelectedTournament(tournament);
 
+        if (tournament.joinedClubsIds) {
+          const clubProfilesPromises = tournament.joinedClubsIds.map((id) => getClubProfileById(id));
+  
+          // Wait for all promises to resolve
+          const clubProfiles = await Promise.all(clubProfilesPromises);
+          
+          setJoinedClubsProfiles(clubProfiles);
+        }
+        
+
         const availabilities = await getPlayerAvailability(tournamentId);
         setAvailabilities(availabilities);
         setAvailableCount(availabilities.filter(a => a.available).length);
@@ -107,24 +123,6 @@ const TournamentPage: React.FC = () => {
     fetchData();
   }, [tournamentId]);
 
-  useEffect(() => {
-    const fetchClubId = async () => {
-      if (userId) {
-        try {
-          const club = await getClubByPlayerId(userId);
-          if (club && club.id) {
-            setClubId(club.id);  // Store the fetched clubId
-          } else {
-            toast.error("You are not associated with any club.");
-          }
-        } catch (error) {
-          toast.error("Failed to fetch club information.");
-        }
-      }
-    };
-
-    fetchClubId();
-  }, [userId]);
 
   const handleAvailabilityUpdate = async (availability: boolean) => {
     if (tournamentId === null || isNaN(tournamentId)) {
@@ -241,11 +239,11 @@ const TournamentPage: React.FC = () => {
       {/* Joined Clubs */}
       <div className="bg-gray-800 rounded-lg p-6 mb-6">
         <h3 className="text-2xl font-semibold mb-4">Joined Clubs</h3>
-        {selectedTournament.joinedClubs && selectedTournament.joinedClubs.length === 0 ? (
+        {joinedClubsProfiles && joinedClubsProfiles.length === 0 ? (
           <p>No clubs have joined this tournament yet.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {selectedTournament.joinedClubs?.map((club: Club) => (
+            {joinedClubsProfiles?.map((club: ClubProfile) => (
               <div key={club.id} className="bg-gray-700 rounded-lg p-4 flex items-center justify-between space-x-4">
                 <div className="flex items-center space-x-4">
                   <img 
@@ -272,11 +270,15 @@ const TournamentPage: React.FC = () => {
       </div>
         
       {/* Show Availability */}
-      <ShowAvailability 
-        availabilities={availabilities} 
-        currentUserId={userId} 
-        currentUserClubId={clubId !== null ? clubId : undefined} 
-      />
+      {
+        clubId &&
+        <ShowAvailability 
+          availabilities={availabilities} 
+          currentUserId={userId} 
+          currentUserClubId={clubId !== null ? clubId : undefined} 
+        />
+      }
+      
 
       {/* Remove Confirmation Dialog */}
       <Dialog open={isRemoveDialogOpen} onOpenChange={setIsRemoveDialogOpen}>
@@ -337,13 +339,15 @@ const TournamentPage: React.FC = () => {
             Update Tournament
           </Button>
         )}
-
-        <Button
-          onClick={() => setIsAvailabilityDialogOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          Indicate Availability
-        </Button>
+        {
+          clubId &&
+          <Button
+            onClick={() => setIsAvailabilityDialogOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            Indicate Availability
+          </Button>
+        }
 
         <Button onClick={handleBackClick}>Back to  Tournaments</Button>
       </div>

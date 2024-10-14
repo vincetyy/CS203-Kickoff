@@ -21,7 +21,7 @@ const ClubInfoModal: React.FC<ClubInfoModalProps> = ({ clubId }) => {
   useEffect(() => {
     const fetchClub = async () => {
       try {
-        const clubResponse = await axios.get(`http://localhost:8080/clubs/${clubId}`);
+        const clubResponse = await axios.get(`http://localhost:8082/clubs/${clubId}`);
         setClub(clubResponse.data);
 
         const captainResponse = await fetchPlayerProfileById(clubResponse.data.captainId);

@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.security.core.GrantedAuthority;
 
 import com.crashcourse.kickoff.tms.user.model.User;
 
@@ -26,7 +26,7 @@ import io.jsonwebtoken.security.Keys;
 public class JwtUtil {
     private final Dotenv dotenv = Dotenv.load(); // Load the .env file
     private final String JWT_SECRET_KEY = dotenv.get("JWT_SECRET_KEY"); // Retrieve the secret key
-    private final long jwtExpirationInMillis = 300000; // 5 mins in milliseconds
+    private final long jwtExpirationInMillis = 3600000; // 1 hour in milliseconds
 
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(JWT_SECRET_KEY); // Decode the Base64-encoded secret key

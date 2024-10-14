@@ -25,7 +25,7 @@ export interface Tournament {
   knockoutFormat: string;
   minRank: number;
   maxRank: number;
-  joinedClubs?: Club[];
+  joinedClubsIds?: number[];
   host?: HostProfile;  
 }
 
@@ -37,6 +37,6 @@ export interface TournamentUpdate {
   prizePool?: number[];
   minRank?: number;
   maxRank?: number;
-  joinedClubs?: Club[];
+  joinedClubsIds?: number[];
   host?: HostProfile;
 }

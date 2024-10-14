@@ -7,16 +7,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.crashcourse.kickoff.tms.host.HostProfile;
 import com.crashcourse.kickoff.tms.host.HostProfileService;
-import com.crashcourse.kickoff.tms.player.PlayerProfile;
 import com.crashcourse.kickoff.tms.player.service.PlayerProfileService;
 import com.crashcourse.kickoff.tms.security.SecurityConfig;
-import com.crashcourse.kickoff.tms.user.UserRepository;
+import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
 import com.crashcourse.kickoff.tms.user.model.User;
 import com.crashcourse.kickoff.tms.user.service.UserService;
-import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
-
-import java.time.LocalDateTime;
-import java.util.*;
 
 @SpringBootApplication
 public class KickoffTournamentManagementApplication {

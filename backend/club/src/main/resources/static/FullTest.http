@@ -1,0 +1,133 @@
+### Login and get token
+POST http://localhost:8081/users/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "password"
+}
+
+### Login and get token for dummyUser
+POST http://localhost:8081/users/login
+Content-Type: application/json
+
+{
+  "username": "dummyUser",
+  "password": "password"
+}
+
+
+### User
+### Check users
+GET http://localhost:8081/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1BMQVlFUiIsIlJPTEVfQURNSU4iLCJST0xFX0hPU1QiXSwidXNlcklkIjoxLCJzdWIiOiJhZG1pbiIsImlhdCI6MTcyODgzMjUxNywiZXhwIjoxNzI4ODMyODE3fQ.oINySbnyJseBRyx9LykC9XFaubR9JGPuh0VCsnlZX_E
+
+### Creates new "normal" user (not admin)
+POST http://localhost:8081/users
+Content-Type: application/json
+
+{
+    "username" : "new_user@gmail.com",
+    "password" : "validpassword"
+}
+### Creates 2nd new "normal" user (not admin)
+POST http://localhost:8081/users
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+  "username": "player",
+  "password": "password123"
+}
+
+### PlayerProfile
+### Assign a PlayerProfile to the admin
+POST http://localhost:8081/users/1/playerProfile
+Authorization: Basic admin password
+Content-Type: application/json
+
+{
+    "preferredPosition": "POSITION_FORWARD",
+    "profileDescription": "I love football!"
+}
+
+### Assign a PlayerProfile to the normal user
+POST http://localhost:8081/users/2/playerProfile
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1BMQVlFUiJdLCJ1c2VySWQiOjIsInN1YiI6ImR1bW15VXNlciIsImlhdCI6MTcyODgzMjQ4MCwiZXhwIjoxNzI4ODMyNzgwfQ.r5o463zNxyqvJIdyqzTBolaFV9rkuwYa9bJ1cUxmUJY
+Content-Type: application/json
+
+{
+    "preferredPosition": "POSITION_DEFENDER",
+    "profileDescription": "I love football too!"
+}
+
+### Assign a PlayerProfile to the 2nd normal user
+POST http://localhost:8081/users/3/playerProfile
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+    "preferredPosition": "POSITION_DEFENDER",
+    "profileDescription": "I love playing as a defender!"
+}
+
+### Club
+### Check all clubs
+GET http://localhost:8082/clubs
+Authorization: Basic admin:password
+
+### Create a new club under admin
+POST http://localhost:8082/clubs
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1BMQVlFUiJdLCJ1c2VySWQiOjIsInN1YiI6ImR1bW15VXNlciIsImlhdCI6MTcyODgzMjQ4MCwiZXhwIjoxNzI4ODMyNzgwfQ.r5o463zNxyqvJIdyqzTBolaFV9rkuwYa9bJ1cUxmUJY
+Content-Type: application/json
+
+{
+  "club": {
+    "name": "My New Club",
+    "elo": 1000,
+    "ratingDeviation": 50
+  },
+  "creatorId": 1  
+}
+
+### Create a new club under normal user
+POST http://localhost:8082/clubs
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1BMQVlFUiJdLCJ1c2VySWQiOjIsInN1YiI6ImR1bW15VXNlciIsImlhdCI6MTcyODgzMjQ4MCwiZXhwIjoxNzI4ODMyNzgwfQ.r5o463zNxyqvJIdyqzTBolaFV9rkuwYa9bJ1cUxmUJY
+Content-Type: application/json
+
+{
+  "club": {
+    "name": "My New Club 2",
+    "elo": 500,
+    "ratingDeviation": 25,
+    "clubDescription": "This is a new club"
+  },
+  "creatorId": 2
+}
+
+### Invite a normal user 2 to club 1
+POST http://localhost:8082/clubs/1/invite
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1BMQVlFUiJdLCJ1c2VySWQiOjIsInN1YiI6ImR1bW15VXNlciIsImlhdCI6MTcyODgzMjQ4MCwiZXhwIjoxNzI4ODMyNzgwfQ.r5o463zNxyqvJIdyqzTBolaFV9rkuwYa9bJ1cUxmUJY
+Content-Type: application/json
+
+{
+  "playerId": 3,
+  "captainId": 1
+}
+
+### Accept the invitation for normal player to join club 1
+POST http://localhost:8082/players/3/acceptInvitation
+Authorization: Basic admin:password
+Content-Type: application/json
+
+{
+    "clubId": 1  
+}
+
+### Get players from clubID
+GET http://localhost:8082/clubs/1/players
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1BMQVlFUiJdLCJ1c2VySWQiOjIsInN1YiI6ImR1bW15VXNlciIsImlhdCI6MTcyODgzMjQ4MCwiZXhwIjoxNzI4ODMyNzgwfQ.r5o463zNxyqvJIdyqzTBolaFV9rkuwYa9bJ1cUxmUJY
+
+### check specific club info page
+GET http://localhost:8082/clubs/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1BMQVlFUiJdLCJ1c2VySWQiOjIsInN1YiI6ImR1bW15VXNlciIsImlhdCI6MTcyODgzMjQ4MCwiZXhwIjoxNzI4ODMyNzgwfQ.r5o463zNxyqvJIdyqzTBolaFV9rkuwYa9bJ1cUxmUJY
