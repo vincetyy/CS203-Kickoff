@@ -3,7 +3,7 @@ import eyePassword from '@/assets/eyePassword.svg';
 import eyePasswordOff from '@/assets/eyePasswordOff.svg';
 
 import { useDispatch } from 'react-redux';
-import { setUserId } from '../store/userSlice';  // Import the action
+import { setUser } from '../store/userSlice';  // Import the action
 
 import {
     Input,
@@ -48,7 +48,7 @@ const Login = () => {
             localStorage.setItem('username', username); 
             console.log('Login successful');
 
-            dispatch(setUserId(response.data.userId));
+            dispatch(setUser({ userId: 1, username: 'JohnDoe' }));
 
             // Fetch the user's club using fetchUserClubAsync thunk
             dispatch(fetchUserClubAsync());
