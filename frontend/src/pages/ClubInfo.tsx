@@ -5,6 +5,9 @@ import { toast } from 'react-hot-toast';
 import { Button } from '../components/ui/button';
 import { ClubProfile } from '../types/club';
 import { PlayerProfile } from '../types/profile';
+import { selectUserId } from '../store/userSlice';
+import { useSelector } from 'react-redux';
+
 import {
   Dialog,
   DialogContent,
@@ -37,7 +40,7 @@ const ClubInfo: React.FC = () => {
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedPosition, setSelectedPosition] = useState<PlayerPosition | null>(null);
-  
+  const userId = useSelector(selectUserId);
 
   useEffect(() => {
     const fetchClub = async () => {
@@ -71,8 +74,12 @@ const ClubInfo: React.FC = () => {
       return;
     }
 
+    if (!userId) {
+      toast.error('You need to log in to apply.');
+      return;
+    }
+
     try {
-      const userId = 2; // Replace with actual player ID
       await axios.post(`http://localhost:8082/clubs/${id}/apply`, {
         playerId: userId,
         desiredPosition: selectedPosition,
