@@ -12,13 +12,12 @@ import { selectUserClub } from '../store/userSlice';
 import axios from 'axios';
 
 export default function Header() {
-  const [newApplications, setNewApplications] = useState(false);  // State to track if there are new applications
+  const [newApplications, setNewApplications] = useState(false); 
   const username = useSelector(selectUsername);
   const navigate = useNavigate();
   const userClub: Club | null = useSelector(selectUserClub);
   const clubId = userClub?.id;
 
-  // Polling to check for new applications every 5 seconds
   useEffect(() => {
     const checkForNewApplications = async () => {
       if (!clubId) return;
@@ -32,7 +31,7 @@ export default function Header() {
           const hasPending = playerIds.length > 0;  // If there are any pending applications, set the flag
           setNewApplications(hasPending);
         } else {
-          setNewApplications(false);  // No pending applications
+          setNewApplications(false);  
         }
       } catch (error) {
         console.error('Error fetching applications:', error);
@@ -42,7 +41,6 @@ export default function Header() {
 
     const intervalId = setInterval(checkForNewApplications, 2000);  // Poll every 5 seconds
 
-    // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
   }, [clubId]);
 
@@ -70,7 +68,7 @@ export default function Header() {
           className="relative"
           onClick={handleBellClick}
         >
-          <Bell className="h-6 w-6 text-blue-500" /> {/* Make the bell icon blue */}
+          <Bell className="h-6 w-6 text-blue-500" /> 
           {newApplications && (
             <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white" />
           )}

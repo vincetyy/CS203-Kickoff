@@ -83,11 +83,11 @@ export default function ApplicationsPage() {
     try {
       const updateResponse = await axios.post(
         `http://localhost:8082/clubs/${clubId}/applications/${playerId}`,
-        { applicationStatus: status },  // Pass the status in the request body
+        { applicationStatus: status },  
         {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,  // Add token if needed
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,  
         },
       });
 
