@@ -14,7 +14,7 @@ interface Application {
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
 }
 
-export default function ApplicationsPage({ setNewApplications }: { setNewApplications: (hasPending: boolean) => void }) {
+export default function ApplicationsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -52,20 +52,16 @@ export default function ApplicationsPage({ setNewApplications }: { setNewApplica
       if (!clubId) return;
       try {
         const baseUrl = 'http://localhost:8082';
-        const response = await fetch(`${baseUrl}/clubs/${clubId}/applications`);
+        const response = await axios.get(`${baseUrl}/clubs/${clubId}/applications`);
 
-        if (response.ok) {
-          const playerIds: number[] = await response.json();
+        if (response.status === 200) {
+          const playerIds: number[] = response.data;
           const newApplications = playerIds.map(playerId => ({
             playerId,
             status: 'PENDING' as const
           }));
 
           setApplications(newApplications);
-
-          // Check if there are any pending applications
-          const hasPending = newApplications.some(app => app.status === 'PENDING');
-          setNewApplications(hasPending);  // Pass the pending applications state to Layout
         } else {
           throw new Error('Failed to fetch applications');
         }
@@ -78,12 +74,12 @@ export default function ApplicationsPage({ setNewApplications }: { setNewApplica
     if (clubId) {
       fetchApplications();
     }
-  }, [clubId, setNewApplications]);
+  }, [clubId]);
 
   // Handle accept/reject application status
   const handleApplicationUpdate = async (playerId: number, status: 'ACCEPTED' | 'REJECTED') => {
     if (!clubId) return;
-  
+
     try {
       const updateResponse = await axios.post(
         `http://localhost:8082/clubs/${clubId}/applications/${playerId}`,
@@ -92,13 +88,12 @@ export default function ApplicationsPage({ setNewApplications }: { setNewApplica
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('token')}`,  // Add token if needed
-          },
-        }
-      );
-  
+        },
+      });
+
       if (updateResponse.status === 200) {
         toast.success(`Application ${status.toLowerCase()} successfully!`);
-        
+
         // Update the applications state to reflect the new status
         setApplications(prevApplications =>
           prevApplications.map(app =>
