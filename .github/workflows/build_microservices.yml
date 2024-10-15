@@ -36,13 +36,13 @@ jobs:
     # Step 5: Build the Docker image for tournament
     - name: Build Docker image for tournament
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/kickoff-tournament:latest ./backend/tournament
-        docker tag ${{ secrets.DOCKER_USERNAME }}/kickoff-tournament:latest ${{ secrets.DOCKER_USERNAME }}/kickoff-tournament:${{ github.sha }}
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/kickoff-tournaments:latest ./backend/tournament
+        docker tag ${{ secrets.DOCKER_USERNAME }}/kickoff-tournaments:latest ${{ secrets.DOCKER_USERNAME }}/kickoff-tournaments:${{ github.sha }}
 
     - name: Push Docker image for tournament
       run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/kickoff-tournament:latest
-        docker push ${{ secrets.DOCKER_USERNAME }}/kickoff-tournament:${{ github.sha }}
+        docker push ${{ secrets.DOCKER_USERNAME }}/kickoff-tournaments:latest
+        docker push ${{ secrets.DOCKER_USERNAME }}/kickoff-tournaments:${{ github.sha }}
 
     # Step 6: Build the Docker image for clubs
     - name: Build Docker image for clubs
