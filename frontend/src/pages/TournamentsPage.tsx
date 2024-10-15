@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchTournamentsAsync, joinTournamentAsync } from '../store/tournamentSlice'
+import { fetchTournamentsAsync, joinTournamentAsync, removeClubFromTournamentAsync } from '../store/tournamentSlice'
 import { AppDispatch, RootState } from '../store'
 import { Search } from 'lucide-react'
 import { Input } from "../components/ui/input"
@@ -124,7 +124,7 @@ export default function TournamentsPage() {
 
       // Update the specific tournament in the state
       const updatedTournaments = tournaments.map(t => 
-        t.id === selectedTournament.id ? { ...t, joinedClubsIds: [...(t.joinedClubsIds || []), { id: userClub.id }] } : t
+        t.id === selectedTournament.id ? { ...t, joinedClubsIds: [...(t.joinedClubsIds || []), userClub.id ] } : t
       );
       dispatch({ type: 'tournaments/updateTournaments', payload: updatedTournaments });
 
@@ -138,45 +138,43 @@ export default function TournamentsPage() {
   };
 
   const handleConfirmLeave = async () => {
-    // if (!selectedTournament) return
 
-    // if (!userClub) {
-    //   toast.error("User club information is missing.", {
-    //     duration: 4000,
-    //     position: 'top-center',
-    //   });
-    //   return;
-    // }
+    
+    if (!selectedTournament || !userClub) return
+    try {
+      await dispatch(removeClubFromTournamentAsync({ 
+        tournamentId: selectedTournament.id, 
+        clubId: userClub.id 
+      })).unwrap();
 
-    // try {
-    //   const result = await dispatch(joinTournamentAsync({ 
-    //     clubId: userClub.id, // Hardcoded club ID
-    //     tournamentId: selectedTournament.id 
-    //   })).unwrap()
-      
-    //   // Close the dialog first
-    //   setIsDialogOpen(false)
-    //   setSelectedTournament(null)
+      // Close the dialog first
+      setIsLeaveDialogOpen(false)
+      setSelectedTournament(null)
 
-    //   // Show the success toast
-    //   toast.success(`Successfully joined ${selectedTournament.name}`, {
-    //     duration: 3000,
-    //     position: 'top-center',
-    //   })
+      // Show the success toast
+      toast.success(`Successfully left ${selectedTournament.name}`, {
+        duration: 3000,
+        position: 'top-center',
+      })
 
-    //   // Update the specific tournament in the state
-    //   const updatedTournaments = tournaments.map(t => 
-    //     t.id === selectedTournament.id ? { ...t, joinedClubsIds: [...(t.joinedClubsIds || []), { id: userClub.id }] } : t
-    //   );
-    //   dispatch({ type: 'tournaments/updateTournaments', payload: updatedTournaments });
+      // Update the specific tournament in the state
+      const updatedTournaments = tournaments.map(t => 
+        t.id === selectedTournament.id 
+          ? { 
+              ...t, 
+              joinedClubsIds: (t.joinedClubsIds || []).filter(club => club !== userClub.id) 
+            }
+          : t
+      );
+      dispatch({ type: 'tournaments/updateTournaments', payload: updatedTournaments });
 
-    // } catch (err: any) {
-    //   console.error('Error joining tournament:', err)
-    //   toast.error(`${err.message}`, {
-    //     duration: 4000,
-    //     position: 'top-center',
-    //   })
-    // }
+    } catch (err: any) {
+      console.error('Error leaving tournament:', err)
+      toast.error(`${err.message}`, {
+        duration: 4000,
+        position: 'top-center',
+      })
+    }
   };
 
   if (status === 'loading') return <div>Loading...</div>

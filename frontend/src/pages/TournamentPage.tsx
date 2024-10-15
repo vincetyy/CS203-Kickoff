@@ -21,6 +21,8 @@ import UpdateTournament from '../components/UpdateTournament';
 import { ClubProfile } from '../types/club';
 import { selectClubId } from '../store/clubSlice';
 
+
+
 const TournamentPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
@@ -43,7 +45,6 @@ const TournamentPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const tournamentId = id ? parseInt(id, 10) : null;
   const userId = useSelector(selectUserId);
-  const clubId = useSelector(selectClubId); 
   const userClub: Club | null = useSelector(selectUserClub);
 
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
@@ -51,6 +52,12 @@ const TournamentPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null); 
 
   const isHost = selectedTournament ? selectedTournament.host === userId : false;
+
+  let isCaptain = false;
+  
+  if (userClub) {
+    isCaptain = userClub?.captainId === userId;
+  }
 
   const tournamentFormatMap: { [key: string]: string } = {
     FIVE_SIDE: 'Five-a-side',
@@ -246,28 +253,31 @@ const TournamentPage: React.FC = () => {
           <p>No clubs have joined this tournament yet.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {joinedClubsProfiles?.map((club: ClubProfile) => (
-              <div key={club.id} className="bg-gray-700 rounded-lg p-4 flex items-center justify-between space-x-4">
-                <div className="flex items-center space-x-4">
-                  <img 
-                    src={`https://picsum.photos/seed/${club.id}/100/100`} 
-                    alt={club.name} 
-                    className="w-16 h-16 rounded-full object-cover" 
-                  />
-                  <div>
-                    <h4 className="text-lg font-bold">{club.name}</h4>
+            {joinedClubsProfiles?.map((club: ClubProfile) => {
+              const isUserClub = club.id === userClub?.id;
+              return (
+                <div key={club.id} className="bg-gray-700 rounded-lg p-4 flex items-center justify-between space-x-4">
+                  <div className="flex items-center space-x-4">
+                    <img 
+                      src={`https://picsum.photos/seed/${club.id}/100/100`} 
+                      alt={club.name} 
+                      className="w-16 h-16 rounded-full object-cover" 
+                    />
+                    <div>
+                      <h4 className="text-lg font-bold">{club.name}</h4>
+                    </div>
                   </div>
+                  {(isHost || (isCaptain && isUserClub)) && (
+                    <button 
+                      onClick={() => handleOpenRemoveDialog(club)} 
+                      className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                    >
+                      {isUserClub ? 'Leave' : 'Remove'}
+                    </button>
+                  )}
                 </div>
-                {isHost && (
-                  <button 
-                    onClick={() => handleOpenRemoveDialog(club)} 
-                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -290,7 +300,7 @@ const TournamentPage: React.FC = () => {
             <DialogTitle>Remove {clubToRemove?.name}</DialogTitle>
           </DialogHeader>
           <div className="mt-4">
-            <p>Are you sure you want to remove {clubToRemove?.name} from this tournament?</p>
+            <p> {clubToRemove?.id === userClub.id ? `Are you sure you want to leave this tournament?` : `Are you sure you want to remove ${clubToRemove?.name} from this tournament?`}</p>
           </div>
           <div className="flex flex-col sm:flex-row justify-between mt-4 space-y-2 sm:space-y-0 sm:space-x-2">
             <button 
