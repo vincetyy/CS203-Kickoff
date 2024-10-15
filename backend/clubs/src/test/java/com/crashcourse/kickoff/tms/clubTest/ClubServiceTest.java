@@ -1272,4 +1272,4 @@ public class ClubServiceTest {
         verify(clubRepository, times(1)).findById(clubId);
         verify(clubRepository, times(0)).save(any(Club.class));
     }
-}
+} 
