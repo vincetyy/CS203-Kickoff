@@ -106,6 +106,7 @@ public class ClubController {
     public ResponseEntity<?> applyToClub(@PathVariable Long clubId, @RequestBody PlayerApplicationDTO applicationDTO) {
         try {
             applicationDTO.setClubId(clubId);
+            System.out.println(applicationDTO);
             clubService.applyToClub(applicationDTO);
             return new ResponseEntity<>("Application submitted successfully", HttpStatus.OK);
         } catch (Exception e) {

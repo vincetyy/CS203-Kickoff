@@ -12,11 +12,12 @@ import { getClubByPlayerId } from '../services/clubService';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUserId, setUser, fetchUserClubAsync } from '../store/userSlice';
 import { Club } from '../types/club';
+import { AppDispatch } from '../store';
 import { useNavigate } from 'react-router-dom';
 
 export default function PlayerProfilePage() {
   const userId = useSelector(selectUserId);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile | null>(null);
@@ -52,7 +53,7 @@ export default function PlayerProfilePage() {
         localStorage.setItem('username', username);
 
         dispatch(setUser({ userId: response.data.userId, username }));
-        dispatch(fetchUserClubAsync() as any);
+        dispatch(fetchUserClubAsync());
         toast.success(`Welcome back, ${username}`, {
           duration: 3000,
           position: 'top-center',
