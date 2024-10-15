@@ -30,6 +30,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
+        final String requestURI = request.getRequestURI();
+
+        System.out.println(requestURI);
+
+        // Skip JWT validation for specific paths
+        if (requestURI.equals("/users") || requestURI.equals("/users/login")) {
+            chain.doFilter(request, response);  // Allow the request without validating the JWT
+            return;
+        }
+
         final String authorizationHeader = request.getHeader("Authorization");
 
         String username = null;

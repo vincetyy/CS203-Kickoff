@@ -77,6 +77,7 @@ public class JwtUtil {
                                 .stream()
                                 .map(GrantedAuthority::getAuthority)
                                 .collect(Collectors.toList())); // Add roles to the claims
+                                
         return createToken(claims, user.getUsername());
     }
 

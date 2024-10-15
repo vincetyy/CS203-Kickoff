@@ -1,14 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import videoSource from '../assets/Kickoff2.mp4';
-import aboutImage from '../assets/LandingPageWallpaper.jpg';
-import { Helmet } from 'react-helmet';
 
 const LandingPage: React.FC = () => {
   const [videoEnded, setVideoEnded] = useState(false);
-  const [showAbout, setShowAbout] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const video = videoRef.current;
@@ -18,42 +16,13 @@ const LandingPage: React.FC = () => {
     }
   }, []);
 
+  const handleVideoClick = () => {
+    navigate('/login'); // Navigate to the login page
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-gray-900 text-white">
-      <Helmet>
-        <title>Kickoff</title>
-      </Helmet>
-      <header className="bg-gray-900 text-white p-4 flex justify-between items-center z-20 relative">
-        <Link to="/" className="text-2xl font-bold ml-2 text-white hover:text-gray-300 transition-colors">
-          KICKOFF
-        </Link>
-        <div 
-          className="relative"
-          onMouseEnter={() => setShowAbout(true)}
-          onMouseLeave={() => setShowAbout(false)}
-        >
-          <button className="px-4 py-2 bg-transparent border border-white rounded hover:bg-white hover:text-black transition-colors duration-300">
-            About Us
-          </button>
-          <AnimatePresence>
-            {showAbout && (
-              <motion.div
-                className="absolute right-0 mt-2 w-64 bg-gray-900 text-white rounded-lg shadow-lg p-4 text-sm"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-              >
-                <p className="mb-4 text-left">
-                Kickoff is the brainchild of a passionate team of CS203 students from SMU — Joel, Setlin, Sheen, Vince, Yekai, and Zane — on a mission to change how football tournaments are organized and played.
-                </p>
-                <img src={aboutImage} alt="Football field" className="w-full h-32 object-cover rounded" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </header>
-      <main className="flex-grow relative overflow-hidden">
+    <div className="flex-1 flex flex-col bg-gray-900 text-white">
+      <main className=" flex items-center justify-center">
         <video
           ref={videoRef}
           className="absolute inset-0 w-full h-full object-cover"
@@ -61,6 +30,7 @@ const LandingPage: React.FC = () => {
           autoPlay
           muted
           playsInline
+          onClick={handleVideoClick}
         />
         <AnimatePresence>
           {videoEnded && (
