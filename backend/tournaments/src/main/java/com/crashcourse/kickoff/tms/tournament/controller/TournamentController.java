@@ -166,17 +166,17 @@ public class TournamentController {
             @PathVariable Long clubId,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         
-        if (token == null || !token.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
+        // if (token == null || !token.startsWith("Bearer ")) {
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        // }
 
-        token = token.substring(7); // Remove "Bearer " from token
-        Long userIdFromToken = jwtUtil.extractUserId(token);
+        // token = token.substring(7); // Remove "Bearer " from token
+        // Long userIdFromToken = jwtUtil.extractUserId(token);
 
-        // Ensure the user is authorized (e.g., check if they are the host)
-        if (!tournamentService.isOwnerOfTournament(tournamentId, userIdFromToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-        }
+        // // Ensure the user is authorized (e.g., check if they are the host)
+        // if (!tournamentService.isOwnerOfTournament(tournamentId, userIdFromToken)) {
+        //     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        // }
 
         // Call the service method to remove the club
         tournamentService.removeClubFromTournament(tournamentId, clubId);
