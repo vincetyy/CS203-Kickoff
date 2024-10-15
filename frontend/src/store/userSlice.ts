@@ -5,6 +5,7 @@ import { Club } from '../types/club';
 // Initial state for the user slice
 const initialState = {
   userId: null as number | null,
+  username: null as string | null,  // New field to store the username
   userClub: null as Club | null,  // Store the user's club
   status: 'idle' as 'idle' | 'loading' | 'succeeded' | 'failed',
   error: null as string | null,
@@ -35,11 +36,13 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUserId: (state, action) => {
-      state.userId = action.payload;
+    setUser: (state, action) => {
+      state.userId = action.payload.userId;  // Set userId
+      state.username = action.payload.username;  // Set username
     },
     clearUser: (state) => {
       state.userId = null;
+      state.username = null;  // Clear username
       state.userClub = null;
       state.status = 'idle';
       state.error = null;
@@ -63,8 +66,10 @@ const userSlice = createSlice({
 });
 
 // Export the actions and reducer
-export const { setUserId, clearUser } = userSlice.actions;
-// Selector to retrieve the userId from the Redux store
+export const { setUser, clearUser } = userSlice.actions;
+
+// Selector to retrieve the userId and username from the Redux store
 export const selectUserId = (state: any) => state.user.userId;
+export const selectUsername = (state: any) => state.user.username;  // New selector for username
 
 export default userSlice.reducer;

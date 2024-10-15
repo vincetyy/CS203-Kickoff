@@ -45,7 +45,7 @@ public class UserController {
      * @param user
      * @return
      */
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<User> signup(@RequestBody NewUserDTO newUserDTO) {
         try {
             User newUser = userService.addUser(newUserDTO); 
