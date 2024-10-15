@@ -4,7 +4,9 @@ export interface Club {
   description?: string;
   players: { id: number }[];
   elo: number;
+  captainId: number;
   ratingDeviation: number;
+  clubDescription: string;
 }
 
 export interface ClubProfile {
@@ -14,4 +16,5 @@ export interface ClubProfile {
   elo: number;
   captainId: number;
   players: number[];
+  clubDescription: string;
 }

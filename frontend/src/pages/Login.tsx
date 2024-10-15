@@ -66,9 +66,10 @@ const Login = () => {
             if (axios.isAxiosError(error)) {
               // Axios-specific error handling
               if (error.response) {
+
                 console.error('Error response:', error.response.data);
                 console.error('Error status:', error.response.status)
-                toast.error(`${error.response.data.message}`, {
+                toast.error(`Invalid username or password!`, {
                     duration: 4000,
                     position: 'top-center',
                   });;
