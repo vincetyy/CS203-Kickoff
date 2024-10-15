@@ -30,6 +30,13 @@ public class KickoffTournamentManagementApplication {
 		locationService.createLocation(location1);
 		Location location2 = new Location(null, "Botanic Gardens", null);
 		locationService.createLocation(location2);
+		Location location3 = new Location(null, "SMU", null);
+		locationService.createLocation(location3);
+		Location location4 = new Location(null, "Fort Canning", null);
+		locationService.createLocation(location4);
+		Location location5 = new Location(null, "Istana", null);
+		locationService.createLocation(location5);
+		
 
 		// Tournament
 		TournamentService tournamentService = ctx.getBean(TournamentService.class);
