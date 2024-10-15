@@ -68,6 +68,7 @@ public class JwtUtil {
     }
 
     public Boolean validateToken(String token) {
+        System.out.println(!isTokenExpired(token));
         return !isTokenExpired(token);
     }
 }

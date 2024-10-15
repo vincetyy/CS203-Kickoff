@@ -1,7 +1,6 @@
 package com.crashcourse.kickoff.tms.security;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 import javax.crypto.SecretKey;
@@ -14,6 +13,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtUtil {
@@ -70,4 +70,26 @@ public class JwtUtil {
     public Boolean validateToken(String token) {
         return !isTokenExpired(token);
     }
+
+    public String generateJwtToken() {
+        long currentTimeMillis = System.currentTimeMillis();
+        Date now = new Date(currentTimeMillis);
+        Date expiryDate = new Date(currentTimeMillis + 360000);
+
+        /*
+         * Passing in empty claims
+         */
+        Long userId = 0L;
+        List<Object> roles = new ArrayList<Object>();
+
+        return Jwts.builder()
+            .setSubject("username")
+            .setIssuedAt(now)
+            .setExpiration(expiryDate)
+            .claim("userId", userId)
+            .claim("roles", roles)
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            .compact();
+    }
+
 }

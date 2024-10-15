@@ -139,7 +139,12 @@ public class TournamentController {
             this is because i have to remove clubservice instance var to remove club dependency
             i think we can handle this in the front end, but im not sure, will note down
         */
-        TournamentResponseDTO joinedTournament = tournamentService.joinTournamentAsClub(tournamentJoinDTO);
+        TournamentResponseDTO joinedTournament = null;
+        try {
+            joinedTournament = tournamentService.joinTournamentAsClub(tournamentJoinDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Your club does not have enough players");
+        }
 
         return new ResponseEntity<>(joinedTournament, HttpStatus.CREATED);
     }
