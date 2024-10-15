@@ -194,6 +194,12 @@ public class ClubServiceImpl implements ClubService {
     
         // Save the application
         applicationRepository.save(application);
+
+        /*
+        * Add Applicant to Club
+        */
+        club.getApplicants().add(application.getId());
+        clubRepository.save(club);
     }
 
     public List<Club> getClubsByIds(@Positive(message = "Club ID must be positive") List<Long> clubIds) {
@@ -251,6 +257,16 @@ public class ClubServiceImpl implements ClubService {
     }
 
     @Override
+    public List<Long> getPlayerApplications(Long clubId) {
+        Optional<Club> clubOptional = clubRepository.findById(clubId);
+        if (!clubOptional.isPresent()) {
+            throw new ClubNotFoundException("Club with ID " + clubId + " not found");
+        }
+        Club club = clubOptional.get();
+        return club.getApplicants();
+    }
+
+    @Override
     public List<Long> getPlayers(Long clubId) {
         Optional<Club> clubOptional = clubRepository.findById(clubId);
         if (!clubOptional.isPresent()) {
@@ -259,27 +275,6 @@ public class ClubServiceImpl implements ClubService {
 
         Club club = clubOptional.get();
         return club.getPlayers();
-    }
-
-    public void applyToClub(Long clubId, Long playerId, PlayerPosition desiredPosition) throws Exception {
-        Optional<Club> clubOpt = clubRepository.findById(clubId);
-    
-        if (clubOpt.isPresent()) {
-            Club club = clubOpt.get();
-    
-            // Create a new application
-            PlayerApplication application = new PlayerApplication();
-            application.setClub(club);
-            application.setPlayerId(playerId);
-            application.setDesiredPosition(desiredPosition);
-            application.setStatus(ApplicationStatus.PENDING);
-    
-            // Save the application (ensure you have a repository for ClubApplication)
-            applicationRepository.save(application);
-    
-        } else {
-            throw new Exception("Club or Player not found.");
-        }
     }
 
     public Optional<Club> getClubByPlayerId(Long playerId) {

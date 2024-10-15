@@ -36,6 +36,8 @@ public interface ClubService {
     List<Club> getClubsByIds(List<Long> clubIds);
 
     List<ClubInvitation> getPlayerInvitations(Long playerId) throws Exception;
+    
+    List<Long> getPlayerApplications(Long clubId) throws Exception;
 
     boolean isCaptain(Long clubId, Long playerId);
 
