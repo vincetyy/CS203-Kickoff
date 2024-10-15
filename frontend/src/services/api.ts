@@ -1,5 +1,4 @@
 import axios from 'axios';
-import '../utils/axiosSetup'; 
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_DEFAULT_BASE_URL, // Default base URL (can be overridden per request)
