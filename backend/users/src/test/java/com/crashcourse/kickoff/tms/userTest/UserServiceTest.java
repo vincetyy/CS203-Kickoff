@@ -185,10 +185,11 @@ public class UserServiceTest {
         } catch (Exception e) {
             // Assert
             assertTrue(e instanceof IllegalArgumentException);
-            // assertEquals("Invalid role: invalidRole", e.getMessage());
+            assertEquals("Invalid role: invalidRole", e.getMessage());
         }
     
-        verify(users, times(1)).save(any(User.class)); // Saved once before exception
+        // Since the exception occurs before users.save(), it should not be called
+        verify(users, times(0)).save(any(User.class));
         verify(playerProfileService, times(0)).addPlayerProfile(any(User.class), any(NewUserDTO.class));
         verify(hostProfileService, times(0)).addHostProfile(any(User.class));
     }
@@ -215,7 +216,7 @@ public class UserServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(username, result.getUsername());
-        verify(users, times(1)).findByUsername(username);
+        verify(users, times(2)).findByUsername(username); // twice because first time is called inside When checking the condition for the ternary
     }
 
     @Test
@@ -236,5 +237,74 @@ public class UserServiceTest {
         // Assert
         assertNull(result);
         verify(users, times(1)).findByUsername(username);
+    }
+
+    // ============= getUserById=================
+    @Test
+    public void getUserById_UserExists_ReturnsUser() {
+        // Arrange
+        Long userId = 1L;
+        User user = new User();
+        user.setId(userId);
+        user.setUsername("user1");
+    
+        when(users.findById(userId)).thenReturn(Optional.of(user));
+    
+        // Act
+        User result = null;
+        try {
+            result = userService.getUserById(userId);
+        } catch (Exception e) {
+            fail("Exception should not be thrown");
+        }
+    
+        // Assert
+        assertNotNull(result);
+        assertEquals(userId, result.getId());
+        verify(users, times(1)).findById(userId);
+    }
+
+    @Test
+    public void getUserById_UserDoesNotExist_ReturnsNull() {
+        // Arrange
+        Long userId = 999L;
+    
+        when(users.findById(userId)).thenReturn(Optional.empty());
+    
+        // Act
+        User result = null;
+        try {
+            result = userService.getUserById(userId);
+        } catch (Exception e) {
+            fail("Exception should not be thrown");
+        }
+    
+        // Assert
+        assertNull(result);
+        verify(users, times(1)).findById(userId);
+    }
+
+    // ============= save=================
+    @Test
+    public void save_ValidUser_UserSavedSuccessfully() {
+        // Arrange
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("user1");
+    
+        when(users.save(user)).thenReturn(user); // note this is repo save
+    
+        // Act
+        User result = null;
+        try {
+            result = userService.save(user); // note this is service save
+        } catch (Exception e) {
+            fail("Exception should not be thrown");
+        }
+    
+        // Assert
+        assertNotNull(result);
+        assertEquals("user1", result.getUsername());
+        verify(users, times(1)).save(user);
     }
 }

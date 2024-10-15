@@ -42,7 +42,13 @@ public class UserServiceImpl implements UserService {
         newUser.setUsername(newUserDTO.getUsername());
         newUser.setPassword(encoder.encode(newUserDTO.getPassword()));
         newUser.setEmail(newUserDTO.getEmail());
-        Role newUserRole = Role.valueOf("ROLE_" + newUserDTO.getRole().toUpperCase());
+        
+        Role newUserRole;
+        try {
+            newUserRole = Role.valueOf("ROLE_" + newUserDTO.getRole().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid role: " + newUserDTO.getRole());
+        }
         newUser.setRoles(new HashSet<Role>(Arrays.asList(newUserRole)));
 
         newUser = users.save(newUser);
