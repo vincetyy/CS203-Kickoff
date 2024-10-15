@@ -203,7 +203,6 @@ const TournamentPage: React.FC = () => {
 
   return (
     <>
-      <Toaster />
       {/* Tournament Details Banner */}
       <div className="bg-green-600 rounded-lg p-4 lg:p-6 mb-6 flex items-center space-x-4">
         <div className="bg-white rounded-full p-2 lg:p-3">
