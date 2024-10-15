@@ -46,15 +46,4 @@ public class TournamentResponseDTO {
         private Long id;
         private String name;
     }
-
-    // /**
-    //  * Inner DTO for Club data.
-    //  */
-    // @Data
-    // @NoArgsConstructor
-    // @AllArgsConstructor
-    // public static class ClubDTO {
-    //     private Long id;
-    //     private String name;
-    // }
 }
