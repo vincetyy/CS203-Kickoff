@@ -11,21 +11,28 @@ import { toast } from 'react-hot-toast'
 import TournamentCard from '../components/TournamentCard'
 import CreateTournament from '../components/CreateTournament'
 import { Tournament } from '../types/tournament'
-import { selectClubId } from '../store/clubSlice';
-import { fetchUserClubAsync } from '../store/userSlice'
+import { fetchUserClubAsync, selectUserId } from '../store/userSlice'
 
 
 export default function TournamentsPage() {
   const dispatch = useDispatch<AppDispatch>()
   const { userClub } = useSelector((state: RootState) => state.user);
+  const userId = useSelector(selectUserId);
   const { tournaments, status, error } = useSelector((state: RootState) => state.tournaments)
   const [filteredTournaments, setFilteredTournaments] = useState<Tournament[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [teamSizeFilter, setTeamSizeFilter] = useState<string | null>(null)
   const [knockoutFormatFilter, setKnockoutFormatFilter] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false)
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+
+  let isCaptain = false;
+  
+  if (userClub) {
+    isCaptain = userClub?.captainId === userId;
+  }
 
   useEffect(() => {
     dispatch(fetchTournamentsAsync())
@@ -62,11 +69,14 @@ export default function TournamentsPage() {
     setKnockoutFormatFilter(value === 'ALL' ? null : value);
   };
 
-  const clubId = useSelector(selectClubId); 
-
   const handleJoin = (tournament: Tournament) => {
     setSelectedTournament(tournament)
     setIsDialogOpen(true)
+  };
+
+  const handleLeave = (tournament: Tournament) => {
+    setSelectedTournament(tournament)
+    setIsLeaveDialogOpen(true)
   };
 
   const handleConfirmJoin = async () => {
@@ -114,7 +124,7 @@ export default function TournamentsPage() {
 
       // Update the specific tournament in the state
       const updatedTournaments = tournaments.map(t => 
-        t.id === selectedTournament.id ? { ...t, joinedClubsIds: [...(t.joinedClubsIds || []), { id: clubId }] } : t
+        t.id === selectedTournament.id ? { ...t, joinedClubsIds: [...(t.joinedClubsIds || []), { id: userClub.id }] } : t
       );
       dispatch({ type: 'tournaments/updateTournaments', payload: updatedTournaments });
 
@@ -125,6 +135,48 @@ export default function TournamentsPage() {
         position: 'top-center',
       })
     }
+  };
+
+  const handleConfirmLeave = async () => {
+    // if (!selectedTournament) return
+
+    // if (!userClub) {
+    //   toast.error("User club information is missing.", {
+    //     duration: 4000,
+    //     position: 'top-center',
+    //   });
+    //   return;
+    // }
+
+    // try {
+    //   const result = await dispatch(joinTournamentAsync({ 
+    //     clubId: userClub.id, // Hardcoded club ID
+    //     tournamentId: selectedTournament.id 
+    //   })).unwrap()
+      
+    //   // Close the dialog first
+    //   setIsDialogOpen(false)
+    //   setSelectedTournament(null)
+
+    //   // Show the success toast
+    //   toast.success(`Successfully joined ${selectedTournament.name}`, {
+    //     duration: 3000,
+    //     position: 'top-center',
+    //   })
+
+    //   // Update the specific tournament in the state
+    //   const updatedTournaments = tournaments.map(t => 
+    //     t.id === selectedTournament.id ? { ...t, joinedClubsIds: [...(t.joinedClubsIds || []), { id: userClub.id }] } : t
+    //   );
+    //   dispatch({ type: 'tournaments/updateTournaments', payload: updatedTournaments });
+
+    // } catch (err: any) {
+    //   console.error('Error joining tournament:', err)
+    //   toast.error(`${err.message}`, {
+    //     duration: 4000,
+    //     position: 'top-center',
+    //   })
+    // }
   };
 
   if (status === 'loading') return <div>Loading...</div>
@@ -186,24 +238,33 @@ export default function TournamentsPage() {
 
       {/* Tournament cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-        {filteredTournaments.map((tournament) => (
-          <TournamentCard
-            key={tournament.id}
-            id={tournament.id}
-            name={tournament.name}
-            startDate={new Date(tournament.startDateTime).toLocaleDateString()}
-            endDate={new Date(tournament.endDateTime).toLocaleDateString()}
-            format={tournament.tournamentFormat}
-            teams={`${tournament.joinedClubsIds?.length || 0}/${tournament.maxTeams}`}  // Ensure joinedClubs is defined
-            image={`https://picsum.photos/seed/${tournament.id}/400/300`}
-          >
-            { userClub &&
-              <Button onClick={() => handleJoin(tournament)}>Join</Button>
-            }
-            
-          </TournamentCard>
-        
-        ))}
+        {filteredTournaments.map((tournament) => {
+          const isUserClubInTournament = tournament.joinedClubsIds?.includes(userClub?.id);
+
+          return (
+            <TournamentCard
+              key={tournament.id}
+              id={tournament.id}
+              name={tournament.name}
+              startDate={new Date(tournament.startDateTime).toLocaleDateString()}
+              endDate={new Date(tournament.endDateTime).toLocaleDateString()}
+              format={tournament.tournamentFormat}
+              teams={`${tournament.joinedClubsIds?.length || 0}/${tournament.maxTeams}`}  // Ensure joinedClubs is defined
+              image={`https://picsum.photos/seed/${tournament.id}/400/300`}
+            >
+              {userClub && isCaptain && (
+                <>
+                  {isUserClubInTournament ? (
+                    <Button onClick={() => handleLeave(tournament)}
+                    className="bg-red-500 hover:bg-red-600 text-white">Leave</Button>
+                  ) : (
+                    <Button onClick={() => handleJoin(tournament)}>Join</Button>
+                  )}
+                </>
+              )}
+            </TournamentCard>
+          );
+        })}
       </div>
 
       {/* Join confirmation dialog */}
@@ -225,6 +286,32 @@ export default function TournamentsPage() {
             <button 
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full"
               onClick={handleConfirmJoin}
+            >
+              Confirm
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Leave confirmation dialog */}
+      <Dialog open={isLeaveDialogOpen} onOpenChange={setIsLeaveDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Leave {selectedTournament?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            <p>Are you sure you want to leave this tournament?</p>
+          </div>
+          <div className="flex flex-col sm:flex-row justify-between mt-4 space-y-2 sm:space-y-0 sm:space-x-2">
+            <button 
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 w-full" 
+              onClick={() => setIsLeaveDialogOpen(false)}
+            >
+              Cancel
+            </button>
+            <button 
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full"
+              onClick={handleConfirmLeave}
             >
               Confirm
             </button>

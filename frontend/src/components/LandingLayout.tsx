@@ -3,12 +3,14 @@ import { Link, Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import aboutImage from '../assets/LandingPageWallpaper.jpg';
 import { Helmet } from 'react-helmet';
+import { Toaster } from 'react-hot-toast';
 
 const LandingLayout: React.FC = () => {
   const [showAbout, setShowAbout] = useState(false);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-900 text-white">
+      <Toaster />
       <Helmet>
         <title>Kickoff</title>
       </Helmet>
