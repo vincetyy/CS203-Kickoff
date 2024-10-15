@@ -628,6 +628,169 @@ public class ClubServiceTest {
         verify(clubRepository, times(1)).findById(clubId);
     }
 
+    // ================== invitePlayerToClub ==================
+    @Test
+    public void invitePlayerToClub_ValidCaptainAndClub_InvitationCreated() throws Exception {
+        // Arrange
+        Long clubId = 1L;
+        Long playerId = 100L;
+        Long captainId = 200L;
+    
+        Club club = new Club();
+        club.setId(clubId);
+        club.setCaptainId(captainId);
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.of(club));
+        when(clubInvitationRepository.save(any(ClubInvitation.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    
+        // Act
+        Club resultClub = null;
+        try {
+            resultClub = clubService.invitePlayerToClub(clubId, playerId, captainId);
+        } catch (Exception e) {
+            fail("Exception should not be thrown");
+        }
+    
+        // Assert
+        assertNotNull(resultClub);
+        assertEquals(clubId, resultClub.getId());
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(clubInvitationRepository, times(1)).save(any(ClubInvitation.class));
+    }
+
+    @Test
+    public void invitePlayerToClub_ClubDoesNotExist_ThrowsClubNotFoundException() {
+        // Arrange
+        Long clubId = 1L;
+        Long playerId = 100L;
+        Long captainId = 200L;
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.empty());
+    
+        // Act
+        try {
+            clubService.invitePlayerToClub(clubId, playerId, captainId);
+            fail("Expected ClubNotFoundException to be thrown");
+        } catch (Exception e) {
+            // Assert
+            assertTrue(e instanceof ClubNotFoundException);
+            assertEquals("Club not found with ID: 1", e.getMessage());
+        }
+    
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(clubInvitationRepository, times(0)).save(any(ClubInvitation.class));
+    }
+
+    @Test
+    public void invitePlayerToClub_UserNotCaptain_ThrowsException() {
+        // Arrange
+        Long clubId = 1L;
+        Long playerId = 100L;
+        Long captainId = 200L; // User attempting to invite
+        Long actualCaptainId = 300L; // Actual captain
+    
+        Club club = new Club();
+        club.setId(clubId);
+        club.setCaptainId(actualCaptainId);
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.of(club));
+    
+        // Act
+        try {
+            clubService.invitePlayerToClub(clubId, playerId, captainId);
+            fail("Expected Exception to be thrown");
+        } catch (Exception e) {
+            // Assert
+            assertEquals("Only the club captain can invite players.", e.getMessage());
+        }
+    
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(clubInvitationRepository, times(0)).save(any(ClubInvitation.class));
+    }
+
+    // ================== acceptinvite ==================
+    @Test
+    public void acceptInvite_ValidClubAndPlayer_PlayerAddedToClub() throws Exception {
+        // Arrange
+        Long playerId = 100L;
+        Long clubId = 1L;
+    
+        Club club = new Club();
+        club.setId(clubId);
+        club.setPlayers(new ArrayList<>());
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.of(club));
+        when(clubRepository.save(any(Club.class))).thenReturn(club);
+    
+        // Act
+        Club resultClub = null;
+        try {
+            resultClub = clubService.acceptInvite(playerId, clubId);
+        } catch (Exception e) {
+            fail("Exception should not be thrown");
+        }
+    
+        // Assert
+        assertNotNull(resultClub);
+        assertTrue(resultClub.getPlayers().contains(playerId));
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(clubRepository, times(1)).save(club);
+    }
+
+    @Test
+    public void acceptInvite_ClubDoesNotExist_ThrowsException() {
+        // Arrange
+        Long playerId = 100L;
+        Long clubId = 1L;
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.empty());
+    
+        // Act
+        try {
+            clubService.acceptInvite(playerId, clubId);
+            fail("Expected Exception to be thrown");
+        } catch (Exception e) {
+            // Assert
+            assertEquals("Club not found with id: 1", e.getMessage());
+        }
+    
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(clubRepository, times(0)).save(any(Club.class));
+    }
+
+    @Test
+    public void acceptInvite_ClubAtMaxCapacity_ThrowsPlayerLimitExceededException() {
+        // Arrange
+        Long playerId = 100L;
+        Long clubId = 1L;
+    
+        Club club = new Club();
+        club.setId(clubId);
+        List<Long> players = new ArrayList<>();
+        for (int i = 0; i < Club.MAX_PLAYERS_IN_CLUB; i++) {
+            players.add((long) i);
+        }
+        club.setPlayers(players);
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.of(club));
+    
+        // Act
+        try {
+            clubService.acceptInvite(playerId, clubId);
+            fail("Expected PlayerLimitExceededException to be thrown");
+        } catch (Exception e) {
+            // Assert
+            assertTrue(e instanceof PlayerLimitExceededException);
+            assertEquals(
+                String.format("A club cannot have more than %d players", Club.MAX_PLAYERS_IN_CLUB),
+                e.getMessage()
+            );
+        }
+    
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(clubRepository, times(0)).save(any(Club.class));
+    }
+
     // ================== getPlayerInvitations ==================
     @Test
     public void getPlayerInvitations_PlayerHasInvitations_ReturnsListOfInvitations() {
@@ -733,5 +896,380 @@ public class ClubServiceTest {
             assertTrue(e instanceof PlayerAlreadyAppliedException);
             assertEquals("Player has already applied to this club", e.getMessage());
         }
+    }
+
+    // ================== getPlayerApplications ==================
+    @Test
+    public void getPlayerApplications_ClubExistsWithApplicants_ReturnsPlayerIds() {
+        // Arrange
+        Long clubId = 1L;
+        Long applicationId1 = 10L;
+        Long applicationId2 = 20L;
+        Long playerId1 = 100L;
+        Long playerId2 = 200L;
+    
+        Club club = new Club();
+        club.setId(clubId);
+        club.setApplicants(Arrays.asList(applicationId1, applicationId2));
+    
+        PlayerApplication application1 = new PlayerApplication();
+        application1.setId(applicationId1);
+        application1.setPlayerId(playerId1);
+    
+        PlayerApplication application2 = new PlayerApplication();
+        application2.setId(applicationId2);
+        application2.setPlayerId(playerId2);
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.of(club));
+        when(applicationRepository.findById(applicationId1)).thenReturn(Optional.of(application1));
+        when(applicationRepository.findById(applicationId2)).thenReturn(Optional.of(application2));
+    
+        // Act
+        List<Long> result = null;
+        try {
+            result = clubService.getPlayerApplications(clubId);
+        } catch (Exception e) {
+            fail("Exception should not be thrown");
+        }
+    
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.contains(playerId1));
+        assertTrue(result.contains(playerId2));
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(applicationRepository, times(1)).findById(applicationId1);
+        verify(applicationRepository, times(1)).findById(applicationId2);
+    }
+
+    @Test
+    public void getPlayerApplications_ClubExistsNoApplicants_ReturnsEmptyList() {
+        // Arrange
+        Long clubId = 1L;
+        Club club = new Club();
+        club.setId(clubId);
+        club.setApplicants(new ArrayList<>());
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.of(club));
+    
+        // Act
+        List<Long> result = null;
+        try {
+            result = clubService.getPlayerApplications(clubId);
+        } catch (Exception e) {
+            fail("Exception should not be thrown");
+        }
+    
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(applicationRepository, times(0)).findById(anyLong());
+    }
+
+    @Test
+    public void getPlayerApplications_ClubDoesNotExist_ThrowsClubNotFoundException() {
+        // Arrange
+        Long clubId = 1L;
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.empty());
+    
+        // Act
+        try {
+            clubService.getPlayerApplications(clubId);
+            fail("Expected ClubNotFoundException to be thrown");
+        } catch (Exception e) {
+            // Assert
+            assertTrue(e instanceof ClubNotFoundException);
+            assertEquals("Club with ID 1 not found", e.getMessage());
+        }
+    
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(applicationRepository, times(0)).findById(anyLong());
+    }
+
+    // ================== acceptApplication ==================
+    @Test
+    public void acceptApplication_ValidClubAndApplication_PlayerAddedToClub() {
+        // Arrange
+        Long clubId = 1L;
+        Long playerId = 100L;
+        Long applicationId = 10L;
+    
+        Club club = new Club();
+        club.setId(clubId);
+        club.setPlayers(new ArrayList<>());
+        club.setApplicants(new ArrayList<>(Arrays.asList(applicationId)));
+    
+        PlayerApplication playerApplication = new PlayerApplication();
+        playerApplication.setId(applicationId);
+        playerApplication.setPlayerId(playerId);
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.of(club));
+        when(applicationRepository.findByClubIdAndPlayerId(clubId, playerId)).thenReturn(playerApplication);
+        when(clubRepository.save(any(Club.class))).thenReturn(club);
+    
+        // Act
+        try {
+            clubService.acceptApplication(clubId, playerId);
+        } catch (Exception e) {
+            fail("Exception should not be thrown");
+        }
+    
+        // Assert
+        assertTrue(club.getPlayers().contains(playerId));
+        assertFalse(club.getApplicants().contains(applicationId));
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(applicationRepository, times(1)).findByClubIdAndPlayerId(clubId, playerId);
+        verify(clubRepository, times(1)).save(club);
+        verify(applicationRepository, times(1)).deleteById(applicationId);
+    }
+
+    @Test
+    public void acceptApplication_ClubDoesNotExist_ThrowsClubNotFoundException() {
+        // Arrange
+        Long clubId = 1L;
+        Long playerId = 100L;
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.empty());
+    
+        // Act
+        try {
+            clubService.acceptApplication(clubId, playerId);
+            fail("Expected ClubNotFoundException to be thrown");
+        } catch (Exception e) {
+            // Assert
+            assertTrue(e instanceof ClubNotFoundException);
+            assertEquals("Club with ID 1 not found", e.getMessage());
+        }
+    
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(applicationRepository, times(0)).findByClubIdAndPlayerId(anyLong(), anyLong());
+        verify(clubRepository, times(0)).save(any(Club.class));
+        verify(applicationRepository, times(0)).deleteById(anyLong());
+    }
+
+    @Test
+    public void acceptApplication_ApplicationDoesNotExist_ThrowsException() {
+        // Arrange
+        Long clubId = 1L;
+        Long playerId = 100L;
+    
+        Club club = new Club();
+        club.setId(clubId);
+        club.setApplicants(new ArrayList<>());
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.of(club));
+        when(applicationRepository.findByClubIdAndPlayerId(clubId, playerId)).thenReturn(null);
+    
+        // Act
+        try {
+            clubService.acceptApplication(clubId, playerId);
+            fail("Expected Exception to be thrown");
+        } catch (Exception e) {
+            // Assert
+            assertTrue(e instanceof NullPointerException);
+        }
+    
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(applicationRepository, times(1)).findByClubIdAndPlayerId(clubId, playerId);
+        verify(clubRepository, times(0)).save(any(Club.class));
+        verify(applicationRepository, times(0)).deleteById(anyLong());
+    }
+
+    // ================== rejectApplication ==================
+    @Test
+    public void rejectApplication_ValidClubAndApplication_ApplicationRejected() {
+        // Arrange
+        Long clubId = 1L;
+        Long playerId = 100L;
+        Long applicationId = 10L;
+    
+        Club club = new Club();
+        club.setId(clubId);
+        club.setApplicants(new ArrayList<>(Arrays.asList(applicationId)));
+    
+        PlayerApplication playerApplication = new PlayerApplication();
+        playerApplication.setId(applicationId);
+        playerApplication.setPlayerId(playerId);
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.of(club));
+        when(applicationRepository.findByClubIdAndPlayerId(clubId, playerId)).thenReturn(playerApplication);
+        when(clubRepository.save(any(Club.class))).thenReturn(club);
+    
+        // Act
+        try {
+            clubService.rejectApplication(clubId, playerId);
+        } catch (Exception e) {
+            fail("Exception should not be thrown");
+        }
+    
+        // Assert
+        assertFalse(club.getApplicants().contains(applicationId));
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(applicationRepository, times(1)).findByClubIdAndPlayerId(clubId, playerId);
+        verify(clubRepository, times(1)).save(club);
+        verify(applicationRepository, times(1)).deleteById(applicationId);
+    }
+
+    @Test
+    public void rejectApplication_ClubDoesNotExist_ThrowsClubNotFoundException() {
+        // Arrange
+        Long clubId = 1L;
+        Long playerId = 100L;
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.empty());
+    
+        // Act
+        try {
+            clubService.rejectApplication(clubId, playerId);
+            fail("Expected ClubNotFoundException to be thrown");
+        } catch (Exception e) {
+            // Assert
+            assertTrue(e instanceof ClubNotFoundException);
+            assertEquals("Club with ID 1 not found", e.getMessage());
+        }
+    
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(applicationRepository, times(0)).findByClubIdAndPlayerId(anyLong(), anyLong());
+        verify(clubRepository, times(0)).save(any(Club.class));
+        verify(applicationRepository, times(0)).deleteById(anyLong());
+    }
+
+    @Test
+    public void rejectApplication_ApplicationDoesNotExist_ThrowsException() {
+        // Arrange
+        Long clubId = 1L;
+        Long playerId = 100L;
+    
+        Club club = new Club();
+        club.setId(clubId);
+        club.setApplicants(new ArrayList<>());
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.of(club));
+        when(applicationRepository.findByClubIdAndPlayerId(clubId, playerId)).thenReturn(null);
+    
+        // Act
+        try {
+            clubService.rejectApplication(clubId, playerId);
+            fail("Expected Exception to be thrown");
+        } catch (Exception e) {
+            // Assert
+            assertTrue(e instanceof NullPointerException);
+        }
+    
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(applicationRepository, times(1)).findByClubIdAndPlayerId(clubId, playerId);
+        verify(clubRepository, times(0)).save(any(Club.class));
+        verify(applicationRepository, times(0)).deleteById(anyLong());
+    }
+
+    // transferCaptaincy is the most annoying one... but not used yet anyway
+    @Test
+    public void transferCaptaincy_ValidInputs_CaptainTransferred() throws Exception {
+        // Arrange
+        Long clubId = 1L;
+        Long currentCaptainId = 100L;
+        Long newCaptainId = 200L;
+    
+        Club club = new Club();
+        club.setId(clubId);
+        club.setCaptainId(currentCaptainId);
+        club.setPlayers(new ArrayList<>(Arrays.asList(currentCaptainId, newCaptainId)));
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.of(club));
+        when(clubRepository.save(any(Club.class))).thenReturn(club);
+    
+        // Act
+        Club updatedClub = null;
+        try {
+            updatedClub = clubService.transferCaptaincy(clubId, currentCaptainId, newCaptainId);
+        } catch (Exception e) {
+            fail("Exception should not be thrown");
+        }
+    
+        // Assert
+        assertNotNull(updatedClub);
+        assertEquals(newCaptainId, updatedClub.getCaptainId());
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(clubRepository, times(1)).save(club);
+    }
+
+    @Test
+    public void transferCaptaincy_ClubDoesNotExist_ThrowsClubNotFoundException() {
+        // Arrange
+        Long clubId = 1L;
+        Long currentCaptainId = 100L;
+        Long newCaptainId = 200L;
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.empty());
+    
+        // Act
+        try {
+            clubService.transferCaptaincy(clubId, currentCaptainId, newCaptainId);
+            fail("Expected ClubNotFoundException to be thrown");
+        } catch (Exception e) {
+            // Assert
+            assertTrue(e instanceof ClubNotFoundException);
+            assertEquals("Club with ID 1 not found", e.getMessage());
+        }
+    
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(clubRepository, times(0)).save(any(Club.class));
+    }
+
+    @Test
+    public void transferCaptaincy_UserNotCurrentCaptain_ThrowsException() {
+        // Arrange
+        Long clubId = 1L;
+        Long currentCaptainId = 100L; // The user attempting the transfer
+        Long actualCaptainId = 150L;  // The actual captain
+        Long newCaptainId = 200L;
+    
+        Club club = new Club();
+        club.setId(clubId);
+        club.setCaptainId(actualCaptainId);
+        club.setPlayers(new ArrayList<>(Arrays.asList(actualCaptainId, newCaptainId)));
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.of(club));
+    
+        // Act
+        try {
+            clubService.transferCaptaincy(clubId, currentCaptainId, newCaptainId);
+            fail("Expected Exception to be thrown");
+        } catch (Exception e) {
+            // Assert
+            assertEquals("Only the current captain can transfer the captaincy.", e.getMessage());
+        }
+    
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(clubRepository, times(0)).save(any(Club.class));
+    }
+
+    @Test
+    public void transferCaptaincy_NewCaptainNotInClub_ThrowsException() {
+        // Arrange
+        Long clubId = 1L;
+        Long currentCaptainId = 100L;
+        Long newCaptainId = 200L;
+    
+        Club club = new Club();
+        club.setId(clubId);
+        club.setCaptainId(currentCaptainId);
+        club.setPlayers(new ArrayList<>(Arrays.asList(currentCaptainId)));
+    
+        when(clubRepository.findById(clubId)).thenReturn(Optional.of(club));
+    
+        // Act
+        try {
+            clubService.transferCaptaincy(clubId, currentCaptainId, newCaptainId);
+            fail("Expected Exception to be thrown");
+        } catch (Exception e) {
+            // Assert
+            assertEquals("The new captain must be a player in the club.", e.getMessage());
+        }
+    
+        verify(clubRepository, times(1)).findById(clubId);
+        verify(clubRepository, times(0)).save(any(Club.class));
     }
 }
