@@ -18,7 +18,9 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtUtil {
     private final Dotenv dotenv = Dotenv.load();
-    private final String JWT_SECRET_KEY = dotenv.get("JWT_SECRET_KEY"); 
+    private final String JWT_SECRET_KEY = System.getenv("JWT_SECRET_KEY") != null
+    ? System.getenv("JWT_SECRET_KEY")  // Use system environment variable if available
+    : dotenv.get("JWT_SECRET_KEY");    // Fall back to dotenv if not
     private final long jwtExpirationInMillis = 3600000; // 1 hour in milliseconds
 
     private SecretKey getSigningKey() {

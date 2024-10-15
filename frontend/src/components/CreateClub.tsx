@@ -112,7 +112,7 @@ const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreate
                   value={elo}
                   onChange={(e) => setElo(Number(e.target.value))}
                   className="form-input"
-                  required
+                  readOnly 
                 />
               </div>
               <div>
@@ -124,7 +124,7 @@ const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreate
                   value={ratingDeviation}
                   onChange={(e) => setRatingDeviation(Number(e.target.value))}
                   className="form-input"
-                  required
+                  readOnly 
                 />
               </div>
             </div>
