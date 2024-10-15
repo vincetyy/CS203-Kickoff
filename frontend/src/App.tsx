@@ -11,6 +11,7 @@ import Signup from './pages/Signup.tsx';
 import ClubInfo from './pages/ClubInfo';
 import PlayerApplication from './pages/PlayerApplication.tsx';
 import LandingLayout from './components/LandingLayout.tsx';
+import "./utils/axiosSetup.js";
 
 function App() {
   return (
