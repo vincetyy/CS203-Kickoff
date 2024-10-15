@@ -1,8 +1,7 @@
 package com.crashcourse.kickoff.tms.club.service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -263,7 +262,12 @@ public class ClubServiceImpl implements ClubService {
             throw new ClubNotFoundException("Club with ID " + clubId + " not found");
         }
         Club club = clubOptional.get();
-        return club.getApplicants();
+        List<Long> playerIds = new ArrayList<>();
+        for (Long applicationId: club.getApplicants()) {
+            Optional<PlayerApplication> applicationOptional = applicationRepository.findById(applicationId);
+            playerIds.add(applicationOptional.get().getPlayerId());
+        }
+        return playerIds;
     }
 
     @Override
