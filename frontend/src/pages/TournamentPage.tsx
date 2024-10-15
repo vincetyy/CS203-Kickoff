@@ -134,7 +134,7 @@ const TournamentPage: React.FC = () => {
       return;
     }
   
-    if (!clubId) {
+    if (!userClub) {
       toast.error("You must be part of a club to mark availability.");
       return;
     }
@@ -143,7 +143,7 @@ const TournamentPage: React.FC = () => {
       const payload = {
         tournamentId: tournamentId,
         playerId: userId,
-        clubId: clubId,  // Use the fetched clubId
+        clubId: userClub.id,  // Use the fetched clubId
         available: availability  
       };
   
@@ -278,7 +278,7 @@ const TournamentPage: React.FC = () => {
         <ShowAvailability 
           availabilities={availabilities} 
           currentUserId={userId} 
-          currentUserClubId={clubId !== null ? clubId : undefined} 
+          currentUserClubId={userClub.id !== null ? userClub.id : undefined} 
         />
       }
       
@@ -343,7 +343,7 @@ const TournamentPage: React.FC = () => {
           </Button>
         )}
         {
-          clubId &&
+          userClub &&
           <Button
             onClick={() => setIsAvailabilityDialogOpen(true)}
             className="bg-blue-600 hover:bg-blue-700"
