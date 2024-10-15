@@ -22,39 +22,20 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
-    # Step 4: Build the Docker image for users
-    - name: Build Docker image for users
+    # Step 4: Build and Push Docker images for all services with environment variables
+    - name: Build and push Docker images with environment variables
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/kickoff-users:latest ./backend/users
-        docker tag ${{ secrets.DOCKER_USERNAME }}/kickoff-users:latest ${{ secrets.DOCKER_USERNAME }}/kickoff-users:${{ github.sha }}
+        services=("users" "tournaments" "clubs")
+        for service in "${services[@]}"; do
+          docker build \
+            --build-arg JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
+            -t ${{ secrets.DOCKER_USERNAME }}/kickoff-$service:latest ./backend/$service
 
-    - name: Push Docker image for users
-      run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/kickoff-users:latest
-        docker push ${{ secrets.DOCKER_USERNAME }}/kickoff-users:${{ github.sha }}
-
-    # Step 5: Build the Docker image for tournament
-    - name: Build Docker image for tournament
-      run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/kickoff-tournaments:latest ./backend/tournament
-        docker tag ${{ secrets.DOCKER_USERNAME }}/kickoff-tournaments:latest ${{ secrets.DOCKER_USERNAME }}/kickoff-tournaments:${{ github.sha }}
-
-    - name: Push Docker image for tournament
-      run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/kickoff-tournaments:latest
-        docker push ${{ secrets.DOCKER_USERNAME }}/kickoff-tournaments:${{ github.sha }}
-
-    # Step 6: Build the Docker image for clubs
-    - name: Build Docker image for clubs
-      run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/kickoff-clubs:latest ./backend/club
-        docker tag ${{ secrets.DOCKER_USERNAME }}/kickoff-clubs:latest ${{ secrets.DOCKER_USERNAME }}/kickoff-clubs:${{ github.sha }}
-
-    - name: Push Docker image for clubs
-      run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/kickoff-clubs:latest
-        docker push ${{ secrets.DOCKER_USERNAME }}/kickoff-clubs:${{ github.sha }}
-
-    # Step 6: Log out from Docker Hub
+          docker tag ${{ secrets.DOCKER_USERNAME }}/kickoff-$service:latest ${{ secrets.DOCKER_USERNAME }}/kickoff-$service:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/kickoff-$service:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/kickoff-$service:${{ github.sha }}
+        done
+    
+    # Step 5: Log out from Docker Hub
     - name: Log out from Docker Hub
       run: docker logout
