@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { PlayerPosition, PlayerProfile } from '../types/profile';
+import eyePassword from '@/assets/eyePassword.svg';
+import eyePasswordOff from '@/assets/eyePasswordOff.svg';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { toast } from 'react-hot-toast';
 import { fetchPlayerProfileById, updatePlayerProfile } from '../services/profileService';
@@ -131,16 +133,11 @@ export default function PlayerProfilePage() {
   // Conditional rendering for login or profile page
   if (!userId) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center ">
         <div className="max-w-sm w-full space-y-8 p-8 bg-gray-900 rounded-lg">
           <div className="text-center">
-            <img
-              className="mx-auto h-20 w-20 rounded-full"
-              src="/assets/avatar.png" 
-              alt="Login Avatar"
-            />
-            <h2 className="mt-6 text-3xl font-extrabold text-white">
-              Nice to see you again
+            <h2 className="mt-6 text-3xl text-white">
+              Log in to see your profile.
             </h2>
           </div>
 
@@ -177,7 +174,7 @@ export default function PlayerProfilePage() {
                     placeholder="Enter Password"
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600 cursor-pointer" onClick={togglePasswordVisibility}>
-                    <img src={showPassword ? '/assets/eyePasswordOff.svg' : '/assets/eyePassword.svg'} alt="Toggle Password Visibility" className="h-5 w-5" />
+                    <img src={showPassword ? eyePassword : eyePasswordOff} alt="Toggle Password Visibility" className="h-5 w-5" />
                   </div>
                 </div>
               </div>
