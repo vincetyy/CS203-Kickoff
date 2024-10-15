@@ -40,10 +40,19 @@ public class KickoffTournamentManagementApplication {
 
 		// Creating dummyUsers, each one name will be User0, User1, User2, ... and pw will be password0, password1, password2, ...
 		final int NUM_DUMMY_USERS = 50;
+		final String[] dummyNames = {
+			"Zane", "Liam", "Emma", "Noah", "AvaFootball", "Elijah", "Charlotte", "William",
+			"Sophia", "James", "Amelia", "Benjamin", "Isabella", "Lucas", "MiaKickoff", "Henry",
+			"Evelyn", "Alexander", "Harper", "Michael", "Camila", "Ethan", "Gianna", "Daniel",
+			"Abigail", "Matthew", "Luna", "Joseph", "Ella", "Sebastian", "Elizabeth", "David",
+			"Sofia", "Carter", "Emily", "Wyatt", "Avery", "John", "Mila", "Owen",
+			"Scarlett", "Luke", "Eleanor", "Gabriel", "Madison", "Anthony", "Aria", "Isaac",
+			"Grace", "Samuel"
+		};
 
-		// create users 1 to 60 (user 0 is admin)
+		// create users 1 to 50 (user 1 is admin) with id 2 to 51
 		for (int i = 1; i <= NUM_DUMMY_USERS; i++) {
-			NewUserDTO dummyUserDTO = new NewUserDTO("User" + i, "user" + i + "@email.com",
+			NewUserDTO dummyUserDTO = new NewUserDTO(dummyNames[i-1] + i, "user" + i + "@email.com",
 					"password" + i, new String[] { "POSITION_Goalkeeper", "POSITION_Midfielder" }, "player"); // now all players are goalkeeper and midfielders, can rand later
 			User dummy = userService.addUser(dummyUserDTO);
 			// playerProfileService.addPlayerProfile(dummy, dummyUserDTO);
