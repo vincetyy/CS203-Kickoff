@@ -15,7 +15,7 @@ import ShowAvailability from '../components/ShowAvailability';
 import AvailabilityButton from '../components/AvailabilityButton'; 
 import { fetchTournamentById, getPlayerAvailability, updatePlayerAvailability } from '../services/tournamentService';
 import { getClubByPlayerId, getClubProfileById } from '../services/clubService' 
-import { fetchUserClubAsync, selectUserId,  } from '../store/userSlice'
+import { fetchUserClubAsync, selectUserClub, selectUserId,  } from '../store/userSlice'
 
 import UpdateTournament from '../components/UpdateTournament';
 import { ClubProfile } from '../types/club';
@@ -44,13 +44,13 @@ const TournamentPage: React.FC = () => {
   const tournamentId = id ? parseInt(id, 10) : null;
   const userId = useSelector(selectUserId);
   const clubId = useSelector(selectClubId); 
-
+  const userClub: Club | null = useSelector(selectUserClub);
 
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'succeeded' | 'failed'>('idle');
   const [error, setError] = useState<string | null>(null); 
 
-  const isHost = selectedTournament ? selectedTournament.host?.id === userId : false;
+  const isHost = selectedTournament ? selectedTournament.host === userId : false;
 
   const tournamentFormatMap: { [key: string]: string } = {
     FIVE_SIDE: 'Five-a-side',
@@ -203,7 +203,6 @@ const TournamentPage: React.FC = () => {
 
   return (
     <>
-      <Toaster />
       {/* Tournament Details Banner */}
       <div className="bg-green-600 rounded-lg p-4 lg:p-6 mb-6 flex items-center space-x-4">
         <div className="bg-white rounded-full p-2 lg:p-3">
@@ -271,7 +270,7 @@ const TournamentPage: React.FC = () => {
         
       {/* Show Availability */}
       {
-        clubId &&
+        userClub &&
         <ShowAvailability 
           availabilities={availabilities} 
           currentUserId={userId} 

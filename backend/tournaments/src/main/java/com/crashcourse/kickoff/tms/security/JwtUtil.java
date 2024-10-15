@@ -1,7 +1,6 @@
 package com.crashcourse.kickoff.tms.security;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 import javax.crypto.SecretKey;
@@ -14,13 +13,25 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtUtil {
-    private final Dotenv dotenv = Dotenv.load();
-    private final String JWT_SECRET_KEY = System.getenv("JWT_SECRET_KEY") != null
-    ? System.getenv("JWT_SECRET_KEY")  // Use system environment variable if available
-    : dotenv.get("JWT_SECRET_KEY");    // Fall back to dotenv if not
+    // Lazily load the dotenv file only if needed
+    private Dotenv dotenv;
+
+    // Try to load JWT_SECRET_KEY from the system environment, fallback to dotenv if system env is null
+    private String JWT_SECRET_KEY;
+
+    public JwtUtil() {
+        JWT_SECRET_KEY = System.getenv("JWT_SECRET_KEY");
+
+        // If JWT_SECRET_KEY is null, load from dotenv
+        if (JWT_SECRET_KEY == null) {
+            dotenv = Dotenv.load();
+            JWT_SECRET_KEY = dotenv.get("JWT_SECRET_KEY");  // Load from dotenv if system env is null
+        }
+    }
     private final long jwtExpirationInMillis = 3600000; // 1 hour in milliseconds
 
     private SecretKey getSigningKey() {
@@ -72,4 +83,26 @@ public class JwtUtil {
     public Boolean validateToken(String token) {
         return !isTokenExpired(token);
     }
+
+    public String generateJwtToken() {
+        long currentTimeMillis = System.currentTimeMillis();
+        Date now = new Date(currentTimeMillis);
+        Date expiryDate = new Date(currentTimeMillis + 360000);
+
+        /*
+         * Passing in empty claims
+         */
+        Long userId = 0L;
+        List<Object> roles = new ArrayList<Object>();
+
+        return Jwts.builder()
+            .setSubject("username")
+            .setIssuedAt(now)
+            .setExpiration(expiryDate)
+            .claim("userId", userId)
+            .claim("roles", roles)
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            .compact();
+    }
+
 }

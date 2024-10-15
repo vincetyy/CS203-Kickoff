@@ -55,6 +55,9 @@ const userSlice = createSlice({
       })
       .addCase(fetchUserClubAsync.fulfilled, (state, action) => {
         state.status = 'succeeded';
+        console.log("OK");
+        console.log(action.payload);
+        
         state.userClub = action.payload;  // Store the fetched club in the state
       })
       .addCase(fetchUserClubAsync.rejected, (state, action) => {
@@ -71,5 +74,6 @@ export const { setUser, clearUser } = userSlice.actions;
 // Selector to retrieve the userId and username from the Redux store
 export const selectUserId = (state: any) => state.user.userId;
 export const selectUsername = (state: any) => state.user.username;  // New selector for username
+export const selectUserClub = (state: any) => state.user.userClub;
 
 export default userSlice.reducer;

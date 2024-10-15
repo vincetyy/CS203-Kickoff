@@ -72,6 +72,30 @@ export default function TournamentsPage() {
   const handleConfirmJoin = async () => {
     if (!selectedTournament) return
 
+    if (!userClub) {
+      toast.error("User club information is missing.", {
+        duration: 4000,
+        position: 'top-center',
+      });
+      return;
+    }
+
+    /**
+     * Works for now because we only have 5 or 7 a side
+     * but need to change in the future with more 
+     * formats or team sizes
+     */
+    const requiredPlayers = selectedTournament.tournamentFormat === "FIVE_SIDE" ? 5 : 7; // Adjust based on your formats
+    const currentPlayerCount = userClub.players ? userClub.players.length : 0;
+
+    if (currentPlayerCount < requiredPlayers) {
+      toast.error(`You need at least ${requiredPlayers} players to join this tournament. Currently, you have ${currentPlayerCount} players.`, {
+        duration: 4000,
+        position: 'top-center',
+      });
+      return; // Prevent the API call
+    }
+
     try {
       const result = await dispatch(joinTournamentAsync({ 
         clubId: userClub.id, // Hardcoded club ID
