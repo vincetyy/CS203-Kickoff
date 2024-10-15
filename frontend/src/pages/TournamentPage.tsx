@@ -80,6 +80,10 @@ const TournamentPage: React.FC = () => {
   
       const updatedTournamentData = await fetchTournamentById(selectedTournament.id);
       setSelectedTournament(updatedTournamentData);
+      setJoinedClubsProfiles(prevProfiles => prevProfiles ? 
+        prevProfiles.filter(club => club.id !== clubToRemove.id) 
+        : prevProfiles
+      );
       toast.success('Club removed successfully');
     }
     setIsRemoveDialogOpen(false);
