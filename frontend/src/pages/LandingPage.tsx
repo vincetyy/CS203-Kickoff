@@ -17,7 +17,7 @@ const LandingPage: React.FC = () => {
   }, []);
 
   const handleVideoClick = () => {
-    navigate('/login'); // Navigate to the login page
+    navigate('/profile'); // Navigate to the login page
   };
 
   return (

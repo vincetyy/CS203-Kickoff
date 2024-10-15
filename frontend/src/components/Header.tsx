@@ -21,9 +21,6 @@ export default function Header() {
   const clubId = userClub?.id;
 
   useEffect(() => {
-    if (userId) {
-      console.log("Updated userId after dispatch: ", userId); // Log the userId
-    }
     const checkForNewApplications = async () => {
       if (!clubId) return;
 
