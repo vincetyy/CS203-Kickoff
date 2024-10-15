@@ -3,24 +3,13 @@ package com.crashcourse.kickoff.tms.player.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.crashcourse.kickoff.tms.player.PlayerPosition;
 import com.crashcourse.kickoff.tms.player.PlayerProfile;
-import com.crashcourse.kickoff.tms.player.dto.AcceptInvitationRequest;
-import com.crashcourse.kickoff.tms.player.dto.PlayerPositionDTO;
-import com.crashcourse.kickoff.tms.player.dto.PlayerProfileUpdateDTO;
+import com.crashcourse.kickoff.tms.player.dto.*;
 import com.crashcourse.kickoff.tms.player.service.PlayerProfileService;
 import com.crashcourse.kickoff.tms.security.JwtUtil;
 import com.crashcourse.kickoff.tms.user.service.UserService;
@@ -83,17 +72,6 @@ public class PlayerProfileController {
         return new ResponseEntity<>(updatedProfile,HttpStatus.OK);
     }
 
-    // not currently used ("deprecated")
-    // @PutMapping("/{playerProfileId}/position")
-    // public ResponseEntity<PlayerProfile> updatePlayerPosition(
-    //         @PathVariable Long playerProfileId,
-    //         @RequestBody PlayerPositionDTO playerPositionDTO) {
-
-    //     PlayerPosition preferredPosition = playerPositionDTO.getPreferredPosition();
-    //     PlayerProfile updatedProfile = playerProfileService.updatePlayerPosition(playerProfileId, preferredPosition);
-    //     return ResponseEntity.ok(updatedProfile);
-    // }
-
     @PostMapping("/{playerId}/acceptInvitation")
     public ResponseEntity<?> acceptInvitation(@PathVariable Long playerId,
             @RequestBody AcceptInvitationRequest request) {
@@ -105,4 +83,5 @@ public class PlayerProfileController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
 }

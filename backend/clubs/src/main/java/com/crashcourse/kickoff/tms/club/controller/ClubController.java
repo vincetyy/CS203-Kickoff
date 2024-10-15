@@ -160,4 +160,26 @@ public class ClubController {
         }
         return new ResponseEntity<>(applicants, HttpStatus.OK);
     }
+
+    @PostMapping("/{clubId}/applications/{playerId}")
+    public ResponseEntity<?> processApplication(@PathVariable Long clubId, @PathVariable Long playerId, 
+                                                                @RequestBody ApplicationUpdateDTO body) {
+        System.out.println(body.getApplicationStatus());
+        String status = body.getApplicationStatus();
+        if (status.equals("ACCEPTED")) {
+            System.out.printf("APPLICATION ACCEPTED\n");
+
+            clubService.acceptApplication(clubId, playerId);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } else if (status.equals("REJECTED")) {
+            System.out.printf("APPLICATION REJECTED\n");
+
+            clubService.rejectApplication(clubId, playerId);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 }

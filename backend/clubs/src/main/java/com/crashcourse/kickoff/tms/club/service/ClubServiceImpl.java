@@ -7,18 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.crashcourse.kickoff.tms.club.dto.PlayerApplicationDTO;
-import com.crashcourse.kickoff.tms.club.exception.ClubAlreadyExistsException;
-import com.crashcourse.kickoff.tms.club.exception.ClubNotFoundException;
-import com.crashcourse.kickoff.tms.club.exception.PlayerAlreadyAppliedException;
-import com.crashcourse.kickoff.tms.club.exception.PlayerLimitExceededException;
-import com.crashcourse.kickoff.tms.club.model.ApplicationStatus;
-import com.crashcourse.kickoff.tms.club.model.ClubInvitation;
-import com.crashcourse.kickoff.tms.club.model.PlayerApplication;
-import com.crashcourse.kickoff.tms.club.repository.ClubInvitationRepository;
-import com.crashcourse.kickoff.tms.club.repository.ClubRepository;
-import com.crashcourse.kickoff.tms.club.repository.PlayerApplicationRepository;
+import com.crashcourse.kickoff.tms.club.exception.*;
+import com.crashcourse.kickoff.tms.club.model.*;
+import com.crashcourse.kickoff.tms.club.repository.*;
 import com.crashcourse.kickoff.tms.player.PlayerPosition;
-import com.crashcourse.kickoff.tms.club.model.Club;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -35,6 +27,10 @@ public class ClubServiceImpl implements ClubService {
 
     @Autowired
     private ClubInvitationRepository clubInvitationRepository;
+
+    /**
+     * CLUB CRUD METHODS
+     */
 
     // jparepository has automatically implemented crud methods
     @Transactional
@@ -73,34 +69,16 @@ public class ClubServiceImpl implements ClubService {
         return club;
     }
 
-    public void deleteClub(Long id) {
-        if (!clubRepository.existsById(id)) {
-            throw new ClubNotFoundException("Club with ID " + id + " not found");
+    public List<Club> getClubsByIds(@Positive(message = "Club ID must be positive") List<Long> clubIds) {
+        List<Club> clubs = clubRepository.findAllById(clubIds);
+        if (clubs.size() != clubIds.size()) {
+            throw new ClubNotFoundException("One or more clubs not found for the provided IDs.");
         }
-        clubRepository.deleteById(id);
+        return clubs;
     }
 
-    // to transfer captain status to another player in the club
-    public Club transferCaptaincy(Long clubId, Long currentCaptainId, Long newCaptainId) throws Exception {
-        // PlayerProfile currentCaptain = playerProfileRepository.findById(currentCaptainId)
-        // .orElseThrow(() -> new RuntimeException("currentCaptain not found"));
-
-        // PlayerProfile newCaptain = playerProfileRepository.findById(newCaptainId)
-        // .orElseThrow(() -> new RuntimeException("newCaptain not found"));
-        
-        Club club = clubRepository.findById(clubId).orElseThrow(() -> 
-            new ClubNotFoundException("Club with ID " + clubId + " not found"));
-    
-        if (!club.getCaptainId().equals(currentCaptainId)) {
-            throw new Exception("Only the current captain can transfer the captaincy.");
-        }
-    
-        if (!club.getPlayers().contains(newCaptainId)) {
-            throw new Exception("The new captain must be a player in the club.");
-        }
-    
-        club.setCaptainId(newCaptainId);
-        return clubRepository.save(club);
+    public Optional<Club> getClubByPlayerId(Long playerId) {
+        return clubRepository.findClubByPlayerId(playerId);
     }
 
     // general method to update club, if there's common use case for a specific method (eg. updateElo), we can make that too
@@ -127,7 +105,17 @@ public class ClubServiceImpl implements ClubService {
         throw new ClubNotFoundException("Club with ID " + id + " not found");
     }
 
-    // add a player to club
+    public void deleteClub(Long id) {
+        if (!clubRepository.existsById(id)) {
+            throw new ClubNotFoundException("Club with ID " + id + " not found");
+        }
+        clubRepository.deleteById(id);
+    }
+
+    /**
+     * PLAYER-RELATED METHODS
+     */
+
     public Club addPlayerToClub(Long clubId, Long playerId) throws Exception {
         // PlayerProfile player = playerProfileRepository.findById(playerId)
         // .orElseThrow(() -> new RuntimeException("PlayerProfile not found"));
@@ -149,7 +137,17 @@ public class ClubServiceImpl implements ClubService {
         return club;
     }
 
-    // remove a player from club
+    @Override
+    public List<Long> getPlayers(Long clubId) {
+        Optional<Club> clubOptional = clubRepository.findById(clubId);
+        if (!clubOptional.isPresent()) {
+            throw new ClubNotFoundException("Club with ID " + clubId + " not found");
+        }
+
+        Club club = clubOptional.get();
+        return club.getPlayers();
+    }
+
     public Club removePlayerFromClub(Long clubId, Long playerId) throws Exception {
         
         Club club = clubRepository.findById(clubId).orElseThrow(() -> 
@@ -163,50 +161,27 @@ public class ClubServiceImpl implements ClubService {
         return clubRepository.save(club);
     }
 
-    public void applyToClub(PlayerApplicationDTO applicationDTO) throws Exception {
-        // Fetch the club by ID
+    // to transfer captain status to another player in the club
+    public Club transferCaptaincy(Long clubId, Long currentCaptainId, Long newCaptainId) throws Exception {
+        // PlayerProfile currentCaptain = playerProfileRepository.findById(currentCaptainId)
+        // .orElseThrow(() -> new RuntimeException("currentCaptain not found"));
 
-        Long playerId = applicationDTO.getPlayerId(); 
+        // PlayerProfile newCaptain = playerProfileRepository.findById(newCaptainId)
+        // .orElseThrow(() -> new RuntimeException("newCaptain not found"));
         
-        System.out.println("Club ID: " + applicationDTO.getClubId());
-        Club club = clubRepository.findById(applicationDTO.getClubId())
-                .orElseThrow(() -> new ClubNotFoundException("Club with ID " + applicationDTO.getClubId() + " not found"));
+        Club club = clubRepository.findById(clubId).orElseThrow(() -> 
+            new ClubNotFoundException("Club with ID " + clubId + " not found"));
     
-        // Check if the club is full
-        if (club.getPlayers().size() >= Club.MAX_PLAYERS_IN_CLUB) {
-            throw new PlayerLimitExceededException(
-                String.format("A club cannot have more than %d players", Club.MAX_PLAYERS_IN_CLUB)
-            );
+        if (!club.getCaptainId().equals(currentCaptainId)) {
+            throw new Exception("Only the current captain can transfer the captaincy.");
         }
     
-        // Check if the user has already applied to this club
-        if (applicationRepository.existsByPlayerIdAndClub(playerId, club)) {  // Use 'User' instead of 'PlayerProfile'
-            throw new PlayerAlreadyAppliedException("Player has already applied to this club");
+        if (!club.getPlayers().contains(newCaptainId)) {
+            throw new Exception("The new captain must be a player in the club.");
         }
     
-        // Create a new PlayerApplication
-        PlayerApplication application = new PlayerApplication();
-        application.setClub(club);
-        application.setPlayerId(playerId);  
-        application.setDesiredPosition(applicationDTO.getDesiredPosition());
-        application.setStatus(ApplicationStatus.PENDING);
-    
-        // Save the application
-        applicationRepository.save(application);
-
-        /*
-        * Add Applicant to Club
-        */
-        club.getApplicants().add(application.getId());
-        clubRepository.save(club);
-    }
-
-    public List<Club> getClubsByIds(@Positive(message = "Club ID must be positive") List<Long> clubIds) {
-        List<Club> clubs = clubRepository.findAllById(clubIds);
-        if (clubs.size() != clubIds.size()) {
-            throw new ClubNotFoundException("One or more clubs not found for the provided IDs.");
-        }
-        return clubs;
+        club.setCaptainId(newCaptainId);
+        return clubRepository.save(club);
     }
 
     @Override
@@ -214,6 +189,10 @@ public class ClubServiceImpl implements ClubService {
         Club club = clubRepository.findById(clubId).orElse(null);
         return club != null && club.getCaptainId().equals(playerId);
     }
+
+    /**
+     * INVITATION METHODS (CLUB INVITES PLAYER)
+     */
 
     @Override
     public Club invitePlayerToClub(Long clubId, Long playerId, Long captainId) throws Exception {
@@ -255,6 +234,47 @@ public class ClubServiceImpl implements ClubService {
         return clubInvitationRepository.findByPlayerIdAndStatus(playerId, ApplicationStatus.PENDING);
     }
 
+    /**
+     * APPLICATION METHODS (PLAYER APPLIES TO CLUB)
+     */
+
+    public void applyToClub(PlayerApplicationDTO applicationDTO) throws Exception {
+
+        Long playerId = applicationDTO.getPlayerId(); 
+        
+        System.out.println("Club ID: " + applicationDTO.getClubId());
+        Club club = clubRepository.findById(applicationDTO.getClubId())
+                .orElseThrow(() -> new ClubNotFoundException("Club with ID " + applicationDTO.getClubId() + " not found"));
+    
+        // Check if the club is full
+        if (club.getPlayers().size() >= Club.MAX_PLAYERS_IN_CLUB) {
+            throw new PlayerLimitExceededException(
+                String.format("A club cannot have more than %d players", Club.MAX_PLAYERS_IN_CLUB)
+            );
+        }
+    
+        // Check if the user has already applied to this club
+        if (applicationRepository.existsByPlayerIdAndClub(playerId, club)) {  // Use 'User' instead of 'PlayerProfile'
+            throw new PlayerAlreadyAppliedException("Player has already applied to this club");
+        }
+    
+        // Create a new PlayerApplication
+        PlayerApplication application = new PlayerApplication();
+        application.setClub(club);
+        application.setPlayerId(playerId);  
+        application.setDesiredPosition(applicationDTO.getDesiredPosition());
+        application.setStatus(ApplicationStatus.PENDING);
+    
+        // Save the application
+        applicationRepository.save(application);
+
+        /*
+        * Add Applicant to Club
+        */
+        club.getApplicants().add(application.getId());
+        clubRepository.save(club);
+    }
+
     @Override
     public List<Long> getPlayerApplications(Long clubId) {
         Optional<Club> clubOptional = clubRepository.findById(clubId);
@@ -262,7 +282,9 @@ public class ClubServiceImpl implements ClubService {
             throw new ClubNotFoundException("Club with ID " + clubId + " not found");
         }
         Club club = clubOptional.get();
+
         List<Long> playerIds = new ArrayList<>();
+
         for (Long applicationId: club.getApplicants()) {
             Optional<PlayerApplication> applicationOptional = applicationRepository.findById(applicationId);
             playerIds.add(applicationOptional.get().getPlayerId());
@@ -270,18 +292,61 @@ public class ClubServiceImpl implements ClubService {
         return playerIds;
     }
 
+    @Transactional
     @Override
-    public List<Long> getPlayers(Long clubId) {
+    public void acceptApplication(Long clubId, Long playerId) {
         Optional<Club> clubOptional = clubRepository.findById(clubId);
         if (!clubOptional.isPresent()) {
             throw new ClubNotFoundException("Club with ID " + clubId + " not found");
         }
-
         Club club = clubOptional.get();
-        return club.getPlayers();
+
+        /*
+         * Find the application
+         */
+        PlayerApplication playerApplication = applicationRepository.findByClubIdAndPlayerId(clubId, playerId);
+
+        /*
+         * Add to Players list
+         * Remove from applicants list
+         */
+        club.getPlayers().add(playerId);
+        club.getApplicants().remove(playerApplication.getId());
+        clubRepository.save(club);
+
+
+        /*
+         * Remove application from repository
+         */
+        applicationRepository.deleteById(playerApplication.getId());        
     }
 
-    public Optional<Club> getClubByPlayerId(Long playerId) {
-        return clubRepository.findClubByPlayerId(playerId);
+    @Transactional
+    @Override
+    public void rejectApplication(Long clubId, Long playerId) {
+        
+        Optional<Club> clubOptional = clubRepository.findById(clubId);
+        if (!clubOptional.isPresent()) {
+            throw new ClubNotFoundException("Club with ID " + clubId + " not found");
+        }
+        Club club = clubOptional.get();
+
+        /*
+         * Find the application
+         */
+        PlayerApplication playerApplication = applicationRepository.findByClubIdAndPlayerId(clubId, playerId);
+
+        /*
+         * Remove from applicants list
+         */
+        club.getApplicants().remove(playerApplication.getId());
+        clubRepository.save(club);
+
+        /*
+         * Remove application from repository
+         */
+        System.out.println("THREE");
+        applicationRepository.deleteById(playerApplication.getId());
     }
+
 }
