@@ -11,35 +11,49 @@ import jakarta.validation.Valid;
 
 public interface ClubService {
 
+    /**
+     * CLUB CRUD METHODS
+     */
+
     Club createClub(@Valid Club club, Long creatorId) throws Exception;
 
     List<Club> getAllClubs();
-
     Optional<Club> getClubById(Long id);
+    List<Club> getClubsByIds(List<Long> clubIds);
 
-    void deleteClub(Long id);
-
-    Club transferCaptaincy(Long clubId, Long currentCaptainId, Long newCaptainId) throws Exception;
+    Optional<Club> getClubByPlayerId(Long playerId);
 
     Club updateClub(Long id, Club clubDetails);
 
+    void deleteClub(Long id);
+
+    /**
+     * PLAYER CRUD METHODS
+     */
+
     Club addPlayerToClub(Long clubId, Long playerId) throws Exception;
+    Club invitePlayerToClub(Long clubId, Long playerId, Long captainId) throws Exception;
+
+    List<Long> getPlayers(Long clubId);
+    boolean isCaptain(Long clubId, Long playerId);
 
     Club removePlayerFromClub(Long clubId, Long playerId) throws Exception;
 
-    Club invitePlayerToClub(Long clubId, Long playerId, Long captainId) throws Exception;
+    Club transferCaptaincy(Long clubId, Long currentCaptainId, Long newCaptainId) throws Exception;
+
+    /**
+     * INVITATION METHODS
+     */
 
     Club acceptInvite(Long playerId, Long clubId) throws Exception;
 
-    void applyToClub(PlayerApplicationDTO applicationDTO) throws Exception;
-
-    List<Club> getClubsByIds(List<Long> clubIds);
-
     List<ClubInvitation> getPlayerInvitations(Long playerId) throws Exception;
 
-    boolean isCaptain(Long clubId, Long playerId);
-
-    List<Long> getPlayers(Long clubId);
-
-    Optional<Club> getClubByPlayerId(Long playerId);
+    /** 
+     * APPLICATION METHODS
+     */
+    void applyToClub(PlayerApplicationDTO applicationDTO) throws Exception;
+    List<Long> getPlayerApplications(Long clubId) throws Exception;
+    void acceptApplication(Long clubId, Long playerId);
+    void rejectApplication(Long clubId, Long playerId);
 }
