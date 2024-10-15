@@ -41,7 +41,7 @@ public class KickoffTournamentManagementApplication {
 		// Creating dummyUsers, each one name will be User0, User1, User2, ... and pw will be password0, password1, password2, ...
 		final int NUM_DUMMY_USERS = 50;
 		final String[] dummyNames = {
-			"Olivia", "Liam", "Emma", "Noah", "AvaFootball", "Elijah", "Charlotte", "William",
+			"Zane", "Liam", "Emma", "Noah", "AvaFootball", "Elijah", "Charlotte", "William",
 			"Sophia", "James", "Amelia", "Benjamin", "Isabella", "Lucas", "MiaKickoff", "Henry",
 			"Evelyn", "Alexander", "Harper", "Michael", "Camila", "Ethan", "Gianna", "Daniel",
 			"Abigail", "Matthew", "Luna", "Joseph", "Ella", "Sebastian", "Elizabeth", "David",
