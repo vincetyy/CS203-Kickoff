@@ -155,9 +155,11 @@ public class ClubController {
     @GetMapping("/{clubId}/applications")
     public ResponseEntity<List<Long>> getPlayerApplications(@PathVariable Long clubId) {
         List<Long> applicants = clubService.getPlayerApplications(clubId);
-        if (applicants == null) {
-            throw new RuntimeException("help");
-        }
+        if (applicants == null || applicants.isEmpty()) {
+            System.out.println("No applications found for clubId: " + clubId);
+        } else {
+            System.out.println("Applications found for clubId: " + clubId + ", applicants: " + applicants);
+        }    
         return new ResponseEntity<>(applicants, HttpStatus.OK);
     }
 
