@@ -80,5 +80,17 @@ public class KickoffTournamentManagementApplication {
 		tournament3.getJoinedClubsIds().add(5L);
 		tournament3.getJoinedClubsIds().add(6L);
 		tournament3.getJoinedClubsIds().add(7L);
+
+
+		// add users avail for tournament, esp users 8, 15, 22, 29.
+		// users 36, 43 not avail, user50 will be the demo user to apply
+		tournament1.updatePlayerAvailability(8L, true);
+		tournament1.updatePlayerAvailability(15L, true);
+		tournament1.updatePlayerAvailability(22L, true);
+		tournament1.updatePlayerAvailability(29L, true);
+		tournament1.updatePlayerAvailability(36L, false);
+		tournament1.updatePlayerAvailability(43L, false);
+
+		
 	}
 }
