@@ -19,13 +19,12 @@ function App() {
         {/* Routes for the Landing Page and Auth Pages */}
         <Route element={<LandingLayout />}>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
         </Route>
 
         {/* Routes for the Main Application, including Layout */}
         <Route element={<Layout />}>
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/signup" element={<Signup />} />
           <Route path="/tournaments" element={<TournamentsPage />} />
           <Route path="/tournaments/:id" element={<TournamentPage />} />
           <Route path="/clubs" element={<Club />} />

@@ -1,6 +1,6 @@
-import React from 'react'
-import { NavLink } from 'react-router-dom'
-import { User, Trophy, Users, BarChart2, Menu, X } from 'lucide-react'
+import React from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { User, Trophy, Users, BarChart2, Menu, X } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -8,14 +8,21 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
-  const toggleSidebar = () => setIsOpen(!isOpen)
+  const toggleSidebar = () => setIsOpen(!isOpen);
 
+  // Get the current location
+  const location = useLocation();
+
+  // Custom NavItem component with active state
   const NavItem = ({ to, icon: Icon, children }: { to: string; icon: React.ElementType; children: React.ReactNode }) => (
     <NavLink
       to={to}
       className={({ isActive }) =>
         `flex items-center space-x-2 p-2 rounded-md transition-colors duration-200 ${
-          isActive ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+          // Check if current path starts with `to` to apply active state
+          location.pathname.startsWith(to) || isActive
+            ? 'bg-gray-800 text-white'
+            : 'text-gray-300 hover:bg-gray-800 hover:text-white'
         }`
       }
       onClick={() => setIsOpen(false)}
@@ -23,7 +30,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       <Icon className="h-5 w-5" />
       <span>{children}</span>
     </NavLink>
-  )
+  );
 
   return (
     <>
@@ -56,5 +63,5 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         </nav>
       </aside>
     </>
-  )
+  );
 }

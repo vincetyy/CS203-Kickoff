@@ -190,7 +190,7 @@ export default function PlayerProfilePage() {
 
             <div className="text-center text-sm text-white">
               Don’t have an account?{' '}
-              <a href="/signup" className="text-indigo-400">
+              <a href="/profile/signup" className="text-indigo-400">
                 Sign up now
               </a>
             </div>
