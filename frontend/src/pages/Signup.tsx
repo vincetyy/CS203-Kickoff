@@ -4,7 +4,6 @@ import eyePasswordOff from '@/assets/eyePasswordOff.svg';
 
 import {
     Input,
-    Switch,
     Field,
     Label
 } from "@headlessui/react";

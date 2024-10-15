@@ -6,22 +6,27 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+
+import io.github.cdimascio.dotenv.Dotenv;
 
 import com.crashcourse.kickoff.tms.location.model.Location;
 import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
 import com.crashcourse.kickoff.tms.location.service.LocationService;
-import com.crashcourse.kickoff.tms.tournament.dto.PlayerAvailabilityDTO;
-import com.crashcourse.kickoff.tms.tournament.dto.TournamentCreateDTO;
-import com.crashcourse.kickoff.tms.tournament.dto.TournamentJoinDTO;
-import com.crashcourse.kickoff.tms.tournament.dto.TournamentResponseDTO;
-import com.crashcourse.kickoff.tms.tournament.dto.TournamentUpdateDTO;
-import com.crashcourse.kickoff.tms.tournament.exception.ClubAlreadyJoinedException;
-import com.crashcourse.kickoff.tms.tournament.exception.TournamentFullException;
-import com.crashcourse.kickoff.tms.tournament.model.PlayerAvailability;
-import com.crashcourse.kickoff.tms.tournament.model.Tournament;
-import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
+
+import com.crashcourse.kickoff.tms.tournament.RestTemplateConfig;
+import com.crashcourse.kickoff.tms.tournament.dto.*;
+import com.crashcourse.kickoff.tms.tournament.exception.*;
+import com.crashcourse.kickoff.tms.tournament.model.*;
 import com.crashcourse.kickoff.tms.tournament.repository.PlayerAvailabilityRepository;
 import com.crashcourse.kickoff.tms.tournament.repository.TournamentRepository;
+import com.crashcourse.kickoff.tms.security.JwtUtil;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +43,9 @@ public class TournamentServiceImpl implements TournamentService {
     private final LocationRepository locationRepository;
     private final LocationService locationService;
     private final PlayerAvailabilityRepository playerAvailabilityRepository;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Override
     public TournamentResponseDTO createTournament(TournamentCreateDTO dto, Long userIdFromToken) {
@@ -173,6 +181,32 @@ public class TournamentServiceImpl implements TournamentService {
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + tournamentId));
 
         Long clubId = dto.getClubId(); // do i need to handle if clubId is null? 
+
+        /*
+         * refer to ClubController.java
+         */
+        String clubServiceUrl = "http://localhost:8082/clubs/" + clubId + "/players";
+
+        JwtUtil help = new JwtUtil();
+        String jwtToken = help.generateJwtToken();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + jwtToken);
+        HttpEntity<Long> request = new HttpEntity<>(clubId, headers);
+        System.out.println((request));
+
+        ResponseEntity<List<Long>> response = restTemplate.exchange(
+            clubServiceUrl, 
+            HttpMethod.GET, 
+            request, 
+            new ParameterizedTypeReference<List<Long>>() {}
+        );
+        System.out.println(response);
+
+        List<Long> players = response.getBody();
+        if (players == null || tournament.getTournamentFormat().getNumberOfPlayers() > players.size()) {
+            throw new NotEnoughPlayersException("Club does not have enough players.");
+        }
 
         if (tournament.getJoinedClubIds() != null && tournament.getJoinedClubIds().contains(clubId)) {
             throw new ClubAlreadyJoinedException("Club has already joined the tournament.");
