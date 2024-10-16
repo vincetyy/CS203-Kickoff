@@ -185,4 +185,15 @@ public class ClubController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PatchMapping("/{clubId}/leavePlayer")
+    public ResponseEntity<?> playerLeaveClub(@PathVariable Long clubId, @RequestBody PlayerLeaveRequest playerLeaveRequest) {
+        try {
+            Long playerId = playerLeaveRequest.getPlayerId();
+            Club updatedClub = clubService.playerLeaveClub(clubId, playerId);
+            return new ResponseEntity<>(updatedClub, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }

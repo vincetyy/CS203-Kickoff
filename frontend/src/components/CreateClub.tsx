@@ -6,6 +6,9 @@ import axios from 'axios';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog"; 
 import { Club } from '../types/club';  
 import { useNavigate } from 'react-router-dom';
+import { fetchUserClubAsync } from '../store/userSlice';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../store';
 
 interface CreateClubProps {
   isCreateDialogOpen: boolean;
@@ -15,11 +18,12 @@ interface CreateClubProps {
 
 const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreateDialogOpen, handleClubCreated }) => {
   const [clubName, setClubName] = useState('');
-  const [elo, setElo] = useState<number>(1500);
+  const [elo, setElo] = useState<number>(500);
   const [ratingDeviation, setRatingDeviation] = useState<number>(200);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
   const fetchPlayersForClub = async (clubId: number) => {
     try {
@@ -63,14 +67,15 @@ const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreate
           ...newClub,
           players: players || [], 
         };
-        handleClubCreated(completeClub);        
+        handleClubCreated(completeClub);     
+        dispatch(fetchUserClubAsync());   
 
         // Reset the form and close the dialog
         setIsCreateDialogOpen(false);       
         setClubName('');
-        setElo(1500);
+        setElo(500);
         setRatingDeviation(200);
-        navigate(`/clubs/${newClub.id}`);
+        setIsCreateDialogOpen(false);
       }
     } catch (err: any) {
       console.error('Error creating club:', err);

@@ -1,10 +1,10 @@
-// Import necessary types
 import React from 'react';
 
 interface ClubCardProps {
   id: number;
   name: string;
   description: string;
+  ratings: string;
   image: string;
   applied: boolean;
   onClick: () => void;
@@ -15,6 +15,7 @@ const ClubCard: React.FC<ClubCardProps> = ({
   id,
   name,
   description,
+  ratings,
   image,
   applied,
   onClick,
@@ -29,6 +30,7 @@ const ClubCard: React.FC<ClubCardProps> = ({
       <div className="p-4">
         <h3 className="text-xl font-bold mb-2">{name}</h3>
         <p className="text-gray-400">{description}</p>
+        <p className="text-gray-400 mt-2">{ratings}</p>
         {/* You can remove the Join button from here */}
       </div>
     </div>
