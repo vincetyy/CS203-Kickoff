@@ -194,13 +194,13 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ id }) => {
         ) : (
           <p>No tournaments found for the selected filter.</p>
         )}
+        {userId && (
+          <div className="mt-5 bottom-6 right-6">
+            <LeaveClubButton />
+          </div>
+        )}
       </div>
-
-      {userId && (
-        <div className="absolute bottom-6 right-6">
-          <LeaveClubButton />
-        </div>
-      )}
+      
     </div>
   );
 };
