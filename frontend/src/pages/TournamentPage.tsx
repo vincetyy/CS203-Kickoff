@@ -300,7 +300,7 @@ const TournamentPage: React.FC = () => {
             <DialogTitle>Remove {clubToRemove?.name}</DialogTitle>
           </DialogHeader>
           <div className="mt-4">
-            <p> {clubToRemove?.id === userClub.id ? `Are you sure you want to leave this tournament?` : `Are you sure you want to remove ${clubToRemove?.name} from this tournament?`}</p>
+            <p> {clubToRemove?.id === userClub?.id ? `Are you sure you want to leave this tournament?` : `Are you sure you want to remove ${clubToRemove?.name} from this tournament?`}</p>
           </div>
           <div className="flex flex-col sm:flex-row justify-between mt-4 space-y-2 sm:space-y-0 sm:space-x-2">
             <button 

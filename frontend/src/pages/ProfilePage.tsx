@@ -191,7 +191,7 @@ export default function PlayerProfilePage() {
 
             <div className="text-center text-sm text-white">
               Don’t have an account?{' '}
-              <a href="/profile/signup" className="text-indigo-400">
+              <a onClick={() => navigate("/profile/signup")} className="text-indigo-400">
                 Sign up now
               </a>
             </div>
@@ -211,7 +211,7 @@ export default function PlayerProfilePage() {
       <div className="bg-gray-900 rounded-lg p-6">
         <div className="flex items-center mb-6">
           <img
-            src={`https://picsum.photos/seed/${playerProfile.id}/200/200`}
+            src={`https://picsum.photos/seed/${playerProfile.id + 2000}/200/200`}
             alt={`${playerProfile.user.username}'s profile`}
             className="w-24 h-24 rounded-full object-cover mr-6"
           />
@@ -226,7 +226,7 @@ export default function PlayerProfilePage() {
           {club ? (
             <div className="flex items-center">
               <img
-                src={`https://picsum.photos/seed/${club.id}/400/300`}
+                src={`https://picsum.photos/seed/club-${club.id}/800/200`}
                 alt={`${club.name} logo`}
                 className="w-16 h-16 rounded-full object-cover mr-4"
               />

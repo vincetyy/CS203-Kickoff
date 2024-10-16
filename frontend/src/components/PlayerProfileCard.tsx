@@ -50,7 +50,7 @@ const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({ id, availability 
   return (
     <div className="bg-gray-800 rounded-lg p-4 flex items-center space-x-4 w-96">
       <img
-        src={`https://picsum.photos/seed/${playerProfile.id}/100/100`}
+        src={`https://picsum.photos/seed/${playerProfile.id+2000}/100/100`}
         alt={`${playerProfile.user.username}'s profile`}
         className="w-16 h-16 rounded-full object-cover"
       />

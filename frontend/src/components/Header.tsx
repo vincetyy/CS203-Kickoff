@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Menu, Bell, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
-import { Avatar, AvatarFallback } from './ui/avatar';
+import { AvatarImage, AvatarFallback } from './ui/avatar';
 import { Toaster, toast } from 'react-hot-toast';
 import { useSelector, useDispatch } from 'react-redux'; // Correct hook usage inside functional component
 import { selectUsername, selectUserId } from '../store/userSlice';
@@ -75,27 +75,29 @@ export default function Header() {
           KICKOFF
         </Link>
       </div>
-      <div className="flex items-center space-x-4">
-        <Button
-          variant="ghost"
-          className="relative"
-          onClick={handleBellClick}
-        >
-          <Bell className="h-6 w-6 text-blue-500" />
-          {newApplications && (
-            <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white" />
-          )}
-        </Button>
-        <Button variant="ghost" size="icon">
-          <MessageSquare className="h-5 w-5" />
-        </Button>
-        <Button variant="ghost" onClick={handleLogoutClick}> {/* Logout Button */}
-          Logout
-        </Button>
-        <Avatar>
-          <AvatarFallback>{avatarFallbackText}</AvatarFallback>
-        </Avatar>
-      </div>
+      {
+        userId &&
+        <div className="flex items-center space-x-4">
+          <Button
+            variant="ghost"
+            className="relative"
+            onClick={handleBellClick}
+          >
+            <Bell className="h-6 w-6 text-blue-500" />
+            {newApplications && (
+              <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white" />
+            )}
+          </Button>
+          <Button variant="ghost" size="icon">
+            <MessageSquare className="h-5 w-5" />
+          </Button>
+          <Button variant="ghost" onClick={handleLogoutClick}> {/* Logout Button */}
+            Logout
+          </Button>
+          <AvatarImage src={`https://picsum.photos/seed/${userId+2000}/100/100`}>
+          </AvatarImage>
+        </div>
+      }
     </header>
   );
 }

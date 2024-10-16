@@ -194,6 +194,12 @@ export default function Signup() {
                         <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
                             Sign Up
                         </Button>
+                        <div className="text-center text-sm text-white">
+                            Already have an account?{' '}
+                            <a onClick={() => navigate("/profile/")} className="text-indigo-400">
+                                Login now
+                            </a>
+                        </div>
                     </form>
                 </div>
             </div>
