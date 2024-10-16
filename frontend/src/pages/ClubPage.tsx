@@ -190,10 +190,9 @@ export default function ClubPage() {
             id={club.id}
             name={club.name}
             description={
-              club.clubDescription ||
-              `ELO: ${club.elo.toFixed(0)}, RD: ${club.ratingDeviation.toFixed(
-                0
-              )}`
+              club.clubDescription 
+                ? `${club.clubDescription} \n ELO: ${club.elo.toFixed(0)}, RD: ${club.ratingDeviation.toFixed(0)}`
+                : `ELO: ${club.elo.toFixed(0)}, RD: ${club.ratingDeviation.toFixed(0)}`
             }
             image={`https://picsum.photos/seed/${club.id}/400/300`}
             applied={false}
