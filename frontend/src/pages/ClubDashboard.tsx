@@ -9,8 +9,9 @@ import { PlayerPosition, PlayerProfile } from '../types/profile';
 import { AppDispatch, RootState } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchClubsAsync } from '../store/clubSlice';
-import { fetchUserClubAsync } from '../store/userSlice';
+import { fetchUserClubAsync, selectUserId } from '../store/userSlice';
 import { fetchPlayerProfileById } from '../services/profileService';
+import LeaveClubButton from '../components/LeaveClubButton';
 
 enum TournamentFilter {
   UPCOMING = 'UPCOMING',
@@ -56,6 +57,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ id }) => {
   const [club, setClub] = useState<ClubProfile | null>(null);
   const [captain, setCaptain] = useState<PlayerProfile | null>(null);
   const [players, setPlayers] = useState<PlayerProfile[] | null>(null);
+  const userId = useSelector(selectUserId);
 
   useEffect(() => {
     const fetchClub = async () => {
@@ -192,7 +194,13 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ id }) => {
         ) : (
           <p>No tournaments found for the selected filter.</p>
         )}
+        {userId && (
+          <div className="mt-5 bottom-6 right-6">
+            <LeaveClubButton />
+          </div>
+        )}
       </div>
+      
     </div>
   );
 };
