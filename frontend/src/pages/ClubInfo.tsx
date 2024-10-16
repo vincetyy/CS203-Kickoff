@@ -36,6 +36,7 @@ const ClubInfo: React.FC = () => {
   const [captain, setCaptain] = useState<PlayerProfile | null>(null);
   const [players, setPlayers] = useState<PlayerProfile[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [hasApplied, setHasApplied] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -47,8 +48,15 @@ const ClubInfo: React.FC = () => {
       try {
         const clubResponse = await axios.get(`http://localhost:8082/clubs/${id}`);
         setClub(clubResponse.data);
+
+        const applicantsResponse = await axios.get(`http://localhost:8082/clubs/${id}/applications`);
+        console.log(applicantsResponse.data);
+        
+        setHasApplied(applicantsResponse.data.includes(userId));
+        
         
         const captainResponse = await fetchPlayerProfileById(clubResponse.data.captainId);
+        
         setCaptain(captainResponse);
 
         const playerIds = clubResponse.data.players; // Assuming clubResponse.data.players is an array of player IDs
@@ -150,9 +158,14 @@ const ClubInfo: React.FC = () => {
 
       {/* Apply Button */}
       {
-        userId &&
+        userId && !hasApplied &&
         <Button onClick={() => setIsDialogOpen(true)}>Apply to Join</Button>
       }
+
+      {
+        userId && hasApplied &&
+        <Button className="bg-green-500 hover:bg-green-600">Applied!</Button>
+      }   
 
       {/* Position Selection Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
