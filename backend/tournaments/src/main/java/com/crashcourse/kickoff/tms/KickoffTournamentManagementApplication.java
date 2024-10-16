@@ -35,7 +35,17 @@ public class KickoffTournamentManagementApplication {
 		locationService.createLocation(location2);
 		Location location3 = new Location(null, "East Coast Park", null);
 		locationService.createLocation(location3);
-
+		Location location4 = new Location(null, "Jurong East Sports Hall", null);
+		locationService.createLocation(location4);
+		Location location5 = new Location(null, "Bras Basah (SMU)", null);
+		locationService.createLocation(location5);
+		Location location6 = new Location(null, "National Stadium Courts", null);
+		locationService.createLocation(location6);
+		Location location7 = new Location(null, "Our Tampines Hub", null);
+		locationService.createLocation(location7);
+		Location location8 = new Location(null, "Woodlands Football Courts", null);
+		locationService.createLocation(location8);
+u
 		// Tournament
 		final int NUM_MOCKED_TOURNAMENTS = 3;
 
@@ -64,9 +74,9 @@ public class KickoffTournamentManagementApplication {
 		TournamentResponseDTO tournament3 = tournamentService.getTournamentById(3L);
 
 		// im randomly (but not randomly, so its deterministic) adding clubs to tournaments
-		// 236 -- tourney 1
-		// 2457 -- tourney 2
-		// 234567 -- tourney 3
+		// 136 -- tourney 1
+		// 1457 -- tourney 2
+		// 134567 -- tourney 3
 
 		// create tournament join dtos for tournament1
 		TournamentJoinDTO tournamentJoinDTO1 = new TournamentJoinDTO(1L, 1L);

@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.crashcourse.kickoff.tms.host.HostProfile;
 import com.crashcourse.kickoff.tms.host.HostProfileService;
+import com.crashcourse.kickoff.tms.player.PlayerPosition;
 import com.crashcourse.kickoff.tms.player.service.PlayerProfileService;
 import com.crashcourse.kickoff.tms.security.SecurityConfig;
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
@@ -51,9 +52,15 @@ public class KickoffTournamentManagementApplication {
 		};
 
 		// create users 1 to 50 (user 1 is admin) with id 2 to 51
+		private static final PlayerPosition[] POSITIONS = PlayerPosition.values();
 		for (int i = 1; i <= NUM_DUMMY_USERS; i++) {
+			// round-robin positions so that our demo is still deterministic
+			String primaryPosition = POSITIONS[(i - 1) % POSITIONS.length].name();
+			positions.add(primaryPosition);
+			String[] positionArr = {primaryPosition};
+
 			NewUserDTO dummyUserDTO = new NewUserDTO(dummyNames[i-1] + i, "user" + i + "@email.com",
-					"password" + i, new String[] { "POSITION_Goalkeeper", "POSITION_Midfielder" }, "player"); // now all players are goalkeeper and midfielders, can rand later
+					"password" + i, positionArr, "player");
 			User dummy = userService.addUser(dummyUserDTO);
 			// playerProfileService.addPlayerProfile(dummy, dummyUserDTO);
 			System.out.println("[Added dummy user]: " + dummy.getUsername());
