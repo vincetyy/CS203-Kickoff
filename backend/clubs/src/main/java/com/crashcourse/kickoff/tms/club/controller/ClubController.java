@@ -106,6 +106,7 @@ public class ClubController {
     public ResponseEntity<?> applyToClub(@PathVariable Long clubId, @RequestBody PlayerApplicationDTO applicationDTO) {
         try {
             applicationDTO.setClubId(clubId);
+            System.out.println(applicationDTO);
             clubService.applyToClub(applicationDTO);
             return new ResponseEntity<>("Application submitted successfully", HttpStatus.OK);
         } catch (Exception e) {
@@ -155,9 +156,11 @@ public class ClubController {
     @GetMapping("/{clubId}/applications")
     public ResponseEntity<List<Long>> getPlayerApplications(@PathVariable Long clubId) {
         List<Long> applicants = clubService.getPlayerApplications(clubId);
-        if (applicants == null) {
-            throw new RuntimeException("help");
-        }
+        if (applicants == null || applicants.isEmpty()) {
+            System.out.println("No applications found for clubId: " + clubId);
+        } else {
+            System.out.println("Applications found for clubId: " + clubId + ", applicants: " + applicants);
+        }    
         return new ResponseEntity<>(applicants, HttpStatus.OK);
     }
 

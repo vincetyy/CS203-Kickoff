@@ -149,7 +149,10 @@ const ClubInfo: React.FC = () => {
       </div>
 
       {/* Apply Button */}
-      <Button onClick={() => setIsDialogOpen(true)}>Apply to Join</Button>
+      {
+        userId &&
+        <Button onClick={() => setIsDialogOpen(true)}>Apply to Join</Button>
+      }
 
       {/* Position Selection Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

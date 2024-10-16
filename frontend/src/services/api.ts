@@ -1,5 +1,5 @@
 import axios from 'axios';
-import '../utils/axiosSetup'; 
+import '../utils/axiosSetup';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_DEFAULT_BASE_URL, // Default base URL (can be overridden per request)
@@ -13,7 +13,6 @@ api.interceptors.request.use(
   (config) => {
       // Retrieve the token (or other data) from localStorage before each request
       const token = localStorage.getItem('authToken');
-      console.log(token);
       
       // If the token exists, add it to the Authorization header
       if (token && token !== 'undefined' && token !== '') {
@@ -40,7 +39,7 @@ api.interceptors.response.use(
       if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken'); // Unload token from localStorage on 401
           // Use window.location.href for global navigation
-          window.location.href = "/login";
+          window.location.href = "/profile";
       }
 
       // Return the error response

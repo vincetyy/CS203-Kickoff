@@ -1,45 +1,103 @@
-import { Menu, Bell, MessageSquare } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { Button } from "./ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet"
-import Sidebar from './Sidebar'
-import { useSelector } from 'react-redux'
-import { selectUsername } from '../store/userSlice'
+import { useEffect, useState } from 'react';
+import { Menu, Bell, MessageSquare } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from './ui/button';
+import { AvatarImage, AvatarFallback } from './ui/avatar';
+import { Toaster, toast } from 'react-hot-toast';
+import { useSelector, useDispatch } from 'react-redux'; // Correct hook usage inside functional component
+import { selectUsername, selectUserId } from '../store/userSlice';
+import { useNavigate } from 'react-router-dom';
+import { Club } from '../types/club';
+import { selectUserClub, clearUser } from '../store/userSlice';
+import axios from 'axios';
 
-export default function Header({ isSidebarOpen, setIsSidebarOpen }: { isSidebarOpen: boolean; setIsSidebarOpen: (isOpen: boolean) => void }) {
-  const username = useSelector(selectUsername);
-  console.log(username);
-  
-  const avatarFallbackText = username ? username.slice(0, 2).toUpperCase() : "";
+export default function Header() {
+  const [newApplications, setNewApplications] = useState(false);
+  const username = useSelector(selectUsername); // Use useSelector hook inside the component body
+  const userClub: Club | null = useSelector(selectUserClub); // Same here
+  const userId = useSelector(selectUserId);
+  const navigate = useNavigate();
+  const dispatch = useDispatch(); // Use useDispatch inside the component body
+  const clubId = userClub?.id;
+
+  useEffect(() => {
+    const checkForNewApplications = async () => {
+      if (!clubId) return;
+
+      try {
+        const baseUrl = 'http://localhost:8082';
+        const response = await axios.get(`${baseUrl}/clubs/${clubId}/applications`);
+
+        if (response.status === 200) {
+          const playerIds = response.data;
+          const hasPending = playerIds.length > 0;  // If there are any pending applications, set the flag
+          setNewApplications(hasPending);
+        } else {
+          setNewApplications(false);
+        }
+      } catch (error) {
+        console.error('Error fetching applications:', error);
+        setNewApplications(false);
+      }
+    };
+
+    const intervalId = setInterval(checkForNewApplications, 2000);  // Poll every 5 seconds
+
+    return () => clearInterval(intervalId);
+  }, [clubId]);
+
+  const handleBellClick = () => {
+    if (clubId) {
+      navigate(`/clubs/${clubId}/applications`);
+    } else {
+      console.error('No club selected');
+    }
+  };
+
+  const handleLogoutClick = () => {
+    // Clear the auth token from localStorage
+    localStorage.removeItem('authToken');
+
+    // Dispatch a logout action to clear persisted user data
+    dispatch(clearUser()); // Use dispatch here safely
+
+    // Optionally, show a toast to confirm the logout action
+    toast('You have been logged out.');
+  };
+
+  const avatarFallbackText = username ? username.slice(0, 2).toUpperCase() : '';
+
   return (
     <header className="flex justify-between items-center p-4 bg-gray-900">
+      <Toaster /> {/* This is needed for toast notifications */}
       <div className="flex items-center">
-        <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="lg:hidden">
-              <Menu className="h-6 w-6" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0">
-            <Sidebar />
-          </SheetContent>
-        </Sheet>
         <Link to="/" className="text-2xl font-bold ml-2 text-white hover:text-gray-300 transition-colors">
           KICKOFF
         </Link>
       </div>
-      <div className="flex items-center space-x-4">
-        <Button variant="ghost" size="icon">
-          <Bell className="h-5 w-5" />
-        </Button>
-        <Button variant="ghost" size="icon">
-          <MessageSquare className="h-5 w-5" />
-        </Button>
-        <Avatar>
-          <AvatarFallback>{avatarFallbackText}</AvatarFallback>
-        </Avatar>
-      </div>
+      {
+        userId &&
+        <div className="flex items-center space-x-4">
+          <Button
+            variant="ghost"
+            className="relative"
+            onClick={handleBellClick}
+          >
+            <Bell className="h-6 w-6 text-blue-500" />
+            {newApplications && (
+              <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white" />
+            )}
+          </Button>
+          <Button variant="ghost" size="icon">
+            <MessageSquare className="h-5 w-5" />
+          </Button>
+          <Button variant="ghost" onClick={handleLogoutClick}> {/* Logout Button */}
+            Logout
+          </Button>
+          <AvatarImage src={`https://picsum.photos/seed/${userId+2000}/100/100`}>
+          </AvatarImage>
+        </div>
+      }
     </header>
-  )
+  );
 }
