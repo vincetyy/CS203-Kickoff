@@ -61,7 +61,7 @@ const ClubInfoModal: React.FC<ClubInfoModalProps> = ({ clubId }) => {
         className="w-full h-48 object-cover mb-4 rounded"
       />
       <h1 className="text-3xl font-bold mb-4">{club.name}</h1>
-      <p className="text-lg mb-4">{club.description || 'No description available.'}</p>
+      <p className="text-lg mb-4">{club.clubDescription || 'No description available.'}</p>
       <div className="flex items-center mb-4">
         <div className="mr-4">
           <strong>Captain:</strong> {captain || 'No captain assigned.'}

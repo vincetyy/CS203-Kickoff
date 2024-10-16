@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '../components/ui/select';
 import { fetchPlayerProfileById } from '../services/profileService';
+import PlayerProfileCard from '../components/PlayerProfileCard';
 
 enum PlayerPosition {
   POSITION_FORWARD = 'POSITION_FORWARD',
@@ -36,6 +37,7 @@ const ClubInfo: React.FC = () => {
   const [captain, setCaptain] = useState<PlayerProfile | null>(null);
   const [players, setPlayers] = useState<PlayerProfile[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [hasApplied, setHasApplied] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -47,8 +49,15 @@ const ClubInfo: React.FC = () => {
       try {
         const clubResponse = await axios.get(`http://localhost:8082/clubs/${id}`);
         setClub(clubResponse.data);
+
+        const applicantsResponse = await axios.get(`http://localhost:8082/clubs/${id}/applications`);
+        console.log(applicantsResponse.data);
+        
+        setHasApplied(applicantsResponse.data.includes(userId));
+        
         
         const captainResponse = await fetchPlayerProfileById(clubResponse.data.captainId);
+        
         setCaptain(captainResponse);
 
         const playerIds = clubResponse.data.players; // Assuming clubResponse.data.players is an array of player IDs
@@ -85,6 +94,7 @@ const ClubInfo: React.FC = () => {
         desiredPosition: selectedPosition,
       });
       toast.success('Application sent successfully!');
+      setHasApplied(true);
       setIsDialogOpen(false);
       setSelectedPosition(null);
     } catch (err: any) {
@@ -117,7 +127,7 @@ const ClubInfo: React.FC = () => {
         className="w-full h-48 object-cover mb-4 rounded"
       />
       <h1 className="text-3xl font-bold mb-4">{club.name}</h1>
-      <p className="text-lg mb-4">{club.description || 'No description available.'}</p>
+      <p className="text-lg mb-4">{club.clubDescription || 'No description available.'}</p>
       <div className="flex items-center mb-4">
         <div className="mr-4">
           <strong>Captain:</strong> {captain.user.username || 'No captain assigned.'}
@@ -130,15 +140,19 @@ const ClubInfo: React.FC = () => {
       {/* Players List */}
       <div className="mb-4">
         <h2 className="text-2xl font-semibold mb-2">Players in the Club</h2>
-        <ul className="list-disc list-inside mt-2">
-        {players ? (
-          players.map((player, index) => (
-            <li key={index}>{player.user.username}</li>
-          ))
-        ) : (
-          <p>Loading player profiles...</p>
-        )}
-        </ul>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {players ? (
+            players.map((player, index) => (
+              <PlayerProfileCard 
+                id={player.id} 
+                availability={false}
+                needAvailability={false}
+              />
+            ))
+          ) : (
+            <p>Loading player profiles...</p>
+          )}
+        </div>
       </div>
 
       {/* Future Tournaments Section */}
@@ -150,9 +164,14 @@ const ClubInfo: React.FC = () => {
 
       {/* Apply Button */}
       {
-        userId &&
+        userId && !hasApplied &&
         <Button onClick={() => setIsDialogOpen(true)}>Apply to Join</Button>
       }
+
+      {
+        userId && hasApplied &&
+        <Button className="bg-green-500 hover:bg-green-600">Applied!</Button>
+      }   
 
       {/* Position Selection Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

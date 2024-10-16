@@ -9,7 +9,6 @@ export default function Layout() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-900 text-white">
-      <Toaster />
       <Header isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
