@@ -92,3 +92,5 @@ vite.config.ts.timestamp-*
 # Package lock files (uncomment if you want to ignore these)
 # package-lock.json
 # yarn.lock
+
+.LCKKickoffTournamentManagementApplication.java~
