@@ -229,9 +229,12 @@ export default function TournamentsPage() {
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700 w-full lg:w-auto">
-          Create Tournament
-        </Button>
+        {
+          userId &&
+          <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700 w-full lg:w-auto">
+            Create Tournament
+          </Button>
+        }
       </div>
 
       {/* Tournament cards */}
@@ -248,7 +251,7 @@ export default function TournamentsPage() {
               endDate={new Date(tournament.endDateTime).toLocaleDateString()}
               format={tournament.tournamentFormat}
               teams={`${tournament.joinedClubsIds?.length || 0}/${tournament.maxTeams}`}  // Ensure joinedClubs is defined
-              image={`https://picsum.photos/seed/${tournament.id}/400/300`}
+              image={`https://picsum.photos/seed/${tournament.id + 1000}/400/300`}
             >
               {userClub && isCaptain && (
                 <>
