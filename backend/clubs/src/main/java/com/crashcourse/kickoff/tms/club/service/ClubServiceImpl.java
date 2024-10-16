@@ -349,4 +349,18 @@ public class ClubServiceImpl implements ClubService {
         applicationRepository.deleteById(playerApplication.getId());
     }
 
+    @Override
+    @Transactional
+    public Club playerLeaveClub(Long clubId, Long playerId) throws Exception{
+        Club club = clubRepository.findById(clubId).orElseThrow(() -> 
+            new ClubNotFoundException("Club with ID " + clubId + " not found"));
+
+        boolean removed = club.getPlayers().remove(playerId);
+        if (!removed) {
+            throw new Exception("Player is not a member of this club");
+        }
+
+        return clubRepository.save(club);
+    }
+
 }
