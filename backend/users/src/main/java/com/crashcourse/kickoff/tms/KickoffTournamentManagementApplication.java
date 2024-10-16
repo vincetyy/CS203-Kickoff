@@ -48,7 +48,7 @@ public class KickoffTournamentManagementApplication {
 			"Abigail", "Matthew", "Luna", "Joseph", "Ella", "Sebastian", "Elizabeth", "David",
 			"Sofia", "Carter", "Emily", "Wyatt", "Avery", "John", "Mila", "Owen",
 			"Scarlett", "Luke", "Eleanor", "Gabriel", "Madison", "Anthony", "Aria", "Isaac",
-			"Grace", "Samuel"
+			"Grace", "Yekai"
 		};
 
 		// create users 1 to 50 (user 1 is admin) with id 2 to 51

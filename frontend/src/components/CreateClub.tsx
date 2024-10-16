@@ -15,7 +15,7 @@ interface CreateClubProps {
 
 const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreateDialogOpen, handleClubCreated }) => {
   const [clubName, setClubName] = useState('');
-  const [elo, setElo] = useState<number>(1500);
+  const [elo, setElo] = useState<number>(500);
   const [ratingDeviation, setRatingDeviation] = useState<number>(200);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +68,7 @@ const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreate
         // Reset the form and close the dialog
         setIsCreateDialogOpen(false);       
         setClubName('');
-        setElo(1500);
+        setElo(500);
         setRatingDeviation(200);
         navigate(`/clubs/${newClub.id}`);
       }

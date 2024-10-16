@@ -191,9 +191,10 @@ export default function ClubPage() {
             name={club.name}
             description={
               club.clubDescription 
-                ? `${club.clubDescription} \n ELO: ${club.elo.toFixed(0)}, RD: ${club.ratingDeviation.toFixed(0)}`
-                : `ELO: ${club.elo.toFixed(0)}, RD: ${club.ratingDeviation.toFixed(0)}`
+                ? `${club.clubDescription}`
+                : 'This club has no description yet.'
             }
+            ratings={`ELO: ${club.elo.toFixed(0)}, RD: ${club.ratingDeviation.toFixed(0)}`}
             image={`https://picsum.photos/seed/${club.id}/400/300`}
             applied={false}
             onClick={() => handleCardClick(club)}

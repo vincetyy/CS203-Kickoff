@@ -113,14 +113,15 @@ public class KickoffTournamentManagementApplication {
 		// add users avail for tournament, esp users 8, 15, 22, 29.
 		// users 36, 43 not avail, user50 will be the demo user to apply
 		// in my demo: they're all part of club 2
-		for (long i = 1; i <= 29; i+=7) {
-			PlayerAvailabilityDTO playerAvailabilityDTO = new PlayerAvailabilityDTO(1L, i, 2L, true);
+		for (long i = 1; i <= 22; i+=7) {
+			PlayerAvailabilityDTO playerAvailabilityDTO = new PlayerAvailabilityDTO(1L, i+1, 2L, true);
 			tournamentService.updatePlayerAvailability(playerAvailabilityDTO);
 		}
 
-		for (long i = 36; i <= 43; i+=7) {
-			PlayerAvailabilityDTO playerAvailabilityDTO = new PlayerAvailabilityDTO(1L, i, 2L, false);
+		for (long i = 29; i <= 43; i+=7) {
+			PlayerAvailabilityDTO playerAvailabilityDTO = new PlayerAvailabilityDTO(1L, i+1, 2L, false);
 			tournamentService.updatePlayerAvailability(playerAvailabilityDTO);
 		}
 	}
 }
+
