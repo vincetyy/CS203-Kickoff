@@ -38,6 +38,7 @@ public interface ClubService {
     boolean isCaptain(Long clubId, Long playerId);
 
     Club removePlayerFromClub(Long clubId, Long playerId) throws Exception;
+    Club playerLeaveClub(Long clubId, Long playerId) throws Exception;
 
     Club transferCaptaincy(Long clubId, Long currentCaptainId, Long newCaptainId) throws Exception;
 
