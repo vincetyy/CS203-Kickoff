@@ -1,25 +1,22 @@
-import React, { act, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Toaster, toast } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { AppDispatch } from '../store';
-import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 
-import { Tournament, TournamentUpdate, Club, Location, HostProfile } from '../types/tournament';
+import { Tournament, TournamentUpdate, Club } from '../types/tournament';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeClubFromTournamentAsync, updateTournamentAsync } from '../store/tournamentSlice';
 import { PlayerAvailabilityDTO } from '../types/playerAvailability'; 
 import ShowAvailability from '../components/ShowAvailability';
 import AvailabilityButton from '../components/AvailabilityButton'; 
 import { fetchTournamentById, getPlayerAvailability, updatePlayerAvailability } from '../services/tournamentService';
-import { getClubByPlayerId, getClubProfileById } from '../services/clubService' 
+import { getClubProfileById } from '../services/clubService' 
 import { fetchUserClubAsync, selectUserClub, selectUserId,  } from '../store/userSlice'
 
 import UpdateTournament from '../components/UpdateTournament';
 import { ClubProfile } from '../types/club';
-import { selectClubId } from '../store/clubSlice';
 import { fetchPlayerProfileById } from '../services/profileService';
 
 
