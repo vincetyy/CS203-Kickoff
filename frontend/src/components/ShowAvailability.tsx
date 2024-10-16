@@ -31,6 +31,7 @@ export default function ShowAvailability({ availabilities, currentUserId, curren
               key={availability.playerId}
               id={availability.playerId}
               availability={availability.available}
+              needAvailability={true}
             />
           ))}
         </div>
