@@ -52,11 +52,11 @@ public class KickoffTournamentManagementApplication {
 		};
 
 		// create users 1 to 50 (user 1 is admin) with id 2 to 51
-		private static final PlayerPosition[] POSITIONS = PlayerPosition.values();
+		PlayerPosition[] POSITIONS = PlayerPosition.values();
+
 		for (int i = 1; i <= NUM_DUMMY_USERS; i++) {
 			// round-robin positions so that our demo is still deterministic
 			String primaryPosition = POSITIONS[(i - 1) % POSITIONS.length].name();
-			positions.add(primaryPosition);
 			String[] positionArr = {primaryPosition};
 
 			NewUserDTO dummyUserDTO = new NewUserDTO(dummyNames[i-1] + i, "user" + i + "@email.com",

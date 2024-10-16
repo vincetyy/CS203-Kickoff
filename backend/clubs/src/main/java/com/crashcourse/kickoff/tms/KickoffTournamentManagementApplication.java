@@ -45,7 +45,7 @@ public class KickoffTournamentManagementApplication {
 				players.add(i + (7 * k));
 			}
 
-			Club newClub = new Club((Long) i, "Club " + i, 500 + i*200, 50, (Long) i, players, demoClubDescriptions[i-1], new ArrayList<Long>());
+			Club newClub = new Club((Long) i, "Club " + i, 500 + i*200, 50, (Long) i, players, demoClubDescriptions[((int)i) - 1], new ArrayList<Long>());
 			try {
 				clubService.createClub(newClub, (Long) i);
 				System.out.println("[Added club]: " + newClub.getName());

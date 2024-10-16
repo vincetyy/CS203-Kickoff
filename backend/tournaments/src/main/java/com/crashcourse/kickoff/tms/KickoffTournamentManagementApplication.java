@@ -45,7 +45,7 @@ public class KickoffTournamentManagementApplication {
 		locationService.createLocation(location7);
 		Location location8 = new Location(null, "Woodlands Football Courts", null);
 		locationService.createLocation(location8);
-u
+
 		// Tournament
 		final int NUM_MOCKED_TOURNAMENTS = 3;
 
