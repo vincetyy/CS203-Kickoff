@@ -58,8 +58,8 @@ export default function ClubPage() {
     const results = clubs.filter(
       (club) =>
         club.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (club.description &&
-          club.description.toLowerCase().includes(searchTerm.toLowerCase()))
+        (club.clubDescription &&
+          club.clubDescription.toLowerCase().includes(searchTerm.toLowerCase()))
     );
     setFilteredClubs(results);
   }, [searchTerm, clubs]);
@@ -190,11 +190,11 @@ export default function ClubPage() {
             id={club.id}
             name={club.name}
             description={
-              club.description ||
-              `ELO: ${club.elo.toFixed(0)}, RD: ${club.ratingDeviation.toFixed(
-                0
-              )}`
+              club.clubDescription 
+                ? `${club.clubDescription}`
+                : 'This club has no description yet.'
             }
+            ratings={`ELO: ${club.elo.toFixed(0)}, RD: ${club.ratingDeviation.toFixed(0)}`}
             image={`https://picsum.photos/seed/${club.id}/400/300`}
             applied={false}
             onClick={() => handleCardClick(club)}
