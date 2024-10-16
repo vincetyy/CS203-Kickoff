@@ -35,6 +35,16 @@ public class KickoffTournamentManagementApplication {
 		locationService.createLocation(location2);
 		Location location3 = new Location(null, "East Coast Park", null);
 		locationService.createLocation(location3);
+		Location location4 = new Location(null, "Jurong East Sports Hall", null);
+		locationService.createLocation(location4);
+		Location location5 = new Location(null, "Bras Basah (SMU)", null);
+		locationService.createLocation(location5);
+		Location location6 = new Location(null, "National Stadium Courts", null);
+		locationService.createLocation(location6);
+		Location location7 = new Location(null, "Our Tampines Hub", null);
+		locationService.createLocation(location7);
+		Location location8 = new Location(null, "Woodlands Football Courts", null);
+		locationService.createLocation(location8);
 
 		// Tournament
 		final int NUM_MOCKED_TOURNAMENTS = 3;
@@ -64,9 +74,9 @@ public class KickoffTournamentManagementApplication {
 		TournamentResponseDTO tournament3 = tournamentService.getTournamentById(3L);
 
 		// im randomly (but not randomly, so its deterministic) adding clubs to tournaments
-		// 236 -- tourney 1
-		// 2457 -- tourney 2
-		// 234567 -- tourney 3
+		// 136 -- tourney 1
+		// 1457 -- tourney 2
+		// 134567 -- tourney 3
 
 		// create tournament join dtos for tournament1
 		TournamentJoinDTO tournamentJoinDTO1 = new TournamentJoinDTO(1L, 1L);
@@ -103,14 +113,15 @@ public class KickoffTournamentManagementApplication {
 		// add users avail for tournament, esp users 8, 15, 22, 29.
 		// users 36, 43 not avail, user50 will be the demo user to apply
 		// in my demo: they're all part of club 2
-		for (long i = 1; i <= 29; i+=7) {
-			PlayerAvailabilityDTO playerAvailabilityDTO = new PlayerAvailabilityDTO(1L, i, 2L, true);
+		for (long i = 1; i <= 22; i+=7) {
+			PlayerAvailabilityDTO playerAvailabilityDTO = new PlayerAvailabilityDTO(1L, i+1, 2L, true);
 			tournamentService.updatePlayerAvailability(playerAvailabilityDTO);
 		}
 
-		for (long i = 36; i <= 43; i+=7) {
-			PlayerAvailabilityDTO playerAvailabilityDTO = new PlayerAvailabilityDTO(1L, i, 2L, false);
+		for (long i = 29; i <= 43; i+=7) {
+			PlayerAvailabilityDTO playerAvailabilityDTO = new PlayerAvailabilityDTO(1L, i+1, 2L, false);
 			tournamentService.updatePlayerAvailability(playerAvailabilityDTO);
 		}
 	}
 }
+
