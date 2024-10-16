@@ -10,7 +10,6 @@ const LandingLayout: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-900 text-white">
-      <Toaster />
       <Helmet>
         <title>Kickoff</title>
       </Helmet>

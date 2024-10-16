@@ -23,13 +23,14 @@ export default function ApplicationsPage() {
   const userId = useSelector(selectUserId);
   const userClub: Club | null = useSelector(selectUserClub);
   const clubId = userClub?.id;
+  
 
   // Fetch user club on component mount
   useEffect(() => {
     const fetchData = async () => {
       if (!userId) {
-        toast.error('User not logged in');
-        navigate('/login');
+        // toast.error('User not logged in');
+        navigate('/profile');
         return;
       }
 
@@ -130,6 +131,7 @@ export default function ApplicationsPage() {
             <PlayerProfileCard 
               id={application.playerId} 
               availability={application.status === 'PENDING'}
+              needAvailability={false}
             />
             <p className="mt-2">Status: {application.status}</p>
             {application.status === 'PENDING' && (

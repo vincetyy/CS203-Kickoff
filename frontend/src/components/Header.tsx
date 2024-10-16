@@ -20,9 +20,15 @@ export default function Header() {
   const dispatch = useDispatch(); // Use useDispatch inside the component body
   const clubId = userClub?.id;
 
+  let isCaptain = false;
+  
+  if (userClub) {
+    isCaptain = userClub?.captainId === userId;
+  }
+
   useEffect(() => {
     const checkForNewApplications = async () => {
-      if (!clubId) return;
+      if (!clubId || !isCaptain) return;
 
       try {
         const baseUrl = 'http://localhost:8082';
@@ -65,8 +71,6 @@ export default function Header() {
     toast('You have been logged out.');
   };
 
-  const avatarFallbackText = username ? username.slice(0, 2).toUpperCase() : '';
-
   return (
     <header className="flex justify-between items-center p-4 bg-gray-900">
       <Toaster /> {/* This is needed for toast notifications */}
@@ -78,19 +82,23 @@ export default function Header() {
       {
         userId &&
         <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            className="relative"
-            onClick={handleBellClick}
-          >
-            <Bell className="h-6 w-6 text-blue-500" />
-            {newApplications && (
-              <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white" />
-            )}
-          </Button>
-          <Button variant="ghost" size="icon">
+          {
+            isCaptain && 
+            <Button
+              variant="ghost"
+              className="relative"
+              onClick={handleBellClick}
+            >
+              <Bell className="h-6 w-6 text-blue-500" />
+              {newApplications && (
+                <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white" />
+              )}
+            </Button>
+          }
+          
+          {/* <Button variant="ghost" size="icon">
             <MessageSquare className="h-5 w-5" />
-          </Button>
+          </Button> */}
           <Button variant="ghost" onClick={handleLogoutClick}> {/* Logout Button */}
             Logout
           </Button>
