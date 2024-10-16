@@ -20,6 +20,7 @@ import { fetchUserClubAsync, selectUserClub, selectUserId,  } from '../store/use
 import UpdateTournament from '../components/UpdateTournament';
 import { ClubProfile } from '../types/club';
 import { selectClubId } from '../store/clubSlice';
+import { fetchPlayerProfileById } from '../services/profileService';
 
 
 
@@ -41,6 +42,7 @@ const TournamentPage: React.FC = () => {
   const [availableCount, setAvailableCount] = useState(0); 
   const [isAvailabilityDialogOpen, setIsAvailabilityDialogOpen] = useState(false);
   const [joinedClubsProfiles, setJoinedClubsProfiles] = useState<ClubProfile[] | null>(null);
+  const [hostUsername, setHostUsername] = useState('');
 
   const { id } = useParams<{ id: string }>();
   const tournamentId = id ? parseInt(id, 10) : null;
@@ -108,6 +110,13 @@ const TournamentPage: React.FC = () => {
         setStatus('loading');
         const tournament = await fetchTournamentById(tournamentId);
         setSelectedTournament(tournament);
+        if (tournament.host) {
+          const hostId = tournament.host;
+          const hostProfile = await fetchPlayerProfileById(hostId.toString());
+          setHostUsername(hostProfile.user.username);
+        }
+        
+        
 
         if (tournament.joinedClubsIds) {
           const clubProfilesPromises = tournament.joinedClubsIds.map((id) => getClubProfileById(id));
@@ -232,12 +241,13 @@ const TournamentPage: React.FC = () => {
         <h3 className="text-2xl font-semibold mb-4">Tournament Details</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
+            <p><strong>Host:</strong> {hostUsername}</p>
             <p><strong>Start Date & Time:</strong> {formatDate(selectedTournament.startDateTime)}</p>
             <p><strong>End Date & Time:</strong> {formatDate(selectedTournament.endDateTime)}</p>
             <p><strong>Location:</strong> {selectedTournament.location?.name || 'No location specified'}</p>
+            <p><strong>Max Teams:</strong> {selectedTournament.maxTeams}</p>
           </div>
           <div>
-            <p><strong>Max Teams:</strong> {selectedTournament.maxTeams}</p>
             <p><strong>Tournament Format:</strong> {tournamentFormatMap[selectedTournament.tournamentFormat]}</p>
             <p><strong>Knockout Format:</strong> {knockoutFormatMap[selectedTournament.knockoutFormat]}</p>
             <p><strong>Prize Pool:</strong> {selectedTournament.prizePool && selectedTournament.prizePool.length > 0 ? `$${selectedTournament.prizePool.join(', ')}` : 'N/A'}</p>
