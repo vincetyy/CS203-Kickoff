@@ -93,6 +93,7 @@ const ClubInfo: React.FC = () => {
         desiredPosition: selectedPosition,
       });
       toast.success('Application sent successfully!');
+      setHasApplied(true);
       setIsDialogOpen(false);
       setSelectedPosition(null);
     } catch (err: any) {
