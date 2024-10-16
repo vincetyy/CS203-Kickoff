@@ -137,10 +137,14 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ id }) => {
       {/* Players List */}
       <div className="mb-4">
         <h2 className="text-2xl font-semibold mb-2">Players in the Club</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {players ? (
             players.map((player, index) => (
-              <li key={index}>{player.user.username}</li>
+              <PlayerProfileCard 
+                id={player.id} 
+                availability={false}
+                needAvailability={false}
+              />
             ))
           ) : (
             <p>Loading player profiles...</p>
