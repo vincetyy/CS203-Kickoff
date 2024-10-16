@@ -6,9 +6,10 @@ import { PlayerProfile, PlayerPosition } from '../types/profile';
 interface PlayerProfileCardProps {
   id: number;
   availability: boolean;
+  needAvailability: boolean;
 }
 
-const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({ id, availability }) => {
+const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({ id, availability, needAvailability }) => {
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +49,7 @@ const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({ id, availability 
   }
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4 flex items-center space-x-4 w-96">
+    <div className="bg-gray-800 rounded-lg p-4 flex items-center space-x-4">
       <img
         src={`https://picsum.photos/seed/${playerProfile.id+2000}/100/100`}
         alt={`${playerProfile.user.username}'s profile`}
@@ -62,12 +63,14 @@ const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({ id, availability 
             : 'No position specified'}
         </p>
       </div>
-      <Badge
+      { needAvailability &&
+        <Badge
         variant={availability ? 'success' : 'destructive'}
         className="w-24 justify-center whitespace-nowrap"
       >
         {availability ? 'Available' : 'Not Available'}
       </Badge>
+      }
     </div>
   );
 };

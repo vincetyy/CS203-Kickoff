@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '../components/ui/select';
 import { fetchPlayerProfileById } from '../services/profileService';
+import PlayerProfileCard from '../components/PlayerProfileCard';
 
 enum PlayerPosition {
   POSITION_FORWARD = 'POSITION_FORWARD',
@@ -139,15 +140,19 @@ const ClubInfo: React.FC = () => {
       {/* Players List */}
       <div className="mb-4">
         <h2 className="text-2xl font-semibold mb-2">Players in the Club</h2>
-        <ul className="list-disc list-inside mt-2">
-        {players ? (
-          players.map((player, index) => (
-            <li key={index}>{player.user.username}</li>
-          ))
-        ) : (
-          <p>Loading player profiles...</p>
-        )}
-        </ul>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {players ? (
+            players.map((player, index) => (
+              <PlayerProfileCard 
+                id={player.id} 
+                availability={false}
+                needAvailability={false}
+              />
+            ))
+          ) : (
+            <p>Loading player profiles...</p>
+          )}
+        </div>
       </div>
 
       {/* Future Tournaments Section */}
