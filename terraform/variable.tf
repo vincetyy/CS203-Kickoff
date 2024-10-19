@@ -9,11 +9,11 @@ variable "database_name" {
 variable "DATABASE_USERNAME" {
   type        = string
   description = "The username for the database"
-  sensitive = true
+  sensitive   = true
 }
 
 variable "DATABASE_PASSWORD" {
   type        = string
   description = "value of the password for the database"
-  sensitive = true
+  sensitive   = true
 }
