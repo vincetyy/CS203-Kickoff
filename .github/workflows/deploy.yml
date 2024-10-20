@@ -1,4 +1,4 @@
-name: "Terraform Remote Backend"
+name: "Terraform Plan and Apply"
 on:
   push:
     branches:
