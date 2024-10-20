@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main  # Trigger this action on pushes to the "main" branch
+    paths:
+        - 'backend/**'
 
 jobs:
   build:
