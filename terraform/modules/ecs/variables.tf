@@ -24,16 +24,22 @@ variable "aws_region" {
   default     = "ap-southeast-1" # Singapore
 }
 
-variable "users_app_image" {
-  type        = string
-  description = "Docker image to run in the ECS cluster"
-  default     = "vincetyy/kickoff-users:latest"
-}
+# variable "users_app_name" {
+#   type        = string
+#   description = "Name of users container"
+#   default     = "kickoff-users"
+# }
 
-variable "users_app_port" {
-  type        = string
-  default     = "8081"
-}
+# variable "users_app_image" {
+#   type        = string
+#   description = "Docker image to run in the ECS cluster"
+#   default     = "vincetyy/kickoff-users:latest"
+# }
+
+# variable "users_app_port" {
+#   type        = string
+#   default     = "8081"
+# }
 
 variable "app_count" {
   type        = number
@@ -79,23 +85,11 @@ variable "database_password" {
   description = "Password to connect to the database"
 }
 
-# variable "kickoff_services" {
-#   type = map(object({
-#     image   = string
-#     app_port = number
-#   }))
-#   default = {
-#     "kickoff-users" = {
-#       image   = "vincetyy/kickoff-users",
-#       app_port = 3000
-#     }
-#     "kickoff-tournaments" = {
-#       image   = "vincetyy/kickoff-tournaments",
-#       app_port = 3001
-#     }
-#     "kickoff-clubs" = {
-#       image   = "vincetyy/kickoff-clubs",
-#       app_port = 3002
-#     }
-#   }
-# }
+variable "services" {
+  type = map(object({
+    cluster_name = string
+    app_image    = string
+    app_port     = number
+    path_pattern       = list(string)
+  }))
+}
