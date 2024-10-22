@@ -9,6 +9,7 @@ import Signup from './pages/Signup.tsx';
 import ClubInfo from './pages/ClubInfo';
 import PlayerApplication from './pages/PlayerApplication.tsx';
 import LandingLayout from './components/LandingLayout.tsx';
+import AdminDashboard from './pages/AdminDashboard.tsx';
 import "./utils/axiosSetup.js";
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
           <Route path="/clubs/:id" element={<ClubInfo />} />
           <Route path="/clubs/:id/applications" element={<PlayerApplication />} />
         </Route>
+        <Route path="/admin" element={<AdminDashboard />} /> 
       </Routes>
     </Router>
   );
