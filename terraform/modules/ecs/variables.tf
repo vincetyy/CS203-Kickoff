@@ -49,7 +49,7 @@ variable "app_count" {
 
 variable "health_check_path" {
   type        = string
-  default     = "api/v1/health"
+  default     = "/api/v1/health"
   description = "Health check path of the app"
 }
 
