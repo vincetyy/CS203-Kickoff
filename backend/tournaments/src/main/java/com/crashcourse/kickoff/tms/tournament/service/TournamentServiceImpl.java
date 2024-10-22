@@ -284,8 +284,51 @@ public class TournamentServiceImpl implements TournamentService {
                 .collect(Collectors.toList());
     }
 
+    // @Override
+    // @Transactional(readOnly = true)
+    // public List<TournamentResponseDTO> getTournamentsForPlayer(Long playerId, TournamentFilter filter) {
+    //     List<Tournament> tournaments;
+
+    //     String clubServiceUrl = "http://localhost:8082/clubs/" + clubId + "/players";
+
+    //     JwtUtil help = new JwtUtil();
+    //     String jwtToken = help.generateJwtToken();
+
+    //     HttpHeaders headers = new HttpHeaders();
+    //     headers.set("Authorization", "Bearer " + jwtToken);
+    //     HttpEntity<Long> request = new HttpEntity<>(clubId, headers);
+    //     System.out.println((request));
+
+    //     ResponseEntity<List<Long>> response = restTemplate.exchange(
+    //         clubServiceUrl, 
+    //         HttpMethod.GET, 
+    //         request, 
+    //         new ParameterizedTypeReference<List<Long>>() {}
+    //     );
+    //     System.out.println(response);
+
+    //     switch (filter) {
+    //         case UPCOMING:
+    //             tournaments = tournamentRepository.findUpcomingTournamentsForClub(clubId);
+    //             break;
+    //         case CURRENT:
+    //             tournaments = tournamentRepository.findCurrentTournamentsForClub(clubId);
+    //             break;
+    //         case PAST:
+    //             tournaments = tournamentRepository.findPastTournamentsForClub(clubId);
+    //             break;
+    //         default:
+    //             throw new IllegalArgumentException("Invalid filter type");
+    //     }
+
+    //     return tournaments.stream()
+    //             .map(this::mapToResponseDTO)
+    //             .collect(Collectors.toList());
+    // }
+
     @Override
     public PlayerAvailability updatePlayerAvailability(PlayerAvailabilityDTO dto) {
+        
         Long clubId = dto.getClubId();
         
         if (clubId == null) {

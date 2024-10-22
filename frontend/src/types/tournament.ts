@@ -40,3 +40,9 @@ export interface TournamentUpdate {
   joinedClubsIds?: number[];
   host?: number;
 }
+
+export enum TournamentFilter {
+  UPCOMING = 'UPCOMING',
+  CURRENT = 'CURRENT',
+  PAST = 'PAST',
+}

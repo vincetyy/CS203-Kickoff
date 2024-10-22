@@ -191,12 +191,24 @@ public class TournamentController {
         return ResponseEntity.ok(tournaments);
     }
 
+    // @GetMapping("/player/{playerId}")
+    // public ResponseEntity<List<TournamentResponseDTO>> getTournamentsForPlayer(
+    //         @PathVariable Long playerId,
+    //         @RequestParam TournamentFilter filter) {
+    //     List<TournamentResponseDTO> tournaments = tournamentService.getTournamentsForPlayer(playerId, filter);
+    //     return ResponseEntity.ok(tournaments);
+    // }
+
     @PutMapping("/availability")
     public ResponseEntity<?> updatePlayerAvailability(@RequestBody PlayerAvailabilityDTO dto) {
+        
 
         Long tournamentId = dto.getTournamentId();
         Long playerId = dto.getPlayerId();
         Long clubId = dto.getClubId(); 
+        System.out.println(tournamentId);
+        System.out.println(playerId);
+        System.out.println(clubId);
         boolean available = dto.isAvailable();
         PlayerAvailabilityDTO playerAvailabilityDTO = new PlayerAvailabilityDTO(tournamentId, playerId, clubId, available);
         tournamentService.updatePlayerAvailability(playerAvailabilityDTO);

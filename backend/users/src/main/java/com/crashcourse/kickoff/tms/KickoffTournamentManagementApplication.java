@@ -5,8 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.crashcourse.kickoff.tms.host.HostProfile;
-import com.crashcourse.kickoff.tms.host.HostProfileService;
+import com.crashcourse.kickoff.tms.host.*;
+import com.crashcourse.kickoff.tms.host.service.*;
 import com.crashcourse.kickoff.tms.player.PlayerPosition;
 import com.crashcourse.kickoff.tms.player.service.PlayerProfileService;
 import com.crashcourse.kickoff.tms.security.SecurityConfig;
