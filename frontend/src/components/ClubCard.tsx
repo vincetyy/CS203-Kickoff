@@ -20,6 +20,16 @@ const ClubCard: React.FC<ClubCardProps> = ({
   applied,
   onClick,
 }) => {
+
+  const navigateToProfile = () => {
+    if (userId == playerProfile?.user.id) {
+      toast.success('That\'s your profile!');
+      return;
+    } 
+
+    navigate(`/player/${playerProfile?.user.id}`);
+  }
+  
   return (
     <div
       onClick={onClick}

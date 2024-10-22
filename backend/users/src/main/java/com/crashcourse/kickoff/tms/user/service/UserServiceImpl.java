@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.crashcourse.kickoff.tms.host.HostProfileService;
+import com.crashcourse.kickoff.tms.host.service.HostProfileService;
 import com.crashcourse.kickoff.tms.player.service.PlayerProfileService;
 import com.crashcourse.kickoff.tms.user.UserRepository;
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
@@ -80,6 +80,7 @@ public class UserServiceImpl implements UserService {
         return users.findById(userId).orElse(null);  
     }
 
+    @Transactional
     public User save(User user) {
         return users.save(user);  // Save the user and persist changes to the database
     }

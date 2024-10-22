@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { PlayerPosition } from '../types/profile';
@@ -7,6 +6,7 @@ import eyePassword from '@/assets/eyePassword.svg';
 import eyePasswordOff from '@/assets/eyePasswordOff.svg';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { signup } from '../services/userService';
 
 export default function Signup() {
     const navigate = useNavigate();
@@ -57,11 +57,7 @@ export default function Signup() {
         };
 
         try {
-            const response = await axios.post('http://localhost:8081/users', payload, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+            const response = await signup(payload);            
 
             if (response.status === 201) {
                 toast.success('Sign up successful!', {

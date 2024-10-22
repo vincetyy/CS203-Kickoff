@@ -7,8 +7,8 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
 import { Location, Tournament } from '../types/tournament';
+import { getAllLocations } from '../services/tournamentService';
 
 interface CreateTournamentProps {
   isOpen: boolean;
@@ -40,8 +40,8 @@ const CreateTournament: React.FC<CreateTournamentProps> = ({ isOpen, onClose }) 
       setIsLoadingLocations(true);
       setLocationsError(null);
       try {
-        const response = await axios.get<Location[]>('http://localhost:8080/locations');
-        setLocations(response.data);
+        const response = await getAllLocations();
+        setLocations(response);
       } catch (error: any) {
         console.error('Error fetching locations:', error);
         setLocationsError('Failed to load locations. Please try again.');

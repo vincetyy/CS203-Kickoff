@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Badge } from './ui/badge'; // Assuming Badge component is a UI element
-import { fetchPlayerProfileById } from '../services/profileService'; // Your service for fetching player data
+import { fetchPlayerProfileById } from '../services/userService'; // Your service for fetching player data
 import { PlayerProfile, PlayerPosition } from '../types/profile';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { selectUserId } from '../store/userSlice';
+import toast from 'react-hot-toast';
 
 interface PlayerProfileCardProps {
   id: number;
@@ -10,6 +14,8 @@ interface PlayerProfileCardProps {
 }
 
 const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({ id, availability, needAvailability }) => {
+  const navigate = useNavigate();
+  const userId = useSelector(selectUserId);
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,6 +41,15 @@ const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({ id, availability,
     return position.replace('POSITION_', '').charAt(0) + position.replace('POSITION_', '').slice(1).toLowerCase();
   };
 
+  const navigateToProfile = () => {
+    if (userId == playerProfile?.user.id) {
+      toast.success('That\'s your profile!');
+      return;
+    } 
+
+    navigate(`/player/${playerProfile?.user.id}`);
+  }
+
   // Conditional rendering for loading, error, and profile display
   if (loading) {
     return <div>Loading...</div>;
@@ -49,7 +64,7 @@ const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({ id, availability,
   }
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4 flex items-center space-x-4">
+    <div className="bg-gray-800 rounded-lg p-4 flex items-center space-x-4" onClick={ navigateToProfile }>
       <img
         src={`https://picsum.photos/seed/${playerProfile.id+2000}/100/100`}
         alt={`${playerProfile.user.username}'s profile`}

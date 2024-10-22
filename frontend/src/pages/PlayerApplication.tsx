@@ -7,7 +7,7 @@ import { toast } from 'react-hot-toast';
 import { fetchUserClubAsync, selectUserId, selectUserClub } from '../store/userSlice';
 import PlayerProfileCard from '../components/PlayerProfileCard';
 import { Club } from '../types/club';
-import axios from 'axios';
+import { getClubApplication, updatePlayerApplication } from '../services/clubService';
 
 interface Application {
   playerId: number;
@@ -52,8 +52,7 @@ export default function ApplicationsPage() {
     const fetchApplications = async () => {
       if (!clubId) return;
       try {
-        const baseUrl = 'http://localhost:8082';
-        const response = await axios.get(`${baseUrl}/clubs/${clubId}/applications`);
+        const response = await getClubApplication(clubId);
 
         if (response.status === 200) {
           const playerIds: number[] = response.data;
@@ -82,15 +81,7 @@ export default function ApplicationsPage() {
     if (!clubId) return;
 
     try {
-      const updateResponse = await axios.post(
-        `http://localhost:8082/clubs/${clubId}/applications/${playerId}`,
-        { applicationStatus: status },  
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,  
-        },
-      });
+      const updateResponse = await updatePlayerApplication(clubId, playerId, status);
 
       if (updateResponse.status === 200) {
         toast.success(`Application ${status.toLowerCase()} successfully!`);

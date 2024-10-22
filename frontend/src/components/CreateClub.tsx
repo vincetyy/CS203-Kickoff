@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import axios from 'axios';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog"; 
 import { Club } from '../types/club';  
 import { useNavigate } from 'react-router-dom';
 import { fetchUserClubAsync } from '../store/userSlice';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../store';
+import { createClub } from '../services/clubService';
 
 interface CreateClubProps {
   isCreateDialogOpen: boolean;
@@ -27,7 +27,7 @@ const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreate
 
   const fetchPlayersForClub = async (clubId: number) => {
     try {
-      const response = await axios.get(`http://localhost:8082/clubs/${clubId}/players`);
+      const response = await fetchPlayersForClub(clubId);
       return response.data;  
     } catch (err: any) {
       console.error('Error fetching players:', err);
@@ -53,11 +53,7 @@ const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreate
     try {
       setLoading(true);
 
-      const createClubResponse = await axios.post('http://localhost:8082/clubs/create-club', clubData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const createClubResponse = await createClub(clubData);
 
       if (createClubResponse.status === 201) {
         const newClub = createClubResponse.data;  

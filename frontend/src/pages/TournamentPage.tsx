@@ -17,7 +17,8 @@ import { fetchUserClubAsync, selectUserClub, selectUserId,  } from '../store/use
 
 import UpdateTournament from '../components/UpdateTournament';
 import { ClubProfile } from '../types/club';
-import { fetchPlayerProfileById } from '../services/profileService';
+import { fetchPlayerProfileById } from '../services/userService';
+import { ArrowLeft } from 'lucide-react';
 
 
 
@@ -214,12 +215,23 @@ const TournamentPage: React.FC = () => {
     setSelectedTournament(updatedTournamentData);
   };
 
+
+  const navigateToClubPage = (clubId: number) => {
+    navigate(`/clubs/${clubId}`);
+  }
+
   if (status === 'loading') return <div className="text-center mt-10">Loading tournament details...</div>;
   if (status === 'failed') return <div className="text-center mt-10 text-red-500">Error: {error}</div>;
   if (!selectedTournament) return <div className="text-center mt-10">No tournament found.</div>;
 
   return (
     <>
+      <div className='pb-2'>
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+      </div>
+
       {/* Tournament Details Banner */}
       <div className="bg-green-600 rounded-lg p-4 lg:p-6 mb-6 flex items-center space-x-4">
         <div className="bg-white rounded-full p-2 lg:p-3">
@@ -263,7 +275,7 @@ const TournamentPage: React.FC = () => {
             {joinedClubsProfiles?.map((club: ClubProfile) => {
               const isUserClub = club.id === userClub?.id;
               return (
-                <div key={club.id} className="bg-gray-700 rounded-lg p-4 flex items-center justify-between space-x-4">
+                <div onClick={ () => navigate(`/clubs/${club.id}`) } key={club.id} className="bg-gray-700 rounded-lg p-4 flex items-center justify-between space-x-4">
                   <div className="flex items-center space-x-4">
                     <img 
                       src={`https://picsum.photos/seed/${club.id}/100/100`} 
@@ -368,8 +380,6 @@ const TournamentPage: React.FC = () => {
             Indicate Availability
           </Button>
         }
-
-        <Button onClick={handleBackClick}>Back to  Tournaments</Button>
       </div>
     </>
   );

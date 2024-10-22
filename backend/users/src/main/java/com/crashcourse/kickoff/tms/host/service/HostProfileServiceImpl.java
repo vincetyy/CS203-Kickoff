@@ -1,46 +1,49 @@
-package com.crashcourse.kickoff.tms.host;
+package com.crashcourse.kickoff.tms.host.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.crashcourse.kickoff.tms.host.*;
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
 import com.crashcourse.kickoff.tms.user.model.User;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import jakarta.transaction.Transactional;
 
 
 @Service("hostProfileSerice")
 public class HostProfileServiceImpl implements HostProfileService{
-
-    @Autowired
-    private HostProfileRepository hostProfileRepository;
-
     @PersistenceContext
     private EntityManager entityManager;
-    private HostProfileRepository hosts;
 
-    public HostProfileServiceImpl(HostProfileRepository hosts) {
-        this.hosts = hosts;
+    private HostProfileRepository hostProfileRepository;
+
+    public HostProfileServiceImpl(HostProfileRepository hostProfileRepository) {
+        this.hostProfileRepository = hostProfileRepository;
+    }
+
+    @Override
+    public List<HostProfile> getHostProfiles() {
+        return hostProfileRepository.findAll();
     }
     
     @Transactional
     public HostProfile addHostProfile(User newUser) {
-        newUser = entityManager.merge(newUser);
-
+        User managedUser = entityManager.merge(newUser);
         HostProfile newHostProfile = new HostProfile();
         // Set properties specific to HostProfile
-        newHostProfile.setUser(newUser);
-        return hosts.save(newHostProfile);
+        newHostProfile.setUser(managedUser);
+        return hostProfileRepository.save(newHostProfile);
     }
 
     @Override
-    @Transactional (readOnly = true)
+    @Transactional
     public Optional<HostProfile> getHostProfileByID(Long id) {
         Optional<HostProfile> hostProfile = hostProfileRepository.findById(id);
         if (!hostProfile.isPresent()) {

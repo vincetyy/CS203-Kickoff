@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { Button } from '../components/ui/button';
 import { ClubProfile } from '../types/club';
@@ -10,39 +9,12 @@ import { AppDispatch, RootState } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchClubsAsync } from '../store/clubSlice';
 import { fetchUserClubAsync, selectUserId } from '../store/userSlice';
-import { fetchPlayerProfileById } from '../services/profileService';
+import { fetchPlayerProfileById } from '../services/userService';
 import LeaveClubButton from '../components/LeaveClubButton';
+import { getClubProfileById } from '../services/clubService';
+import { Tournament, TournamentFilter } from '../types/tournament';
+import { getTournamentsByClubId } from '../services/tournamentService';
 
-enum TournamentFilter {
-  UPCOMING = 'UPCOMING',
-  CURRENT = 'CURRENT',
-  PAST = 'PAST',
-}
-
-interface Tournament {
-  id: number;
-  name: string;
-  startDateTime: string;
-  endDateTime: string;
-}
-
-interface Player {
-  id: number;
-  user: {
-    username: string;
-  };
-  preferredPositions: PlayerPosition[];
-}
-
-// Adjust ClubProfile to include the captain
-export interface ClubProfile {
-    id: number;
-    name: string;
-    clubDescription: string;
-    elo: number;
-    captain: Player;  // Captain is a Player
-    players: Player[];  // List of players
-}
 interface ClubDashboardProps {
   id: number;
 }
@@ -62,13 +34,13 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ id }) => {
   useEffect(() => {
     const fetchClub = async () => {
       try {
-        const clubResponse = await axios.get(`http://localhost:8082/clubs/${id}`);
-        setClub(clubResponse.data);
+        const clubResponse = await getClubProfileById(id);
+        setClub(clubResponse);
         
-        const captainResponse = await fetchPlayerProfileById(clubResponse.data.captainId);
+        const captainResponse = await fetchPlayerProfileById(clubResponse.captainId.toString());
         setCaptain(captainResponse);
 
-        const playerIds = clubResponse.data.players; // Assuming clubResponse.data.players is an array of player IDs
+        const playerIds = clubResponse.players; // Assuming clubResponse.data.players is an array of player IDs
         const playerProfiles = await Promise.all(playerIds.map((playerId: number) => fetchPlayerProfileById(playerId)));
         console.log(playerProfiles);
         
@@ -88,10 +60,10 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ id }) => {
   useEffect(() => {
     const fetchTournaments = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/tournaments/${id}/tournaments`, {
-          params: { filter: tournamentFilter }
-        });
-        setTournaments(response.data);
+        const response = await getTournamentsByClubId(id, tournamentFilter);
+        console.log(response);
+        
+        setTournaments(response);
       } catch (err: any) {
         console.error('Error fetching tournaments:', err);
         toast.error('Failed to fetch tournaments.');
@@ -112,11 +84,6 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ id }) => {
       </div>
     );
   }
-
-  // Combine captain and players into a single array
-  const allPlayers = [club.captain, ...(club.players || [])].filter(
-    (player) => player && player.user && player.user.username
-  );
   
   return (
     <div className="container mx-auto p-6">
@@ -129,7 +96,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ id }) => {
       <p className="text-lg mb-4">{club.clubDescription || 'No description available.'}</p>
       <div className="flex items-center mb-4">
         <div className="mr-4">
-          <strong>Captain:</strong> {captain.user.username || 'No captain assigned.'}
+          <strong>Captain:</strong> {captain?.user.username || 'No captain assigned.'}
         </div>
         <div>
           <strong>ELO:</strong> {club.elo ? club.elo.toFixed(2) : 'N/A'}
@@ -143,6 +110,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ id }) => {
           {players ? (
             players.map((player, index) => (
               <PlayerProfileCard 
+                key={player.id}
                 id={player.id} 
                 availability={false}
                 needAvailability={false}
