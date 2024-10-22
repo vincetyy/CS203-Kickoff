@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { PlayerPosition, PlayerProfile } from '../types/profile';
@@ -7,7 +6,7 @@ import eyePassword from '@/assets/eyePassword.svg';
 import eyePasswordOff from '@/assets/eyePasswordOff.svg';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { toast } from 'react-hot-toast';
-import { fetchPlayerProfileById, updatePlayerProfile } from '../services/profileService';
+import { fetchPlayerProfileById, login, updatePlayerProfile } from '../services/userService';
 import { getClubByPlayerId } from '../services/clubService';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUserId, setUser, fetchUserClubAsync } from '../store/userSlice';
@@ -42,10 +41,7 @@ export default function PlayerProfilePage() {
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8081/users/login', {
-        username,
-        password,
-      });
+      const response = await login(username, password);
 
       if (response.status === 200) {
         const token = response.data.jwtToken;

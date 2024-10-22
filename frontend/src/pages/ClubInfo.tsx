@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { Button } from '../components/ui/button';
 import { ClubProfile } from '../types/club';
@@ -21,8 +20,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
-import { fetchPlayerProfileById } from '../services/profileService';
+import { fetchPlayerProfileById } from '../services/userService';
 import PlayerProfileCard from '../components/PlayerProfileCard';
+import { applyForClub, getClubApplication, getClubProfileById } from '../services/clubService';
+import { ArrowLeft } from 'lucide-react';
 
 enum PlayerPosition {
   POSITION_FORWARD = 'POSITION_FORWARD',
@@ -44,25 +45,25 @@ const ClubInfo: React.FC = () => {
   const [selectedPosition, setSelectedPosition] = useState<PlayerPosition | null>(null);
   const userId = useSelector(selectUserId);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchClub = async () => {
       try {
-        const clubResponse = await axios.get(`http://localhost:8082/clubs/${id}`);
-        setClub(clubResponse.data);
+        if (!id) {
+          return;
+        }
+        const clubResponse = await getClubProfileById(parseInt(id));
+        setClub(clubResponse);
 
-        const applicantsResponse = await axios.get(`http://localhost:8082/clubs/${id}/applications`);
-        console.log(applicantsResponse.data);
-        
+        const applicantsResponse = await getClubApplication(parseInt(id));
         setHasApplied(applicantsResponse.data.includes(userId));
-        
-        
-        const captainResponse = await fetchPlayerProfileById(clubResponse.data.captainId);
-        
+
+        const captainResponse = await fetchPlayerProfileById(clubResponse.captainId.toString());
         setCaptain(captainResponse);
 
-        const playerIds = clubResponse.data.players; // Assuming clubResponse.data.players is an array of player IDs
-        const playerProfiles = await Promise.all(playerIds.map((playerId: number) => fetchPlayerProfileById(playerId)));
-        console.log(playerProfiles);
+        const playerIds = clubResponse.players; // Assuming clubResponse.data.players is an array of player IDs
+        const playerProfiles = await Promise.all(playerIds.map((playerId: number) => fetchPlayerProfileById(playerId.toString())));
         
         // Store the player profiles in state
         setPlayers(playerProfiles);
@@ -89,10 +90,7 @@ const ClubInfo: React.FC = () => {
     }
 
     try {
-      await axios.post(`http://localhost:8082/clubs/${id}/apply`, {
-        playerId: userId,
-        desiredPosition: selectedPosition,
-      });
+      await applyForClub(id, userId, selectedPosition);
       toast.success('Application sent successfully!');
       setHasApplied(true);
       setIsDialogOpen(false);
@@ -121,6 +119,11 @@ const ClubInfo: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6">
+      <div className='pb-2'>
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+      </div>
       <img
         src={`https://picsum.photos/seed/club-${club.id}/800/200`}
         alt={`${club.name} banner`}
@@ -130,7 +133,7 @@ const ClubInfo: React.FC = () => {
       <p className="text-lg mb-4">{club.clubDescription || 'No description available.'}</p>
       <div className="flex items-center mb-4">
         <div className="mr-4">
-          <strong>Captain:</strong> {captain.user.username || 'No captain assigned.'}
+          <strong>Captain:</strong> {captain?.user.username || 'No captain assigned.'}
         </div>
         <div>
           <strong>ELO:</strong> {club.elo ? club.elo.toFixed(2) : 'N/A'}
