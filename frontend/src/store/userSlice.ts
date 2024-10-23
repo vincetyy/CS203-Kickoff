@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getClubByPlayerId } from '../services/clubService'; // Adjust the path to your service function
 import { Club } from '../types/club';
+import { fetchAllPlayers } from '../services/userService';
+import { PlayerProfile } from '../types/profile';
 
 // Initial state for the user slice
 const initialState = {
@@ -8,6 +10,7 @@ const initialState = {
   username: null as string | null,  // New field to store the username
   userClub: null as Club | null,  // Store the user's club
   isAdmin: false as boolean,
+  players: [] as PlayerProfile[],
   status: 'idle' as 'idle' | 'loading' | 'succeeded' | 'failed',
   error: null as string | null,
 };
@@ -57,6 +60,7 @@ const userSlice = createSlice({
       state.userId = null;
       state.username = null;  // Clear username
       state.userClub = null;
+      state.players = [];  
       state.status = 'idle';
       state.error = null;
       state.isAdmin = false;
@@ -78,6 +82,19 @@ const userSlice = createSlice({
         state.status = 'failed';
         state.userClub = null;
         state.error = action.payload as string;
+      })
+
+      .addCase(fetchAllPlayersAsync.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchAllPlayersAsync.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.players = action.payload; 
+      })
+      .addCase(fetchAllPlayersAsync.rejected, (state, action) => {
+        state.status = 'failed';
+        state.players = []; 
+        state.error = action.payload as string;
       });
   },
 });
@@ -92,3 +109,27 @@ export const selectUserClub = (state: any) => state.user.userClub;
 export const selectIsAdmin = (state: any) => state.user.isAdmin;
 
 export default userSlice.reducer;
+
+export const selectPlayers = (state: any) => state.user.players;
+
+// Async thunk to fetch all players
+export const fetchAllPlayersAsync = createAsyncThunk(
+  'user/fetchAllPlayers',
+  async (_, { rejectWithValue }) => {
+    try {
+      const players = await fetchAllPlayers(); // Fetch all players from the API
+      return players;
+    } catch (error) {
+      let errorMessage = 'Failed to fetch players';
+
+      if (typeof error === 'object' && error !== null && 'response' in error) {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        errorMessage = axiosError.response?.data?.message || errorMessage;
+      } else if (error instanceof Error) {
+        errorMessage = error.message || errorMessage;
+      }
+
+      return rejectWithValue(errorMessage);
+    }
+  }
+);

@@ -36,3 +36,11 @@ export const login = async (username: string, password: string): Promise<AxiosRe
   });
   return response;
 };
+
+// Fetch all player profiles
+export const fetchAllPlayers = async (): Promise<PlayerProfile[]> => {
+  const response = await api.get('/playerProfiles/allPlayers', {
+    baseURL: playerProfileBaseURL 
+  });
+  return response.data;
+};

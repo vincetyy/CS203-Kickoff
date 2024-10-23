@@ -94,4 +94,9 @@ public class PlayerProfileServiceImpl implements PlayerProfileService {
         newPlayerProfile.setUser(newUser);
         return playerProfiles.save(newPlayerProfile);
     }
+
+    @Override
+    public List<PlayerProfile> getAllPlayers() {
+        return playerProfiles.findAll(); 
+    }
 }
