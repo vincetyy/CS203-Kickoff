@@ -57,8 +57,8 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       >
         <nav className="space-y-4">
           <NavItem to="/profile" icon={User}>Profile</NavItem>
-          <NavItem to="/tournaments" icon={Trophy}>Tournaments</NavItem>
           <NavItem to="/clubs" icon={Users}>Club</NavItem>
+          <NavItem to="/tournaments" icon={Trophy}>Tournaments</NavItem>
         </nav>
       </aside>
     </>
