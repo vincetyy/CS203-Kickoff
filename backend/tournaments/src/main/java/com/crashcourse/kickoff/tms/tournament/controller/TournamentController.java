@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,12 +18,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import com.crashcourse.kickoff.tms.security.JwtUtil;
 import com.crashcourse.kickoff.tms.tournament.dto.PlayerAvailabilityDTO;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentCreateDTO;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentJoinDTO;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentResponseDTO;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentUpdateDTO;
+import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
 
@@ -73,7 +77,7 @@ public class TournamentController {
      *
      * @return ResponseEntity with the list of Tournaments and HTTP status.
      */
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TournamentResponseDTO>> getAllTournaments() {
         List<TournamentResponseDTO> tournaments = tournamentService.getAllTournaments();
         return ResponseEntity.ok(tournaments);
@@ -221,4 +225,9 @@ public class TournamentController {
         return ResponseEntity.ok(availabilities);
     }
 
+    @GetMapping("/host/{hostId}")
+    public ResponseEntity<List<Tournament>> getHostedTournaments(@PathVariable Long hostId) {
+        List<Tournament> hostedTournaments = tournamentService.getHostedTournaments(hostId);
+        return ResponseEntity.ok(hostedTournaments);
+    }
 }

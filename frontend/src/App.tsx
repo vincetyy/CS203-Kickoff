@@ -10,7 +10,8 @@ import ClubInfo from './pages/ClubInfo';
 import PlayerApplication from './pages/PlayerApplication.tsx';
 import LandingLayout from './components/LandingLayout.tsx';
 import "./utils/axiosSetup.js";
-import PlayerProfilePage from './pages/ViewProfile.tsx';
+import EditProfile from './pages/EditProfile.tsx';
+import ViewProfile from './pages/ViewProfile.tsx';
 
 function App() {
   return (
@@ -24,7 +25,8 @@ function App() {
         {/* Routes for the Main Application, including Layout */}
         <Route element={<Layout />}>
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/player/:id" element={<PlayerProfilePage />} />
+          <Route path="/profile/edit" element={<EditProfile />} />
+          <Route path="/player/:id" element={<ViewProfile />} />
           <Route path="/profile/signup" element={<Signup />} />
           <Route path="/tournaments" element={<TournamentsPage />} />
           <Route path="/tournaments/:id" element={<TournamentPage />} />

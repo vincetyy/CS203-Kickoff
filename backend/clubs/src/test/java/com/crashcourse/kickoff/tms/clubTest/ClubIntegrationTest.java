@@ -75,7 +75,7 @@ class ClubIntegrationTest {
 
     @Test
     public void getClubs_Success() throws Exception {
-        URI uri = new URI(baseUrl + port + "/clubs");
+        URI uri = new URI(baseUrl + port + "/api/v1/clubs");
 
         ResponseEntity<Club[]> result = restTemplate.getForEntity(uri, Club[].class);
         Club[] clubs = result.getBody();
@@ -87,7 +87,7 @@ class ClubIntegrationTest {
     @Test
     public void getPlayersFromClub_Success() throws Exception {
         Long clubId = 8L; 
-        URI uri = new URI(baseUrl + port + "/clubs/" + clubId + "/players");
+        URI uri = new URI(baseUrl + port + "/api/v1/clubs/" + clubId + "/players");
 
         ResponseEntity<List<Long>> response = restTemplate.exchange(
             uri,
@@ -105,7 +105,7 @@ class ClubIntegrationTest {
     @Test
     public void getPlayersFromClub_Failure() throws Exception {
         Long clubId = 10000L;
-        URI uri = new URI(baseUrl + port + "/clubs/" + clubId + "/players");
+        URI uri = new URI(baseUrl + port + "/api/v1/clubs/" + clubId + "/players");
 
         ResponseEntity<String> response = restTemplate.getForEntity(uri, String.class);
 
@@ -118,7 +118,7 @@ class ClubIntegrationTest {
     @Test
     public void getClubProfile_Success() throws Exception {
         Long clubId = 28L;
-        URI uri = new URI(baseUrl + port + "/clubs/" + clubId);
+        URI uri = new URI(baseUrl + port + "/api/v1/clubs/" + clubId);
 
         ResponseEntity<ClubProfile> response = restTemplate.getForEntity(uri, ClubProfile.class);
 
@@ -131,7 +131,7 @@ class ClubIntegrationTest {
     @Test
     public void getClubProfile_Failure() throws Exception {
         Long clubId = 10000L;  
-        URI uri = new URI(baseUrl + port + "/clubs/" + clubId);
+        URI uri = new URI(baseUrl + port + "/api/v1/clubs/" + clubId);
 
         ResponseEntity<ClubProfile> response = restTemplate.getForEntity(uri, ClubProfile.class);
 

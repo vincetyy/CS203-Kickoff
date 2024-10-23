@@ -88,3 +88,12 @@ export const getAllLocations = async (): Promise<Location[]> => {
   });
   return response.data;
 };
+
+// Get all locations
+export const getTournamentsHosted = async (hostId: number): Promise<Tournament[]> => {
+
+  const response = await api.get(`/tournaments/host/${hostId}`, {
+    baseURL: tournamentBaseURL,
+  });
+  return response.data;
+};

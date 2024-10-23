@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import { Button } from '../components/ui/button';
 import { ClubProfile } from '../types/club';
 import { PlayerProfile } from '../types/profile';
-import { selectUserId } from '../store/userSlice';
+import { selectUserClub, selectUserId } from '../store/userSlice';
 import { useSelector } from 'react-redux';
 
 import {
@@ -22,7 +22,7 @@ import {
 } from '../components/ui/select';
 import { fetchPlayerProfileById } from '../services/userService';
 import PlayerProfileCard from '../components/PlayerProfileCard';
-import { applyForClub, getClubApplication, getClubProfileById } from '../services/clubService';
+import { applyToClub, getClubApplication, getClubProfileById } from '../services/clubService';
 import { ArrowLeft } from 'lucide-react';
 
 enum PlayerPosition {
@@ -44,6 +44,7 @@ const ClubInfo: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedPosition, setSelectedPosition] = useState<PlayerPosition | null>(null);
   const userId = useSelector(selectUserId);
+  const userClub = useSelector(selectUserClub);
 
   const navigate = useNavigate();
 
@@ -94,7 +95,7 @@ const ClubInfo: React.FC = () => {
       if (!id) {
         return;
       }
-      await applyForClub(parseInt(id), userId, selectedPosition);
+      await applyToClub(parseInt(id), userId, selectedPosition);
       toast.success('Application sent successfully!');
       setHasApplied(true);
       setIsDialogOpen(false);
@@ -172,12 +173,12 @@ const ClubInfo: React.FC = () => {
 
       {/* Apply Button */}
       {
-        userId && !hasApplied &&
+        !userClub && userId && !hasApplied &&
         <Button onClick={() => setIsDialogOpen(true)}>Apply to Join</Button>
       }
 
       {
-        userId && hasApplied &&
+        !userClub && userId && hasApplied &&
         <Button className="bg-green-500 hover:bg-green-600">Applied!</Button>
       }   
 
