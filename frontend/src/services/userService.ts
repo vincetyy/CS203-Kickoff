@@ -1,5 +1,5 @@
 import api from './api';
-import { PlayerProfile, PlayerPosition, User } from '../types/profile';
+import { PlayerProfile, PlayerPosition, } from '../types/profile';
 import { AxiosResponse } from 'axios';
 
 // Set the base URL at the top of the file (from environment variable or a hardcoded value)

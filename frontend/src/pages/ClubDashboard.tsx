@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { Button } from '../components/ui/button';
 import { ClubProfile } from '../types/club';
 import PlayerProfileCard from '../components/PlayerProfileCard';
-import { PlayerPosition, PlayerProfile } from '../types/profile';
-import { AppDispatch, RootState } from '../store';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchClubsAsync } from '../store/clubSlice';
-import { fetchUserClubAsync, selectUserId } from '../store/userSlice';
+import { PlayerProfile } from '../types/profile';
+import { useSelector } from 'react-redux';
+import { selectUserId } from '../store/userSlice';
 import { fetchPlayerProfileById } from '../services/userService';
 import LeaveClubButton from '../components/LeaveClubButton';
 import { getClubProfileById } from '../services/clubService';
@@ -41,7 +38,9 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ id }) => {
         setCaptain(captainResponse);
 
         const playerIds = clubResponse.players; // Assuming clubResponse.data.players is an array of player IDs
-        const playerProfiles = await Promise.all(playerIds.map((playerId: number) => fetchPlayerProfileById(playerId)));
+        const playerProfiles = await Promise.all(
+          playerIds.map((player) => fetchPlayerProfileById(player.toString()))
+        );
         console.log(playerProfiles);
         
         // Store the player profiles in state
@@ -108,7 +107,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ id }) => {
         <h2 className="text-2xl font-semibold mb-2">Players in the Club</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {players ? (
-            players.map((player, index) => (
+            players.map((player) => (
               <PlayerProfileCard 
                 key={player.id}
                 id={player.id} 

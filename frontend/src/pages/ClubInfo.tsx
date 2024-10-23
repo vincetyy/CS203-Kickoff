@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import { Button } from '../components/ui/button';
 import { ClubProfile } from '../types/club';
 import { PlayerProfile } from '../types/profile';
-import { selectUserId } from '../store/userSlice';
+import { selectUserClub, selectUserId } from '../store/userSlice';
 import { useSelector } from 'react-redux';
 
 import {
@@ -22,7 +22,7 @@ import {
 } from '../components/ui/select';
 import { fetchPlayerProfileById } from '../services/userService';
 import PlayerProfileCard from '../components/PlayerProfileCard';
-import { applyForClub, getClubApplication, getClubProfileById } from '../services/clubService';
+import { applyToClub, getClubApplication, getClubProfileById } from '../services/clubService';
 import { ArrowLeft } from 'lucide-react';
 
 enum PlayerPosition {
@@ -44,6 +44,7 @@ const ClubInfo: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedPosition, setSelectedPosition] = useState<PlayerPosition | null>(null);
   const userId = useSelector(selectUserId);
+  const userClub = useSelector(selectUserClub);
 
   const navigate = useNavigate();
 
@@ -63,8 +64,9 @@ const ClubInfo: React.FC = () => {
         setCaptain(captainResponse);
 
         const playerIds = clubResponse.players; // Assuming clubResponse.data.players is an array of player IDs
-        const playerProfiles = await Promise.all(playerIds.map((playerId: number) => fetchPlayerProfileById(playerId.toString())));
-        
+        const playerProfiles = await Promise.all(
+  playerIds.map((player) => fetchPlayerProfileById(player.toString()))
+);
         // Store the player profiles in state
         setPlayers(playerProfiles);
       } catch (err: any) {
@@ -90,7 +92,10 @@ const ClubInfo: React.FC = () => {
     }
 
     try {
-      await applyForClub(id, userId, selectedPosition);
+      if (!id) {
+        return;
+      }
+      await applyToClub(parseInt(id), userId, selectedPosition);
       toast.success('Application sent successfully!');
       setHasApplied(true);
       setIsDialogOpen(false);
@@ -145,8 +150,9 @@ const ClubInfo: React.FC = () => {
         <h2 className="text-2xl font-semibold mb-2">Players in the Club</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {players ? (
-            players.map((player, index) => (
+            players.map((player) => (
               <PlayerProfileCard 
+                key={player.id}
                 id={player.id} 
                 availability={false}
                 needAvailability={false}
@@ -167,12 +173,12 @@ const ClubInfo: React.FC = () => {
 
       {/* Apply Button */}
       {
-        userId && !hasApplied &&
+        !userClub && userId && !hasApplied &&
         <Button onClick={() => setIsDialogOpen(true)}>Apply to Join</Button>
       }
 
       {
-        userId && hasApplied &&
+        !userClub && userId && hasApplied &&
         <Button className="bg-green-500 hover:bg-green-600">Applied!</Button>
       }   
 

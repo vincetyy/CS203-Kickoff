@@ -8,6 +8,7 @@ import com.crashcourse.kickoff.tms.tournament.dto.TournamentJoinDTO;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentResponseDTO;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentUpdateDTO;
 import com.crashcourse.kickoff.tms.tournament.model.PlayerAvailability;
+import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
 
 public interface TournamentService {
@@ -35,4 +36,6 @@ public interface TournamentService {
     PlayerAvailability updatePlayerAvailability(PlayerAvailabilityDTO dto);  
 
     List<PlayerAvailabilityDTO> getPlayerAvailabilityForTournament(Long tournamentId);
+
+    List<Tournament> getHostedTournaments(Long host);
 }
