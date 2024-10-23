@@ -31,8 +31,8 @@ public class MatchResponseDTO {
     /*
      * Score
      */
-    int club1Score;
-    int club2Score;
+    private int club1Score;
+    private int club2Score;
 
-    Long winningClubId;
+    private Long winningClubId;
 }
