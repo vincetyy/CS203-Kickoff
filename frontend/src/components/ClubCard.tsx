@@ -32,11 +32,6 @@ const ClubCard: React.FC<ClubCardProps> = ({
         <p className="text-gray-400 mt-2">{ratings}</p>
         {/* You can remove the Join button from here */}
       </div>
-      <div className="p-4">
-        <Button onClick={() => {/* Add admin action here */}}>
-          Manage Club
-        </Button>
-      </div>
       
     </div>
   );

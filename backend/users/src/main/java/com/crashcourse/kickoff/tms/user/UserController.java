@@ -18,6 +18,7 @@ import com.crashcourse.kickoff.tms.security.JwtUtil;
 import com.crashcourse.kickoff.tms.user.dto.LoginDetails;
 import com.crashcourse.kickoff.tms.user.dto.LoginResponseDTO;
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
+import com.crashcourse.kickoff.tms.user.model.Role;
 import com.crashcourse.kickoff.tms.user.model.User;
 import com.crashcourse.kickoff.tms.user.service.UserService;
 
@@ -73,8 +74,10 @@ public class UserController {
         // Assuming User has a getId() method to retrieve userId
         Long userId = user.getId();
 
+        boolean isAdmin = user.getRoles().contains(Role.ROLE_ADMIN);
+
         // Return both userId and jwtToken in the response
-        LoginResponseDTO loginResponse = new LoginResponseDTO(userId, jwt);
+        LoginResponseDTO loginResponse = new LoginResponseDTO(userId, jwt, isAdmin);
         return ResponseEntity.ok(loginResponse);
     }
 }

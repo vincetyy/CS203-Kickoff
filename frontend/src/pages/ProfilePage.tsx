@@ -47,7 +47,7 @@ export default function PlayerProfilePage() {
         localStorage.setItem('authToken', token);
         localStorage.setItem('username', username);
 
-        dispatch(setUser({ userId: response.data.userId, username }));
+        dispatch(setUser({ userId: response.data.userId, username: username, isAdmin: response.data.admin }));
         dispatch(fetchUserClubAsync());
         toast.success(`Welcome back, ${username}`, {
           duration: 3000,
