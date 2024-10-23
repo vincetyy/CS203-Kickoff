@@ -186,7 +186,7 @@ public class TournamentServiceImpl implements TournamentService {
         /*
          * refer to ClubController.java
          */
-        String clubServiceUrl = "http://localhost:8082/clubs/" + clubId + "/players";
+        String clubServiceUrl = "http://localhost:8082/api/v1/clubs/" + clubId + "/players";
 
         JwtUtil help = new JwtUtil();
         String jwtToken = help.generateJwtToken();
