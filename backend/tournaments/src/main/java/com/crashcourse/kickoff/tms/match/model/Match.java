@@ -7,8 +7,11 @@ import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Data
@@ -20,30 +23,10 @@ public class Match {
 
     private boolean isOver;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "tournament_id")
-    private Tournament tournament;
-    
-    /*
-     * Matches are stored in a binary tree data structure
-     */
-
-    @JsonManagedReference
-    @OneToOne
-    @JoinColumn(name = "left_child_id")
-    private Match leftChild;
-
-
-    @JsonManagedReference
-    @OneToOne
-    @JoinColumn(name = "right_child_id")
-    private Match rightChild;
-
-
-    @JsonBackReference
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "parent_id")
-    private Match parentMatch;
+    @JoinColumn(name = "round_id")
+    private Round round;
 
     /*
      * Clubs
