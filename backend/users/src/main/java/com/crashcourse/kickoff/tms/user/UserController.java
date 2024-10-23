@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.crashcourse.kickoff.tms.security.JwtUtil;
+import com.crashcourse.kickoff.tms.security.JwtAuthService;
 import com.crashcourse.kickoff.tms.user.dto.LoginDetails;
 import com.crashcourse.kickoff.tms.user.dto.LoginResponseDTO;
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
@@ -33,15 +34,37 @@ public class UserController {
     private AuthenticationManager authenticationManager;
     @Autowired
     private JwtUtil jwtUtil;
+    private final JwtAuthService jwtAuthService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, JwtAuthService jwtAuthService) {
         this.userService = userService;
+        this.jwtAuthService = jwtAuthService;
     }
 
     @GetMapping
     public List<User> getUsers() {
         return userService.getUsers();
     }
+
+    // @GetMapping("/{user_id}")
+    // public ResponseEntity<User> getUserById(
+    //         @PathVariable Long user_id,
+    //         @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = true) String token) {
+
+    //     try {
+    //         User foundUser = userService.getUserById(user_id);
+    //         if (foundUser == null) {
+    //             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+    //                     .body("User with ID " + user_id + " not found.");
+    //         }
+    //         return ResponseEntity.ok(users);
+    //     } catch (Exception e) {
+    //         // Log the error for debugging purposes
+    //         System.err.println("Error fetching user: " + e.getMessage());
+    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+    //                 .body("An unexpected error occurred.");
+    //     }
+    // }
 
     /**
      * Using BCrypt encoder to encrypt the password for storage
@@ -64,17 +87,10 @@ public class UserController {
     public ResponseEntity<String> delete(@PathVariable Long idToDelete,
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = true) String token) {
 
-        if (token == null || !token.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization token is missing or invalid" + token);
-        }
-        token = token.substring(7);
-        // Extract the userId from the token using JwtUtil
-        Long userIdFromToken = jwtUtil.extractUserId(token);
-        if (!idToDelete.equals(userIdFromToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to view this profile");
-        }
+        // Validate token and authorization
+        ResponseEntity<String> authResponse = jwtAuthService.validateToken(token, idToDelete);
+        if (authResponse != null) return authResponse;
 
-        System.out.println("id received: " + userIdFromToken);
         if (userService.getUserById(idToDelete) != null) {
             userService.deleteUserById(idToDelete);
             return ResponseEntity.ok("User deleted successfully.");
