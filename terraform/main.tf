@@ -31,19 +31,19 @@ module "ecs" {
       cluster_name = "users-cluster"
       app_image    = "vincetyy/kickoff-users:latest"
       app_port     = 8081
-      path_pattern = ["/users*", "/playerProfiles*"]
+      path_pattern = ["/api/v1/users*", "/api/v1/playerProfiles*"]
     }
     tournaments = {
       cluster_name = "tournaments-cluster"
       app_image    = "vincetyy/kickoff-tournaments:latest"
       app_port     = 8080
-      path_pattern = ["/tournaments*", "/locations*"]
+      path_pattern = ["/api/v1/tournaments*", "/api/v1/locations*"]
     }
     clubs = {
       cluster_name = "clubs-cluster"
       app_image    = "vincetyy/kickoff-clubs:latest"
       app_port     = 8082
-      path_pattern = ["/clubs*"]
+      path_pattern = ["/api/v1/clubs*"]
     }
   }
 }

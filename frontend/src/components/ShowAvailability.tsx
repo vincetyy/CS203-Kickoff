@@ -1,4 +1,3 @@
-import React from 'react';
 import PlayerProfileCard from './PlayerProfileCard';
 import { PlayerAvailabilityDTO } from '../types/playerAvailability';
 
@@ -8,7 +7,7 @@ interface ShowAvailabilityProps {
   currentUserClubId?: number;
 }
 
-export default function ShowAvailability({ availabilities, currentUserId, currentUserClubId }: ShowAvailabilityProps) {
+export default function ShowAvailability({ availabilities, currentUserClubId }: ShowAvailabilityProps) {
   const filteredAvailabilities = availabilities.filter(a => a.clubId === currentUserClubId);
   const totalPlayers = filteredAvailabilities.length;
   const availablePlayers = filteredAvailabilities.filter((a) => a.available).length;

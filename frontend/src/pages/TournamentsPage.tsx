@@ -107,7 +107,8 @@ export default function TournamentsPage() {
     }
 
     try {
-      const result = await dispatch(joinTournamentAsync({ 
+      if (!selectedTournament.id) return;
+      await dispatch(joinTournamentAsync({ 
         clubId: userClub.id, // Hardcoded club ID
         tournamentId: selectedTournament.id 
       })).unwrap()
@@ -140,7 +141,7 @@ export default function TournamentsPage() {
   const handleConfirmLeave = async () => {
 
     
-    if (!selectedTournament || !userClub) return
+    if (!selectedTournament || !userClub || !selectedTournament.id) return
     try {
       await dispatch(removeClubFromTournamentAsync({ 
         tournamentId: selectedTournament.id, 
@@ -240,9 +241,10 @@ export default function TournamentsPage() {
       {/* Tournament cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
         {filteredTournaments.map((tournament) => {
-          const isUserClubInTournament = tournament.joinedClubsIds?.includes(userClub?.id);
+          const isUserClubInTournament = userClub?.id !== undefined && tournament.joinedClubsIds?.includes(userClub?.id);
 
           return (
+            tournament?.id &&
             <TournamentCard
               key={tournament.id}
               id={tournament.id}

@@ -4,7 +4,6 @@ import { Button } from '../components/ui/button';
 import { PlayerPosition, PlayerProfile } from '../types/profile';
 import eyePassword from '@/assets/eyePassword.svg';
 import eyePasswordOff from '@/assets/eyePasswordOff.svg';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { toast } from 'react-hot-toast';
 import { fetchPlayerProfileById, login, updatePlayerProfile } from '../services/userService';
 import { getClubByPlayerId } from '../services/clubService';
@@ -30,7 +29,6 @@ export default function PlayerProfilePage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
 
   // Toggle password visibility
   const togglePasswordVisibility = () => {
