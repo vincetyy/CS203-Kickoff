@@ -2,6 +2,8 @@ package com.crashcourse.kickoff.tms.match.model;
 
 import java.util.*;
 
+import com.crashcourse.kickoff.tms.tournament.model.Tournament;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -18,7 +20,9 @@ public class Match {
 
     private boolean isOver;
 
-    private Long tournamentId;
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "tournament_id")
+    private Tournament tournament;
     
     /*
      * Matches are stored in a binary tree data structure
