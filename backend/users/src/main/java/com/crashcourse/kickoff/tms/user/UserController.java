@@ -47,6 +47,30 @@ public class UserController {
         return userService.getUsers();
     }
 
+    @GetMapping("/{user_id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long user_id,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = true) String token) {
+        // Validate token and authorization
+        ResponseEntity<String> authResponse = jwtAuthService.validateToken(token, user_id);
+        if (authResponse != null)
+            return authResponse;
+
+        try {
+            User foundUser = userService.getUserById(user_id);
+            if (foundUser == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("User with ID " + user_id + " not found.");
+            }
+
+            return ResponseEntity.ok(foundUser);
+        } catch (Exception e) {
+            // Log the error for debugging purposes
+            System.err.println("Error fetching user: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred.");
+        }
+    }
+
     @GetMapping("/publicinfo/{user_id}")
     public ResponseEntity<?> getUserPublicInfoById(
             @PathVariable Long user_id,
@@ -60,8 +84,7 @@ public class UserController {
 
             UserResponseDTO userDTO = new UserResponseDTO(
                     foundUser.getId(),
-                    foundUser.getUsername()
-            );
+                    foundUser.getUsername());
 
             return ResponseEntity.ok(userDTO);
         } catch (Exception e) {
@@ -95,7 +118,8 @@ public class UserController {
 
         // Validate token and authorization
         ResponseEntity<String> authResponse = jwtAuthService.validateToken(token, idToDelete);
-        if (authResponse != null) return authResponse;
+        if (authResponse != null)
+            return authResponse;
 
         if (userService.getUserById(idToDelete) != null) {
             userService.deleteUserById(idToDelete);
