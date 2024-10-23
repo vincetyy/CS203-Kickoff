@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../store'
-import { User, Trophy, Users, BarChart2, Menu, X, Search, Bell, LogOut } from 'lucide-react'
+import { User, Trophy, Users, Menu, X, Search, Bell } from 'lucide-react'
 import { Input } from "../components/ui/input"
 import { Button } from "../components/ui/button"
 import { toast, Toaster } from 'react-hot-toast'
 import { fetchClubsAsync } from '../store/clubSlice'
 import { fetchTournamentsAsync } from '../store/tournamentSlice'
-import { selectUsername, selectUserId, selectUserClub, clearUser } from '../store/userSlice'
+import { selectUserId, clearUser } from '../store/userSlice'
 import ClubCard from '../components/ClubCard'
 import TournamentCard from '../components/TournamentCard'
 import { Club } from '../types/club'
@@ -43,9 +43,7 @@ const AdminDashboard = () => {
   const [clubFilter, setClubFilter] = useState<ClubFilter>(ClubFilter.ALL)
   const [playerFilter, setPlayerFilter] = useState<PlayerFilter>(PlayerFilter.ALL)
 
-  const username = useSelector(selectUsername)
   const userId = useSelector(selectUserId)
-  const userClub = useSelector(selectUserClub)
   const { clubs } = useSelector((state: RootState) => state.clubs)
   const { tournaments } = useSelector((state: RootState) => state.tournaments)
 
@@ -149,7 +147,7 @@ const AdminDashboard = () => {
             </h2>
             <div className="w-full mb-4">
               <div className="relative w-full">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                <Search className="absolute items-center left-2 top-2.5 w-4 text-gray-500" />
                 <Input
                   type="search"
                   placeholder={`Search ${activeTab}`}
@@ -222,9 +220,6 @@ const AdminDashboard = () => {
                   applied={false}
                   onClick={() => {/* Add admin action here */}}
                 />
-                <Button onClick={() => {/* Add admin action here */}}>
-                  Manage Club
-                </Button>
               </div>
             ))}
             </div>
