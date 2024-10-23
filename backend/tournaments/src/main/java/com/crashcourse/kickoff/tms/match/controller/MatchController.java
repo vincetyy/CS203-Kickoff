@@ -1,5 +1,7 @@
 package com.crashcourse.kickoff.tms.match.controller;
 
+import java.util.*;
+
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
+import com.crashcourse.kickoff.tms.match.model.Match;
 import com.crashcourse.kickoff.tms.match.dto.*;
 import com.crashcourse.kickoff.tms.match.service.MatchService;
 import com.crashcourse.kickoff.tms.security.JwtUtil;
@@ -34,13 +37,22 @@ public class MatchController {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
 
+    @PostMapping("/{tournamentId}/createbracket")
+    public ResponseEntity<?> createBracket(@PathVariable Long tournamentId, @RequestBody Long numberOfClubs) {
+        try {
+            List<List<Match>> bracket = matchService.createBracket(tournamentId, numberOfClubs);
+            return new ResponseEntity<>(bracket, HttpStatus.CREATED);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getMatchById(@PathVariable Long id) {
         try {
-            MatchResponseDTO matchResponseDTO = matchService.getMatchById(id);
+            Match matchResponseDTO = matchService.getMatchById(id);
             return new ResponseEntity<>(matchResponseDTO, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

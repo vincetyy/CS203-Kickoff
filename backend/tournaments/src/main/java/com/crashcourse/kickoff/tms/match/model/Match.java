@@ -23,27 +23,6 @@ public class Match {
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "tournament_id")
     private Tournament tournament;
-    
-    /*
-     * Matches are stored in a binary tree data structure
-     */
-
-    @JsonManagedReference
-    @OneToOne
-    @JoinColumn(name = "left_child_id")
-    private Match leftChild;
-
-
-    @JsonManagedReference
-    @OneToOne
-    @JoinColumn(name = "right_child_id")
-    private Match rightChild;
-
-
-    @JsonBackReference
-    @ManyToOne
-    @JoinColumn(name = "parent_id")
-    private Match parentMatch;
 
     /*
      * Clubs

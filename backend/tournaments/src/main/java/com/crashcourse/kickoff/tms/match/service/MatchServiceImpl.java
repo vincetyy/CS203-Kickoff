@@ -1,6 +1,6 @@
 package com.crashcourse.kickoff.tms.match.service;
 
-import java.util.Optional;
+import java.util.*;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,26 +33,6 @@ public class MatchServiceImpl implements MatchService {
         match.setTournament(tournament);
 
         /*
-         * Update Parent
-         */
-        Long parentId = matchCreateDTO.getParentId();
-        if (parentId > 0) {
-            Match parentMatch = matchRepository.findById(parentId)
-                .orElseThrow(() -> new EntityNotFoundException("Parent match not found with id: " + parentId));
-            match.setParentMatch(parentMatch);
-
-            if (parentMatch.getLeftChild() == null) {
-                parentMatch.setLeftChild(match);
-            } else if (parentMatch.getRightChild() == null) {
-                parentMatch.setRightChild(match);
-            } else {
-                throw new RuntimeException("Parent match already has two children matches.");
-            }
-            matchRepository.save(parentMatch);
-
-        }
-
-        /*
          * Save matches
          */
         Match savedMatch = matchRepository.save(match);
@@ -61,10 +41,46 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public MatchResponseDTO getMatchById(Long id) {
-        Match foundMatch = matchRepository.findById(id)
+    public List<List<Match>> createBracket(Long tournamentId, Long numberOfClubs){
+        if (numberOfClubs == 0) {
+            throw new EntityNotFoundException("No clubs found");
+        }
+
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+            .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + tournamentId));
+
+        /*
+         * Calculate Number of Rounds
+         */
+        int numberOfRounds = (int) Math.ceil(Math.log(numberOfClubs) / Math.log(2));
+
+        /*
+         * Create brackets
+         */
+        List<List<Match>> tournamentMatches = new ArrayList<>();
+        int roundNumber = 1;
+        while (numberOfRounds - roundNumber >= 0) {
+
+            List<Match> roundMatches = new ArrayList<>();
+
+            int size = (int)Math.pow(2, numberOfRounds - roundNumber);
+            for (int i = 0; i < size; i++) {
+                Match match = new Match();
+                match.setTournament(tournament);
+                matchRepository.save(match);
+                
+                roundMatches.add(i, match);
+            }
+            tournamentMatches.add(roundMatches);
+            roundNumber++;
+        }
+        return tournamentMatches;
+    }
+
+    @Override
+    public Match getMatchById(Long id) {
+        return matchRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Match not found with ID: " + id));
-        return mapToResponseDTO(foundMatch);
     }
 
     @Override
@@ -72,9 +88,9 @@ public class MatchServiceImpl implements MatchService {
         Match foundMatch = matchRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Match not found with ID: " + id));
 
-        foundMatch.setOver(matchUpdateDTO.isOver());
-        foundMatch.setClub1Id(matchUpdateDTO.getClub1Id());
-        foundMatch.setClub2Id(matchUpdateDTO.getClub2Id());
+        /*
+         * Update Score
+         */
         foundMatch.setClub1Score(matchUpdateDTO.getClub1Score());
         foundMatch.setClub2Score(matchUpdateDTO.getClub2Score());
         foundMatch.setWinningClubId(matchUpdateDTO.getWinningClubId());
@@ -94,28 +110,11 @@ public class MatchServiceImpl implements MatchService {
      * @return TournamentResponseDTO
      */
     private MatchResponseDTO mapToResponseDTO(Match match) {
-        Long leftChildId = 0L;
-        if (match.getLeftChild() != null) {
-            leftChildId = match.getLeftChild().getId();
-        }
-        Long rightChildId = 0L;
-        if (match.getRightChild() != null) {
-            rightChildId = match.getRightChild().getId();
-        }
-        Long parentId = 0L;
-        if (match.getParentMatch() != null) {
-            parentId = match.getParentMatch().getId();
-        }
-
         return new MatchResponseDTO(
                 match.getId(),
                 match.isOver(),
 
                 match.getTournament().getId(),
-                leftChildId,
-                rightChildId,
-                parentId,
-
                 match.getClub1Id(),
                 match.getClub2Id(),
 
