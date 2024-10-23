@@ -12,8 +12,8 @@ export const fetchClubs = async (): Promise<Club[]> => {
   return response.data;
 };
 
-export const applyToClub = async (clubId: number, playerProfileId: number, desiredPosition: string): Promise<any> => {
-  const response = await api.post(`/clubs/${clubId}/apply`, { playerProfileId, desiredPosition }, {
+export const applyToClub = async (clubId: number, playerId: number, desiredPosition: string): Promise<any> => {
+  const response = await api.post(`/clubs/${clubId}/apply`, { playerId, desiredPosition }, {
     baseURL: clubBaseURL,
   });
   return response.data;
@@ -47,8 +47,8 @@ export const getClubApplication = async (clubId: number): Promise<AxiosResponse>
   return response;
 };
 
-export const updatePlayerApplication = async (clubId: number, playerId: number, status: string): Promise<AxiosResponse> => {
-  const response = await api.post(`/clubs/${clubId}/applications/${playerId}`, status, {
+export const updatePlayerApplication = async (clubId: number, playerId: number, applicationStatus: string): Promise<AxiosResponse> => {
+  const response = await api.post(`/clubs/${clubId}/applications/${playerId}`, { applicationStatus }, {
     baseURL: clubBaseURL,
   });
   return response;
