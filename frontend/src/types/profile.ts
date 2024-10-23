@@ -24,8 +24,7 @@ export interface User {
 // Interface for PlayerProfile
 export interface PlayerProfile {
   id: number;
-  club: Club | null;
-  user: User;
+  username: String;
   preferredPositions: PlayerPosition[];
   profileDescription: string;
 }

@@ -106,7 +106,7 @@ const TournamentPage: React.FC = () => {
         if (tournament.host) {
           const hostId = tournament.host;
           const hostProfile = await fetchPlayerProfileById(hostId.toString());
-          setHostUsername(hostProfile.user.username);
+          setHostUsername(hostProfile.username);
         }
         
         

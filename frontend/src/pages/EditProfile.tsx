@@ -101,11 +101,11 @@ export default function PlayerProfilePage() {
         <div className="flex items-center mb-6">
           <img
             src={`https://picsum.photos/seed/${playerProfile.id + 2000}/200/200`}
-            alt={`${playerProfile.user.username}'s profile`}
+            alt={`${playerProfile.username}'s profile`}
             className="w-24 h-24 rounded-full object-cover mr-6"
           />
           <div>
-            <h1 className="text-3xl font-bold">{playerProfile.user.username}</h1>
+            <h1 className="text-3xl font-bold">{playerProfile. username}</h1>
             <p className="text-gray-400">Player ID: {playerProfile.id}</p>
           </div>
         </div>

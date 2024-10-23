@@ -57,9 +57,7 @@ public class PlayerProfileController {
                 playerProfile.getId(),
                 playerProfile.getUser().getUsername(),
                 playerProfile.getProfileDescription(),
-                playerProfile.getPreferredPositions().stream()
-                .map(position -> position.name().replace("POSITION_", "")) // Clean the enum names
-                    .toList()
+                playerProfile.getPreferredPositions()
         );
 
         return ResponseEntity.ok(playerProfileDTO);

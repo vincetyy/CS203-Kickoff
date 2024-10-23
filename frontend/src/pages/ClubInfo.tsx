@@ -138,7 +138,7 @@ const ClubInfo: React.FC = () => {
       <p className="text-lg mb-4">{club.clubDescription || 'No description available.'}</p>
       <div className="flex items-center mb-4">
         <div className="mr-4">
-          <strong>Captain:</strong> {captain?.user.username || 'No captain assigned.'}
+          <strong>Captain:</strong> {captain?.username || 'No captain assigned.'}
         </div>
         <div>
           <strong>ELO:</strong> {club.elo ? club.elo.toFixed(2) : 'N/A'}
