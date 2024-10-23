@@ -1,25 +1,28 @@
-import React, { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '../store'
-import { User, Trophy, Users, Menu, X, Search, Bell } from 'lucide-react'
-import { Input } from "../components/ui/input"
-import { Button } from "../components/ui/button"
-import { toast, Toaster } from 'react-hot-toast'
-import { fetchClubsAsync } from '../store/clubSlice'
-import { fetchTournamentsAsync } from '../store/tournamentSlice'
-import { selectUserId, clearUser } from '../store/userSlice'
-import ClubCard from '../components/ClubCard'
-import TournamentCard from '../components/TournamentCard'
-import { Club } from '../types/club'
-import { Tournament } from '../types/tournament'
-import { AvatarImage } from '../components/ui/avatar'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../store';
+import { User, Trophy, Users, Menu, X, Search, Bell } from 'lucide-react';
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
+import { toast, Toaster } from 'react-hot-toast';
+import { fetchAllPlayersAsync, selectPlayers } from '../store/userSlice';
+import { fetchClubsAsync } from '../store/clubSlice';
+import { fetchTournamentsAsync } from '../store/tournamentSlice';
+import { selectUserId, clearUser } from '../store/userSlice';
+import ClubCard from '../components/ClubCard';
+import TournamentCard from '../components/TournamentCard';
+import { Club } from '../types/club';
+import { Tournament } from '../types/tournament';
+import { PlayerProfile } from '../types/profile'; 
+import PlayerProfileCard from '../components/PlayerProfileCard';
+import { AvatarImage } from '../components/ui/avatar';
+import { Link } from 'react-router-dom';
 
 enum TournamentFilter {
   UPCOMING = 'All Tournaments',
   CURRENT = 'Pending',
   PAST = 'Verified',
-  REJECTED = 'Rejected'
+  REJECTED = 'Rejected',
 }
 
 enum ClubFilter {
@@ -35,43 +38,47 @@ enum PlayerFilter {
 }
 
 const AdminDashboard = () => {
-  const dispatch = useDispatch<AppDispatch>()
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState('players')
-  const [searchTerm, setSearchTerm] = useState('')
-  const [tournamentFilter, setTournamentFilter] = useState<TournamentFilter>(TournamentFilter.UPCOMING)
-  const [clubFilter, setClubFilter] = useState<ClubFilter>(ClubFilter.ALL)
-  const [playerFilter, setPlayerFilter] = useState<PlayerFilter>(PlayerFilter.ALL)
+  const dispatch = useDispatch<AppDispatch>();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('players');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [tournamentFilter, setTournamentFilter] = useState<TournamentFilter>(TournamentFilter.UPCOMING);
+  const [clubFilter, setClubFilter] = useState<ClubFilter>(ClubFilter.ALL);
+  const [playerFilter, setPlayerFilter] = useState<PlayerFilter>(PlayerFilter.ALL);
 
-  const userId = useSelector(selectUserId)
-  const { clubs } = useSelector((state: RootState) => state.clubs)
-  const { tournaments } = useSelector((state: RootState) => state.tournaments)
+  const userId = useSelector(selectUserId);
+  const players = useSelector(selectPlayers); // Use selectPlayers to access players
+  const { clubs } = useSelector((state: RootState) => state.clubs);
+  const { tournaments } = useSelector((state: RootState) => state.tournaments);
 
   useEffect(() => {
-    dispatch(fetchClubsAsync())
-    dispatch(fetchTournamentsAsync())
-  }, [dispatch])
+    dispatch(fetchClubsAsync());
+    dispatch(fetchTournamentsAsync());
+    dispatch(fetchAllPlayersAsync());
+  }, [dispatch]);
 
   const filteredClubs = clubs.filter(club =>
     club.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  );
 
   const filteredTournaments = tournaments.filter(tournament =>
     tournament.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  );
+
+  const filteredPlayers = players.filter((player: PlayerProfile) =>
+    player.user.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken')
-    dispatch(clearUser())
-    toast('You have been logged out.')
-  }
+    localStorage.removeItem('authToken');
+    dispatch(clearUser());
+    toast('You have been logged out.');
+  };
 
   const NavItem = ({ to, icon: Icon, children }: { to: string; icon: React.ElementType; children: React.ReactNode }) => (
     <button
       className={`flex items-center space-x-2 p-2 rounded-md transition-colors duration-200 w-full text-left ${
-        activeTab === to
-          ? '!bg-gray-800 !text-white' 
-          : 'bg-transparent text-gray-300 hover:bg-gray-800 hover:text-white' 
+        activeTab === to ? '!bg-gray-800 !text-white' : 'bg-transparent text-gray-300 hover:bg-gray-800 hover:text-white'
       }`}
       onClick={() => {
         setActiveTab(to);
@@ -81,8 +88,7 @@ const AdminDashboard = () => {
       <Icon className="h-5 w-5" />
       <span>{children}</span>
     </button>
-  )
-  
+  );
 
   return (
     <div className="flex flex-col min-h-screen text-white">
@@ -91,7 +97,7 @@ const AdminDashboard = () => {
         <div className="flex items-center">
           <Button
             size="icon"
-            className="md:hidden mr-2 "
+            className="md:hidden mr-2"
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           >
             {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -102,20 +108,16 @@ const AdminDashboard = () => {
         </div>
         {userId && (
           <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              className="relative"
-              onClick={() => {/* Handle bell click */}}
-            >
+            <Button variant="ghost" className="relative" onClick={() => {}}>
               <Bell className="h-6 w-6 text-blue-500" />
             </Button>
             <Button variant="ghost" onClick={handleLogout}>
               Logout
             </Button>
             <AvatarImage
-              src={`https://picsum.photos/seed/${userId+2000}/100/100`}
+              src={`https://picsum.photos/seed/${userId + 2000}/100/100`}
               alt="User avatar"
-              />
+            />
           </div>
         )}
       </header>
@@ -124,11 +126,9 @@ const AdminDashboard = () => {
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <aside
-          className={`
-            fixed top-0 left-0 z-20 h-full w-64 p-6 space-y-6 transition-transform duration-300 ease-in-out transform
+          className={`fixed top-0 left-0 z-20 h-full w-64 p-6 space-y-6 transition-transform duration-300 ease-in-out transform
             ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-            md:relative md:translate-x-0
-          `}
+            md:relative md:translate-x-0`}
         >
           <nav className="space-y-4">
             <NavItem to="players" icon={User}>Players</NavItem>
@@ -157,6 +157,7 @@ const AdminDashboard = () => {
                 />
               </div>
             </div>
+
             {/* Filters based on active tab */}
             {activeTab === 'tournaments' && (
               <div className="flex justify-center space-x-4 mb-4">
@@ -171,6 +172,7 @@ const AdminDashboard = () => {
                 ))}
               </div>
             )}
+
             {activeTab === 'clubs' && (
               <div className="flex justify-center space-x-4 mb-4">
                 {Object.values(ClubFilter).map((filter) => (
@@ -184,44 +186,41 @@ const AdminDashboard = () => {
                 ))}
               </div>
             )}
+
             {activeTab === 'players' && (
-              <div className="flex justify-center space-x-4 mb-4">
-                {Object.values(PlayerFilter).map((filter) => (
-                  <Button
-                    key={filter}
-                    onClick={() => setPlayerFilter(filter)}
-                    variant={playerFilter === filter ? "default" : "secondary"}
-                  >
-                    {filter}
-                  </Button>
-                ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredPlayers.length > 0 ? (
+                  filteredPlayers.map((player: PlayerProfile) => (
+                      <PlayerProfileCard
+                      key={player.id}
+                      id={player.id}
+                      availability={true}  
+                      needAvailability={true}  
+                    />
+                  ))
+                ) : (
+                  <p>No players available</p>
+                )}
               </div>
             )}
           </div>
 
-          {/* Content for each tab */}
-          {activeTab === 'players' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Add player cards or table here */}
-              <p>Player management coming soon...</p>
-            </div>
-          )}
-
+          {/* Club and Tournament Content */}
           {activeTab === 'clubs' && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredClubs.map((club: Club) => (
-              <div key={club.id}>
-                <ClubCard
-                  id={club.id}
-                  name={club.name}
-                  description={club.clubDescription || 'No description available.'}
-                  ratings={`ELO: ${club.elo.toFixed(0)}, RD: ${club.ratingDeviation.toFixed(0)}`}
-                  image={`https://picsum.photos/seed/${club.id}/400/300`}
-                  applied={false}
-                  onClick={() => {/* Add admin action here */}}
-                />
-              </div>
-            ))}
+                <div key={club.id}>
+                  <ClubCard
+                    id={club.id}
+                    name={club.name}
+                    description={club.clubDescription || 'No description available.'}
+                    ratings={`ELO: ${club.elo.toFixed(0)}, RD: ${club.ratingDeviation.toFixed(0)}`}
+                    image={`https://picsum.photos/seed/${club.id}/400/300`}
+                    applied={false}
+                    onClick={() => {}}
+                  />
+                </div>
+              ))}
             </div>
           )}
 
@@ -230,7 +229,7 @@ const AdminDashboard = () => {
               {filteredTournaments.map((tournament: Tournament) => (
                 <TournamentCard
                   key={tournament.id}
-                  id={tournament.id}
+                  id={tournament.id || 0}
                   name={tournament.name}
                   startDate={new Date(tournament.startDateTime).toLocaleDateString()}
                   endDate={new Date(tournament.endDateTime).toLocaleDateString()}
@@ -238,7 +237,7 @@ const AdminDashboard = () => {
                   teams={`${tournament.joinedClubsIds?.length || 0}/${tournament.maxTeams}`}
                   image={`https://picsum.photos/seed/${tournament.id + 1000}/400/300`}
                 >
-                  <Button onClick={() => {/* Add admin action here */}}>
+                  <Button onClick={() => {}}>
                     Manage Tournament
                   </Button>
                 </TournamentCard>
@@ -248,7 +247,7 @@ const AdminDashboard = () => {
         </main>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AdminDashboard
+export default AdminDashboard;
