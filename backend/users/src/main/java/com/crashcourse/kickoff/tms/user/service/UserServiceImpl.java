@@ -93,4 +93,9 @@ public class UserServiceImpl implements UserService {
         return users.save(user);  // Save the user and persist changes to the database
     }
 
+    @Transactional
+    public void deleteUserById(Long userId) {
+        users.deleteById(userId);
+    }
+
 }

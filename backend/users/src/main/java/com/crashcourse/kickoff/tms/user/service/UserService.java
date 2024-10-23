@@ -12,5 +12,6 @@ public interface UserService {
     User addUser(NewUserDTO newUserDTO);
     User getUserById(Long userId);   
     User save(User user);
-    public User addHostProfileToUser(User user);
+    User addHostProfileToUser(User user);
+    void deleteUserById(Long userId);
 }
