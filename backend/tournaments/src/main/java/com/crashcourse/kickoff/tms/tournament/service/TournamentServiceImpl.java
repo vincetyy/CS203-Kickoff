@@ -163,7 +163,8 @@ public class TournamentServiceImpl implements TournamentService {
                 tournament.getMinRank(),
                 tournament.getMaxRank(),
                 clubIds,
-                tournament.getHost()
+                tournament.getHost(),
+                tournament.getRounds()
         );
     }
 

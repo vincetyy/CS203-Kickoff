@@ -7,8 +7,11 @@ import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Data
@@ -20,9 +23,10 @@ public class Match {
 
     private boolean isOver;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "tournament_id")
-    private Tournament tournament;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "round_id")
+    private Round round;
 
     /*
      * Clubs

@@ -6,7 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.crashcourse.kickoff.tms.match.model.Match;
+import com.crashcourse.kickoff.tms.match.model.Round;
+
 import com.crashcourse.kickoff.tms.match.repository.MatchRepository;
+import com.crashcourse.kickoff.tms.match.repository.RoundRepository;
 import com.crashcourse.kickoff.tms.match.dto.*;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.repository.TournamentRepository;
@@ -22,60 +25,68 @@ public class MatchServiceImpl implements MatchService {
     private MatchRepository matchRepository;
 
     @Autowired
+    private RoundRepository roundRepository;
+
+    @Autowired
     private TournamentRepository tournamentRepository;
 
+    /*
+     * Matches can now only be created through
+     * create bracket
+     */
     @Override
-    public MatchResponseDTO createMatch(MatchCreateDTO matchCreateDTO) {
-
+    public Match createMatch(Long roundId) {
         Match match = new Match();
-        Tournament tournament = tournamentRepository.findById(matchCreateDTO.getTournamentId())
-            .orElseThrow(() -> new EntityNotFoundException("Parent match not found with id: " + matchCreateDTO.getTournamentId()));
-        match.setTournament(tournament);
-
-        /*
-         * Save matches
-         */
-        Match savedMatch = matchRepository.save(match);
-
-        return mapToResponseDTO(savedMatch);
+        Round round = roundRepository.findById(roundId)
+            .orElseThrow(() -> new EntityNotFoundException("Round not found with id: " + roundId));
+        match.setRound(round);
+        System.out.println("SFDSKFSFSD\n\n\n\n\n");
+        return matchRepository.save(match);
     }
 
+    public Round createRound(int numberOfMatches) {
+        System.out.println("YES\n\n\n\n\n");
+        Round round = new Round();
+        // Save the round first so it has a valid ID
+        round = roundRepository.save(round);
+    
+        List<Match> matches = new ArrayList<>();
+        for (int i = 0; i < numberOfMatches; i++) {
+            matches.add(createMatch(round.getId()));
+        }
+    
+        round.setMatches(matches);
+        return roundRepository.save(round);
+    }
+    
     @Override
-    public List<List<Match>> createBracket(Long tournamentId, Long numberOfClubs){
+    public List<Round> createBracket(Long tournamentId, Long numberOfClubs) {
         if (numberOfClubs == 0) {
             throw new EntityNotFoundException("No clubs found");
         }
-
+    
         Tournament tournament = tournamentRepository.findById(tournamentId)
             .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + tournamentId));
-
-        /*
-         * Calculate Number of Rounds
-         */
+    
+        // Calculate number of rounds
         int numberOfRounds = (int) Math.ceil(Math.log(numberOfClubs) / Math.log(2));
-
-        /*
-         * Create brackets
-         */
-        List<List<Match>> tournamentMatches = new ArrayList<>();
+    
+        List<Round> tournamentRounds = new ArrayList<>();
         int roundNumber = 1;
-        while (numberOfRounds - roundNumber >= 0) {
-
-            List<Match> roundMatches = new ArrayList<>();
-
-            int size = (int)Math.pow(2, numberOfRounds - roundNumber);
-            for (int i = 0; i < size; i++) {
-                Match match = new Match();
-                match.setTournament(tournament);
-                matchRepository.save(match);
-                
-                roundMatches.add(i, match);
-            }
-            tournamentMatches.add(roundMatches);
-            roundNumber++;
+        
+        while (roundNumber <= numberOfRounds) { // Adjust the condition
+            System.out.println("HELLO\n\n\n\n\n");
+            int size = (int) Math.pow(2, numberOfRounds - roundNumber);
+            tournamentRounds.add(createRound(size));
+            roundNumber++;  // Increment to avoid infinite loop
         }
-        return tournamentMatches;
+    
+        System.out.println("BYE\n\n\n\n\n");
+        tournament.setRounds(tournamentRounds);
+        tournamentRepository.save(tournament);
+        return tournamentRounds;
     }
+    
 
     @Override
     public Match getMatchById(Long id) {
@@ -114,7 +125,7 @@ public class MatchServiceImpl implements MatchService {
                 match.getId(),
                 match.isOver(),
 
-                match.getTournament().getId(),
+                match.getRound().getTournament().getId(),
                 match.getClub1Id(),
                 match.getClub2Id(),
 

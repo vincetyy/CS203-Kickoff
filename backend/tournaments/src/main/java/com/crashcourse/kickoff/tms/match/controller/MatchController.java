@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import com.crashcourse.kickoff.tms.match.model.Match;
+import com.crashcourse.kickoff.tms.match.model.Round;
 import com.crashcourse.kickoff.tms.match.dto.*;
 import com.crashcourse.kickoff.tms.match.service.MatchService;
 import com.crashcourse.kickoff.tms.security.JwtUtil;
@@ -28,21 +29,10 @@ public class MatchController {
     @Autowired
     private final MatchService matchService;
 
-    @PostMapping
-    public ResponseEntity<?> createMatch(
-            @RequestBody MatchCreateDTO matchCreateDTO) {
-        try {
-            MatchResponseDTO createdMatch = matchService.createMatch(matchCreateDTO);
-            return new ResponseEntity<>(createdMatch, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
     @PostMapping("/{tournamentId}/createbracket")
     public ResponseEntity<?> createBracket(@PathVariable Long tournamentId, @RequestBody Long numberOfClubs) {
         try {
-            List<List<Match>> bracket = matchService.createBracket(tournamentId, numberOfClubs);
+            List<Round> bracket = matchService.createBracket(tournamentId, numberOfClubs);
             return new ResponseEntity<>(bracket, HttpStatus.CREATED);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
