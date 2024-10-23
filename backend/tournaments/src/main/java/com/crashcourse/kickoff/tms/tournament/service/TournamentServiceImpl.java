@@ -370,4 +370,9 @@ public class TournamentServiceImpl implements TournamentService {
             .collect(Collectors.toList());
     }
 
+    public List<Tournament> getHostedTournaments(Long host) {
+        List<Tournament> hostedTournaments = tournamentRepository.findByHost(host);
+        return hostedTournaments;
+    }
+
 }

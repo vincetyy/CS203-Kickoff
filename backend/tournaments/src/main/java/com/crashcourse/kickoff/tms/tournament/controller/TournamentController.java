@@ -22,6 +22,7 @@ import com.crashcourse.kickoff.tms.tournament.dto.TournamentCreateDTO;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentJoinDTO;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentResponseDTO;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentUpdateDTO;
+import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
 
@@ -221,4 +222,9 @@ public class TournamentController {
         return ResponseEntity.ok(availabilities);
     }
 
+    @GetMapping("/host/{hostId}")
+    public ResponseEntity<List<Tournament>> getHostedTournaments(@PathVariable Long hostId) {
+        List<Tournament> hostedTournaments = tournamentService.getHostedTournaments(hostId);
+        return ResponseEntity.ok(hostedTournaments);
+    }
 }

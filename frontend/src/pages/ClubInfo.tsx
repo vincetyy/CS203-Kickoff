@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import { Button } from '../components/ui/button';
 import { ClubProfile } from '../types/club';
 import { PlayerProfile } from '../types/profile';
-import { selectUserId } from '../store/userSlice';
+import { selectUserClub, selectUserId } from '../store/userSlice';
 import { useSelector } from 'react-redux';
 
 import {
@@ -44,6 +44,7 @@ const ClubInfo: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedPosition, setSelectedPosition] = useState<PlayerPosition | null>(null);
   const userId = useSelector(selectUserId);
+  const userClub = useSelector(selectUserClub);
 
   const navigate = useNavigate();
 
@@ -167,12 +168,12 @@ const ClubInfo: React.FC = () => {
 
       {/* Apply Button */}
       {
-        userId && !hasApplied &&
+        !userClub && userId && !hasApplied &&
         <Button onClick={() => setIsDialogOpen(true)}>Apply to Join</Button>
       }
 
       {
-        userId && hasApplied &&
+        !userClub && userId && hasApplied &&
         <Button className="bg-green-500 hover:bg-green-600">Applied!</Button>
       }   
 

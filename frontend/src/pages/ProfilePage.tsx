@@ -4,7 +4,6 @@ import { Button } from '../components/ui/button';
 import { PlayerPosition, PlayerProfile } from '../types/profile';
 import eyePassword from '@/assets/eyePassword.svg';
 import eyePasswordOff from '@/assets/eyePasswordOff.svg';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { toast } from 'react-hot-toast';
 import { fetchPlayerProfileById, login, updatePlayerProfile } from '../services/userService';
 import { getClubByPlayerId } from '../services/clubService';
@@ -13,6 +12,7 @@ import { selectUserId, setUser, fetchUserClubAsync } from '../store/userSlice';
 import { Club } from '../types/club';
 import { AppDispatch } from '../store';
 import { useNavigate } from 'react-router-dom';
+import ViewProfile from './ViewProfile';
 
 export default function PlayerProfilePage() {
   const userId = useSelector(selectUserId);
@@ -202,71 +202,5 @@ export default function PlayerProfilePage() {
 
   if (error || !playerProfile) return <div>Error: {error || 'Profile not found'}</div>;
 
-  return (
-    <div className="container mx-auto p-6">
-      <div className="bg-gray-900 rounded-lg p-6">
-        <div className="flex items-center mb-6">
-          <img
-            src={`https://picsum.photos/seed/${playerProfile.id + 2000}/200/200`}
-            alt={`${playerProfile.user.username}'s profile`}
-            className="w-24 h-24 rounded-full object-cover mr-6"
-          />
-          <div>
-            <h1 className="text-3xl font-bold">{playerProfile.user.username}</h1>
-            <p className="text-gray-400">Player ID: {playerProfile.id}</p>
-          </div>
-        </div>
-
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-2">Club Information</h2>
-          {club ? (
-            <div className="flex items-center">
-              <img
-                src={`https://picsum.photos/seed/club-${club.id}/800/200`}
-                alt={`${club.name} logo`}
-                className="w-16 h-16 rounded-full object-cover mr-4"
-              />
-              <div>
-                <p className="font-semibold">{club.name}</p>
-                <p className="text-sm text-gray-400">ELO: {club.elo.toFixed(2)}</p>
-              </div>
-            </div>
-          ) : (
-            <p>You are not currently associated with a club.</p>
-          )}
-        </div>
-
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-2">Profile Description</h2>
-          <Input
-            value={profileDescription}
-            onChange={(e) => setProfileDescription(e.target.value)}
-            placeholder="Describe yourself"
-            className="w-full bg-gray-800 border-gray-700"
-          />
-        </div>
-
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-2">Preferred Positions</h2>
-          <div className="flex flex-wrap">
-            {Object.values(PlayerPosition).map((position) => (
-              <label key={position} className="mr-4 mb-2 flex items-center">
-                <input
-                  type="checkbox"
-                  checked={preferredPositions.includes(position)}
-                  onChange={() => handlePreferredPositionsChange(position)}
-                  className="form-checkbox h-4 w-4 text-blue-600"
-                />
-                <span className="ml-2">{formatPosition(position)}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700">
-          Update Profile
-        </Button>
-      </div>
-    </div>
-  );
+  return (<ViewProfile />);
 }
