@@ -46,25 +46,32 @@ public class UserController {
         return userService.getUsers();
     }
 
-    // @GetMapping("/{user_id}")
-    // public ResponseEntity<User> getUserById(
-    //         @PathVariable Long user_id,
-    //         @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = true) String token) {
+    @GetMapping("/{user_id}")
+    public ResponseEntity<?> getUserById(
+            @PathVariable Long user_id,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = true) String token) {
+        // Validate token and authorization
+        ResponseEntity<String> authResponse = jwtAuthService.validateToken(token, user_id);
+        System.out.println("token: " + token);
+        System.out.println("user_id" + user_id);
+        System.out.println("response:");
+        System.out.println(authResponse);
+        if (authResponse != null) return authResponse;
 
-    //     try {
-    //         User foundUser = userService.getUserById(user_id);
-    //         if (foundUser == null) {
-    //             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-    //                     .body("User with ID " + user_id + " not found.");
-    //         }
-    //         return ResponseEntity.ok(users);
-    //     } catch (Exception e) {
-    //         // Log the error for debugging purposes
-    //         System.err.println("Error fetching user: " + e.getMessage());
-    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-    //                 .body("An unexpected error occurred.");
-    //     }
-    // }
+        try {
+            User foundUser = userService.getUserById(user_id);
+            if (foundUser == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("User with ID " + user_id + " not found.");
+            }
+            return ResponseEntity.ok(foundUser);
+        } catch (Exception e) {
+            // Log the error for debugging purposes
+            System.err.println("Error fetching user: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred.");
+        }
+    }
 
     /**
      * Using BCrypt encoder to encrypt the password for storage
