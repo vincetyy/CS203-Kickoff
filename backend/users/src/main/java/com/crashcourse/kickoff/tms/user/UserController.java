@@ -47,14 +47,10 @@ public class UserController {
         return userService.getUsers();
     }
 
-    @GetMapping("/{user_id}")
-    public ResponseEntity<?> getUserById(
+    @GetMapping("/publicinfo/{user_id}")
+    public ResponseEntity<?> getUserPublicInfoById(
             @PathVariable Long user_id,
-            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = true) String token) {
-        // Validate token and authorization
-        ResponseEntity<String> authResponse = jwtAuthService.validateToken(token, user_id);
-        if (authResponse != null) return authResponse;
-
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
         try {
             User foundUser = userService.getUserById(user_id);
             if (foundUser == null) {
@@ -64,8 +60,7 @@ public class UserController {
 
             UserResponseDTO userDTO = new UserResponseDTO(
                     foundUser.getId(),
-                    foundUser.getUsername(),
-                    foundUser.getEmail()
+                    foundUser.getUsername()
             );
 
             return ResponseEntity.ok(userDTO);

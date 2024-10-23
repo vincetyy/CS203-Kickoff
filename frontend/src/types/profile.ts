@@ -15,10 +15,9 @@ export interface Club {
 }
 
 // Interface for User
-export interface User {
+export interface UserPublicDetails {
   id: number;
   username: string;
-  // Add other User properties if needed
 }
 
 // Interface for PlayerProfile

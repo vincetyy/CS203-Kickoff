@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { PlayerPosition, PlayerProfile } from '../types/profile';
-import { fetchPlayerProfileById } from '../services/userService';
+import { PlayerPosition, PlayerProfile, UserPublicDetails} from '../types/profile';
+import { fetchPlayerProfileById, fetchUserPublicInfoById} from '../services/userService';
 import { getClubByPlayerId } from '../services/clubService';
 import { Club } from '../types/club';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -25,6 +25,7 @@ export default function ViewProfile() {
   userId = id ? id : userId;
 
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile | null>(null);
+  const [viewedUser, setViwedUser] = useState<UserPublicDetails | null>(null);
   const [club, setClub] = useState<Club | null>(null);
   const [preferredPositions, setPreferredPositions] = useState<PlayerPosition[]>([]);
   const [profileDescription, setProfileDescription] = useState('');
@@ -41,6 +42,14 @@ export default function ViewProfile() {
     }
 
     const fetchUserProfile = async () => {
+
+      try {
+        const viewedUser = await fetchUserPublicInfoById(userId);
+        setViwedUser(viewedUser);
+      } catch (err) {
+        console.error('Error fetching user:', err);
+        setLoading(false);
+      }
 
       // Fetch PlayerProfile, sets to null if absent (404)
       try {
@@ -118,7 +127,7 @@ export default function ViewProfile() {
             />
             <div className="text-center md:text-left">
               <div className='flex items-center gap-2'>
-                <h1 className="text-3xl font-bold">{playerProfile ? playerProfile.username : null}</h1>
+                <h1 className="text-3xl font-bold">{viewedUser ? viewedUser.username : null}</h1>
                 {!id && (
                   <Button
                     variant="ghost"
@@ -132,7 +141,7 @@ export default function ViewProfile() {
                 )}
               </div>
 
-              <p className="text-muted-foreground">ID: {playerProfile ? playerProfile.username : null}</p>
+              <p className="text-muted-foreground">ID: {viewedUser ? viewedUser.id : null}</p>
               <div className="mt-4 flex flex-wrap gap-2 justify-center md:justify-start">
                 <p className="text-muted-foreground">{profileDescription || 'No user description provided.'}</p>
               </div>
