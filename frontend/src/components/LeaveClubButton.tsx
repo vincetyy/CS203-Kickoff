@@ -1,11 +1,11 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { Button } from '../components/ui/button';
 import { toast } from 'react-hot-toast';
 import { fetchUserClubAsync, selectUserId, selectUserClub } from '../store/userSlice';
 import { Club } from '../types/club';
+import { leaveClub } from '../services/clubService';
 
 const LeaveClubButton: React.FC = () => {
   const dispatch = useDispatch();
@@ -21,15 +21,7 @@ const LeaveClubButton: React.FC = () => {
     }
 
     try {
-        const response = await axios.patch(
-            `http://localhost:8082/clubs/${clubId}/leavePlayer`,
-            { playerId: userId },  // Ensure this matches the backend's expected structure
-            {
-              headers: {
-                'Content-Type': 'application/json',  // You still need to specify content type
-              },
-            }
-          );     
+        const response = await leaveClub (clubId, userId);
     
         if (response.status === 200) {
           toast.success('You have left the club successfully');

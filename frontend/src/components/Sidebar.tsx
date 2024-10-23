@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { User, Trophy, Users, BarChart2, Menu, X } from 'lucide-react';
+import { User, Trophy, Users, Menu, X } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;

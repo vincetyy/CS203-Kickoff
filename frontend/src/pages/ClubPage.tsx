@@ -22,7 +22,6 @@ import ClubCard from '../components/ClubCard';
 import ClubInfoModal from '../components/ClubInfoModal';
 import {  toast } from 'react-hot-toast';
 import { Club } from '../types/club';
-import { useNavigate } from 'react-router-dom';
 import CreateClub from '../components/CreateClub';
 import { fetchUserClubAsync, selectUserId } from '../store/userSlice';
 

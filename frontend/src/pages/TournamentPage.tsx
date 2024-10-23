@@ -5,7 +5,7 @@ import { AppDispatch } from '../store';
 import { Button } from "../components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
 
-import { Tournament, TournamentUpdate, Club } from '../types/tournament';
+import { Tournament, TournamentUpdate } from '../types/tournament';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeClubFromTournamentAsync, updateTournamentAsync } from '../store/tournamentSlice';
 import { PlayerAvailabilityDTO } from '../types/playerAvailability'; 
@@ -16,8 +16,9 @@ import { getClubProfileById } from '../services/clubService'
 import { fetchUserClubAsync, selectUserClub, selectUserId,  } from '../store/userSlice'
 
 import UpdateTournament from '../components/UpdateTournament';
-import { ClubProfile } from '../types/club';
-import { fetchPlayerProfileById } from '../services/profileService';
+import { Club, ClubProfile } from '../types/club';
+import { fetchPlayerProfileById } from '../services/userService';
+import { ArrowLeft } from 'lucide-react';
 
 
 
@@ -36,7 +37,6 @@ const TournamentPage: React.FC = () => {
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [initialUpdateData, setInitialUpdateData] = useState<TournamentUpdate | null>(null);
   const [availabilities, setAvailabilities] = useState<PlayerAvailabilityDTO[]>([]);
-  const [availableCount, setAvailableCount] = useState(0); 
   const [isAvailabilityDialogOpen, setIsAvailabilityDialogOpen] = useState(false);
   const [joinedClubsProfiles, setJoinedClubsProfiles] = useState<ClubProfile[] | null>(null);
   const [hostUsername, setHostUsername] = useState('');
@@ -68,9 +68,6 @@ const TournamentPage: React.FC = () => {
     DOUBLE_ELIM: 'Double Elimination'
   };
 
-  const handleBackClick = () => {
-    navigate('/tournaments');
-  };
 
   const handleOpenRemoveDialog = (club: Club) => {
     setClubToRemove(club);
@@ -78,12 +75,11 @@ const TournamentPage: React.FC = () => {
   };
 
   const handleConfirmRemove = async () => {
-    if (clubToRemove && selectedTournament) {
+    if (clubToRemove && selectedTournament && selectedTournament.id) {
       await dispatch(removeClubFromTournamentAsync({ 
         tournamentId: selectedTournament.id, 
         clubId: clubToRemove.id 
       })).unwrap();
-  
       const updatedTournamentData = await fetchTournamentById(selectedTournament.id);
       setSelectedTournament(updatedTournamentData);
       setJoinedClubsProfiles(prevProfiles => prevProfiles ? 
@@ -127,7 +123,6 @@ const TournamentPage: React.FC = () => {
 
         const availabilities = await getPlayerAvailability(tournamentId);
         setAvailabilities(availabilities);
-        setAvailableCount(availabilities.filter(a => a.available).length);
         setStatus('succeeded');
       } catch (err) {
         console.error('Error fetching tournament data:', err);
@@ -166,7 +161,6 @@ const TournamentPage: React.FC = () => {
       // Refetch or update availabilities after the change
       const updatedAvailabilities = await getPlayerAvailability(tournamentId);
       setAvailabilities(updatedAvailabilities);
-      setAvailableCount(updatedAvailabilities.filter(a => a.available).length); 
   
       toast.success(`You have marked yourself as ${availability ? 'available' : 'not available'}.`);
     } catch (err) {
@@ -204,7 +198,7 @@ const TournamentPage: React.FC = () => {
     if (selectedTournament === null || tournamentId === null) {
       throw new Error('Invalid tournament data.');
     }
-
+    if (!selectedTournament.id) return;
     await dispatch(updateTournamentAsync({ 
       tournamentId: selectedTournament.id,
       tournamentData: data
@@ -214,12 +208,19 @@ const TournamentPage: React.FC = () => {
     setSelectedTournament(updatedTournamentData);
   };
 
+
   if (status === 'loading') return <div className="text-center mt-10">Loading tournament details...</div>;
   if (status === 'failed') return <div className="text-center mt-10 text-red-500">Error: {error}</div>;
   if (!selectedTournament) return <div className="text-center mt-10">No tournament found.</div>;
 
   return (
     <>
+      <div className='pb-2'>
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+      </div>
+
       {/* Tournament Details Banner */}
       <div className="bg-green-600 rounded-lg p-4 lg:p-6 mb-6 flex items-center space-x-4">
         <div className="bg-white rounded-full p-2 lg:p-3">
@@ -263,7 +264,7 @@ const TournamentPage: React.FC = () => {
             {joinedClubsProfiles?.map((club: ClubProfile) => {
               const isUserClub = club.id === userClub?.id;
               return (
-                <div key={club.id} className="bg-gray-700 rounded-lg p-4 flex items-center justify-between space-x-4">
+                <div onClick={ () => navigate(`/clubs/${club.id}`) } key={club.id} className="bg-gray-700 rounded-lg p-4 flex items-center justify-between space-x-4">
                   <div className="flex items-center space-x-4">
                     <img 
                       src={`https://picsum.photos/seed/${club.id}/100/100`} 
@@ -368,8 +369,6 @@ const TournamentPage: React.FC = () => {
             Indicate Availability
           </Button>
         }
-
-        <Button onClick={handleBackClick}>Back to  Tournaments</Button>
       </div>
     </>
   );

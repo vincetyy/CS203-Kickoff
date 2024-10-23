@@ -7,8 +7,8 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
 import { Location, Tournament } from '../types/tournament';
+import { getAllLocations } from '../services/tournamentService';
 
 interface CreateTournamentProps {
   isOpen: boolean;
@@ -40,8 +40,8 @@ const CreateTournament: React.FC<CreateTournamentProps> = ({ isOpen, onClose }) 
       setIsLoadingLocations(true);
       setLocationsError(null);
       try {
-        const response = await axios.get<Location[]>('http://localhost:8080/locations');
-        setLocations(response.data);
+        const response = await getAllLocations();
+        setLocations(response);
       } catch (error: any) {
         console.error('Error fetching locations:', error);
         setLocationsError('Failed to load locations. Please try again.');
@@ -154,7 +154,7 @@ const CreateTournament: React.FC<CreateTournamentProps> = ({ isOpen, onClose }) 
                 <p className="text-red-500">{locationsError}</p>
               ) : (
                 <Select
-                  value={newTournament.location ? newTournament.location.id.toString() : ''}
+                  defaultValue={newTournament.location ? newTournament.location.id.toString() : ''}
                   onValueChange={handleLocationChange}
                 >
                   <SelectTrigger className="select-trigger">
@@ -217,7 +217,7 @@ const CreateTournament: React.FC<CreateTournamentProps> = ({ isOpen, onClose }) 
             <div>
               <label htmlFor="tournamentFormat" className="form-label">Tournament Format</label>
               <Select
-                value={newTournament.tournamentFormat}
+                defaultValue={newTournament.tournamentFormat}
                 onValueChange={(value) => setNewTournament(prev => ({ ...prev, tournamentFormat: value }))}
               >
                 <SelectTrigger className="select-trigger">
@@ -234,7 +234,7 @@ const CreateTournament: React.FC<CreateTournamentProps> = ({ isOpen, onClose }) 
             <div>
               <label htmlFor="knockoutFormat" className="form-label">Knockout Format</label>
               <Select
-                value={newTournament.knockoutFormat}
+                defaultValue={newTournament.knockoutFormat}
                 onValueChange={(value) => setNewTournament(prev => ({ ...prev, knockoutFormat: value }))}
               >
                 <SelectTrigger className="select-trigger">

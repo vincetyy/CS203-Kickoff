@@ -5,7 +5,7 @@ import { Button } from "../components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Location, TournamentUpdate } from '../types/tournament';
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
+import { getAllLocations } from '../services/tournamentService';
 
 interface UpdateTournamentProps {
   isOpen: boolean;
@@ -52,8 +52,8 @@ const UpdateTournament: React.FC<UpdateTournamentProps> = ({ isOpen, onClose, in
       setIsLoadingLocations(true);
       setLocationsError(null);
       try {
-        const response = await axios.get<Location[]>('http://localhost:8080/locations');
-        setLocations(response.data);
+        const response = await getAllLocations();
+        setLocations(response);
       } catch (error: any) {
         console.error('Error fetching locations:', error);
         setLocationsError('Failed to load locations. Please try again.');

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { ClubProfile } from '../types/club';
 import { Button } from './ui/button';
 import { useNavigate } from 'react-router-dom';
-import { fetchPlayerProfileById } from '../services/profileService';
+import { fetchPlayerProfileById } from '../services/userService';
+import { getClubProfileById } from '../services/clubService';
 
 interface ClubInfoModalProps {
   clubId: number;
@@ -21,10 +21,10 @@ const ClubInfoModal: React.FC<ClubInfoModalProps> = ({ clubId }) => {
   useEffect(() => {
     const fetchClub = async () => {
       try {
-        const clubResponse = await axios.get(`http://localhost:8082/clubs/${clubId}`);
-        setClub(clubResponse.data);
+        const clubResponse = await getClubProfileById(clubId);
+        setClub(clubResponse);
 
-        const captainResponse = await fetchPlayerProfileById(clubResponse.data.captainId);
+        const captainResponse = await fetchPlayerProfileById(clubResponse.captainId.toString());
         setCaptain(captainResponse.user.username);
       } catch (err: any) {
         console.error('Error fetching club info:', err);
