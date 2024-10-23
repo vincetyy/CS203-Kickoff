@@ -40,14 +40,11 @@ public class MatchServiceImpl implements MatchService {
         Round round = roundRepository.findById(roundId)
             .orElseThrow(() -> new EntityNotFoundException("Round not found with id: " + roundId));
         match.setRound(round);
-        System.out.println("SFDSKFSFSD\n\n\n\n\n");
         return matchRepository.save(match);
     }
 
     public Round createRound(int numberOfMatches) {
-        System.out.println("YES\n\n\n\n\n");
         Round round = new Round();
-        // Save the round first so it has a valid ID
         round = roundRepository.save(round);
     
         List<Match> matches = new ArrayList<>();
@@ -60,7 +57,7 @@ public class MatchServiceImpl implements MatchService {
     }
     
     @Override
-    public List<Round> createBracket(Long tournamentId, Long numberOfClubs) {
+    public List<Round> createBracket(Long tournamentId, int numberOfClubs) {
         if (numberOfClubs == 0) {
             throw new EntityNotFoundException("No clubs found");
         }
@@ -68,20 +65,19 @@ public class MatchServiceImpl implements MatchService {
         Tournament tournament = tournamentRepository.findById(tournamentId)
             .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + tournamentId));
     
-        // Calculate number of rounds
+        /*
+         * 9 teams will require 4 rounds 16 -> 8 -> 4 -> 2
+         */
         int numberOfRounds = (int) Math.ceil(Math.log(numberOfClubs) / Math.log(2));
     
         List<Round> tournamentRounds = new ArrayList<>();
-        int roundNumber = 1;
-        
-        while (roundNumber <= numberOfRounds) { // Adjust the condition
-            System.out.println("HELLO\n\n\n\n\n");
-            int size = (int) Math.pow(2, numberOfRounds - roundNumber);
+
+        while (numberOfRounds > 0) {
+            int size = (int) Math.pow(2, numberOfRounds);
             tournamentRounds.add(createRound(size));
-            roundNumber++;  // Increment to avoid infinite loop
+            numberOfRounds--;
         }
     
-        System.out.println("BYE\n\n\n\n\n");
         tournament.setRounds(tournamentRounds);
         tournamentRepository.save(tournament);
         return tournamentRounds;

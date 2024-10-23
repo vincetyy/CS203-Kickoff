@@ -16,6 +16,9 @@ import org.springframework.http.ResponseEntity;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
+import com.crashcourse.kickoff.tms.match.model.Round;
+import com.crashcourse.kickoff.tms.match.service.MatchService;
+
 import com.crashcourse.kickoff.tms.location.model.Location;
 import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
 import com.crashcourse.kickoff.tms.location.service.LocationService;
@@ -43,6 +46,7 @@ public class TournamentServiceImpl implements TournamentService {
     private final LocationRepository locationRepository;
     private final LocationService locationService;
     private final PlayerAvailabilityRepository playerAvailabilityRepository;
+    private final MatchService matchService;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -92,6 +96,16 @@ public class TournamentServiceImpl implements TournamentService {
 
         Tournament updatedTournament = tournamentRepository.save(existingTournament);
         return mapToResponseDTO(updatedTournament);
+    }
+
+    public List<Round> startTournament(Long id) {
+        Tournament tournament = tournamentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + id));
+        if (tournament.getJoinedClubIds() == null || tournament.getJoinedClubIds().size() == 0) {
+            throw new EntityNotFoundException("No clubs found in tournament with id: " + id);
+        }
+        System.out.println(tournament.getJoinedClubIds().size());
+        return matchService.createBracket(id, tournament.getJoinedClubIds().size());
     }
 
     @Override

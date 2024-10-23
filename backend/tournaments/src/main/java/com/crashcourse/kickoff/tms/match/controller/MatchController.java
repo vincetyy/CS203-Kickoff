@@ -30,7 +30,7 @@ public class MatchController {
     private final MatchService matchService;
 
     @PostMapping("/{tournamentId}/createbracket")
-    public ResponseEntity<?> createBracket(@PathVariable Long tournamentId, @RequestBody Long numberOfClubs) {
+    public ResponseEntity<?> createBracket(@PathVariable Long tournamentId, @RequestBody int numberOfClubs) {
         try {
             List<Round> bracket = matchService.createBracket(tournamentId, numberOfClubs);
             return new ResponseEntity<>(bracket, HttpStatus.CREATED);

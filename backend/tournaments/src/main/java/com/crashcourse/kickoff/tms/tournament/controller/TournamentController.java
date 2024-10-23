@@ -14,6 +14,7 @@ import com.crashcourse.kickoff.tms.tournament.dto.TournamentUpdateDTO;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
+import com.crashcourse.kickoff.tms.match.model.Round;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -96,6 +97,24 @@ public class TournamentController {
         }
         TournamentResponseDTO updatedTournament = tournamentService.updateTournament(id, tournamentUpdateDTO);
         return ResponseEntity.ok(updatedTournament);
+    }
+
+    @PostMapping("/{id}/start")
+    public ResponseEntity<?> startTournament(@PathVariable Long id,
+                    @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization token is missing or invalid." + token);
+        }
+        token = token.substring(7);
+        Long userIdFromToken = jwtUtil.extractUserId(token);
+
+        boolean isOwnerOfTournament = tournamentService.isOwnerOfTournament(id,userIdFromToken);
+
+        if (!isOwnerOfTournament) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to start this tournament.");
+        }
+        List<Round> rounds = tournamentService.startTournament(id);
+        return ResponseEntity.ok(rounds);
     }
 
     /**
