@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import LandingPage from './pages/LandingPage';
-import ProfilePage from './pages/ProfilePage';
+import ProfilePage from './pages/ProfilePage.tsx';
 import TournamentsPage from './pages/TournamentsPage';
 import TournamentPage from './pages/TournamentPage';
 import Club from './pages/Club';
@@ -11,6 +11,8 @@ import PlayerApplication from './pages/PlayerApplication.tsx';
 import LandingLayout from './components/LandingLayout.tsx';
 import AdminDashboard from './pages/AdminDashboard.tsx';
 import "./utils/axiosSetup.js";
+import EditProfile from './pages/EditProfile.tsx';
+import ViewProfile from './pages/ViewProfile.tsx';
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
         {/* Routes for the Main Application, including Layout */}
         <Route element={<Layout />}>
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/edit" element={<EditProfile />} />
+          <Route path="/player/:id" element={<ViewProfile />} />
           <Route path="/profile/signup" element={<Signup />} />
           <Route path="/tournaments" element={<TournamentsPage />} />
           <Route path="/tournaments/:id" element={<TournamentPage />} />

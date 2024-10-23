@@ -27,4 +27,6 @@ public interface TournamentRepository extends JpaRepository<Tournament, Long> {
     // Find past tournaments for a specific club
     @Query("SELECT t FROM Tournament t WHERE :clubId MEMBER OF t.joinedClubIds AND t.endDateTime < CURRENT_TIMESTAMP")
     List<Tournament> findPastTournamentsForClub(@Param("clubId") Long clubId);
+
+    List<Tournament> findByHost(Long host);
 }

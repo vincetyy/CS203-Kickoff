@@ -12,12 +12,10 @@ interface ClubCardProps {
 }
 
 const ClubCard: React.FC<ClubCardProps> = ({
-  id,
   name,
   description,
   ratings,
   image,
-  applied,
   onClick,
 }) => {
   return (

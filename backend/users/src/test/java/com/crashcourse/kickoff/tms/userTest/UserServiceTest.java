@@ -14,7 +14,7 @@ import com.crashcourse.kickoff.tms.user.model.User;
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
 import com.crashcourse.kickoff.tms.user.model.Role;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import com.crashcourse.kickoff.tms.host.HostProfileService;
+import com.crashcourse.kickoff.tms.host.service.*;
 import com.crashcourse.kickoff.tms.player.service.PlayerProfileService;
 
 public class UserServiceTest {

@@ -2,13 +2,12 @@ import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import axios from 'axios';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog"; 
 import { Club } from '../types/club';  
-import { useNavigate } from 'react-router-dom';
 import { fetchUserClubAsync } from '../store/userSlice';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../store';
+import { createClub, getPlayersInClub } from '../services/clubService';
 
 interface CreateClubProps {
   isCreateDialogOpen: boolean;
@@ -21,13 +20,11 @@ const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreate
   const [elo, setElo] = useState<number>(500);
   const [ratingDeviation, setRatingDeviation] = useState<number>(200);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
   const fetchPlayersForClub = async (clubId: number) => {
     try {
-      const response = await axios.get(`http://localhost:8082/clubs/${clubId}/players`);
+      const response = await getPlayersInClub(clubId);
       return response.data;  
     } catch (err: any) {
       console.error('Error fetching players:', err);
@@ -53,11 +50,7 @@ const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreate
     try {
       setLoading(true);
 
-      const createClubResponse = await axios.post('http://localhost:8082/clubs/create-club', clubData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const createClubResponse = await createClub(clubData);
 
       if (createClubResponse.status === 201) {
         const newClub = createClubResponse.data;  
@@ -79,7 +72,6 @@ const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreate
       }
     } catch (err: any) {
       console.error('Error creating club:', err);
-      setError(err.response?.data?.message || 'Failed to create the club');
       toast.error(err.response?.data?.message || 'An error occurred');
     } finally {
       setLoading(false);

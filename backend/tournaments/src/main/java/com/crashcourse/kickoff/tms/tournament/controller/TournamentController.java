@@ -2,19 +2,8 @@ package com.crashcourse.kickoff.tms.tournament.controller;
 
 import java.util.List;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 
 import com.crashcourse.kickoff.tms.security.JwtUtil;
 import com.crashcourse.kickoff.tms.tournament.dto.PlayerAvailabilityDTO;
@@ -22,6 +11,7 @@ import com.crashcourse.kickoff.tms.tournament.dto.TournamentCreateDTO;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentJoinDTO;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentResponseDTO;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentUpdateDTO;
+import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
 
@@ -73,7 +63,7 @@ public class TournamentController {
      *
      * @return ResponseEntity with the list of Tournaments and HTTP status.
      */
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TournamentResponseDTO>> getAllTournaments() {
         List<TournamentResponseDTO> tournaments = tournamentService.getAllTournaments();
         return ResponseEntity.ok(tournaments);
@@ -191,12 +181,24 @@ public class TournamentController {
         return ResponseEntity.ok(tournaments);
     }
 
+    // @GetMapping("/player/{playerId}")
+    // public ResponseEntity<List<TournamentResponseDTO>> getTournamentsForPlayer(
+    //         @PathVariable Long playerId,
+    //         @RequestParam TournamentFilter filter) {
+    //     List<TournamentResponseDTO> tournaments = tournamentService.getTournamentsForPlayer(playerId, filter);
+    //     return ResponseEntity.ok(tournaments);
+    // }
+
     @PutMapping("/availability")
     public ResponseEntity<?> updatePlayerAvailability(@RequestBody PlayerAvailabilityDTO dto) {
+        
 
         Long tournamentId = dto.getTournamentId();
         Long playerId = dto.getPlayerId();
         Long clubId = dto.getClubId(); 
+        System.out.println(tournamentId);
+        System.out.println(playerId);
+        System.out.println(clubId);
         boolean available = dto.isAvailable();
         PlayerAvailabilityDTO playerAvailabilityDTO = new PlayerAvailabilityDTO(tournamentId, playerId, clubId, available);
         tournamentService.updatePlayerAvailability(playerAvailabilityDTO);
@@ -209,4 +211,9 @@ public class TournamentController {
         return ResponseEntity.ok(availabilities);
     }
 
+    @GetMapping("/host/{hostId}")
+    public ResponseEntity<List<Tournament>> getHostedTournaments(@PathVariable Long hostId) {
+        List<Tournament> hostedTournaments = tournamentService.getHostedTournaments(hostId);
+        return ResponseEntity.ok(hostedTournaments);
+    }
 }

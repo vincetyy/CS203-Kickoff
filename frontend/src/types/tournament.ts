@@ -14,7 +14,7 @@ export interface HostProfile {
 }
 
 export interface Tournament {
-  id: number;
+  id?: number;
   name: string;
   startDateTime: string;
   endDateTime: string;
@@ -39,4 +39,10 @@ export interface TournamentUpdate {
   maxRank?: number;
   joinedClubsIds?: number[];
   host?: number;
+}
+
+export enum TournamentFilter {
+  UPCOMING = 'UPCOMING',
+  CURRENT = 'CURRENT',
+  PAST = 'PAST',
 }

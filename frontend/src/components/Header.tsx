@@ -1,19 +1,18 @@
 import { useEffect, useState } from 'react';
-import { Menu, Bell, MessageSquare } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
-import { AvatarImage, AvatarFallback } from './ui/avatar';
+import { AvatarImage } from './ui/avatar';
 import { Toaster, toast } from 'react-hot-toast';
 import { useSelector, useDispatch } from 'react-redux'; // Correct hook usage inside functional component
-import { selectUsername, selectUserId } from '../store/userSlice';
+import { selectUserId } from '../store/userSlice';
 import { useNavigate } from 'react-router-dom';
 import { Club } from '../types/club';
 import { selectUserClub, clearUser } from '../store/userSlice';
-import axios from 'axios';
+import { getClubApplication } from '../services/clubService';
 
 export default function Header() {
   const [newApplications, setNewApplications] = useState(false);
-  const username = useSelector(selectUsername); // Use useSelector hook inside the component body
   const userClub: Club | null = useSelector(selectUserClub); // Same here
   const userId = useSelector(selectUserId);
   const navigate = useNavigate();
@@ -31,8 +30,7 @@ export default function Header() {
       if (!clubId || !isCaptain) return;
 
       try {
-        const baseUrl = 'http://localhost:8082';
-        const response = await axios.get(`${baseUrl}/clubs/${clubId}/applications`);
+        const response = await getClubApplication(clubId);
 
         if (response.status === 200) {
           const playerIds = response.data;

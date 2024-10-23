@@ -123,7 +123,7 @@ class TournamentTest {
      */
     @Test
     void getAllTournaments_Success() throws Exception {
-        URI uri = new URI(baseUrl + port + "/tournaments");
+        URI uri = new URI(baseUrl + port + "/api/v1/tournaments");
 
         // Send GET request to /tournaments
         ResponseEntity<TournamentResponseDTO[]> response = restTemplate.getForEntity(uri, TournamentResponseDTO[].class);

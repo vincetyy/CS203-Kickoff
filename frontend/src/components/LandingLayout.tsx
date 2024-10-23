@@ -3,7 +3,6 @@ import { Link, Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import aboutImage from '../assets/LandingPageWallpaper.jpg';
 import { Helmet } from 'react-helmet';
-import { Toaster } from 'react-hot-toast';
 
 const LandingLayout: React.FC = () => {
   const [showAbout, setShowAbout] = useState(false);

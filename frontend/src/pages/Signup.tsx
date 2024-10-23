@@ -1,26 +1,26 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { PlayerPosition } from '../types/profile';
+import { Slider } from '../components/RoleSlider';
 import eyePassword from '@/assets/eyePassword.svg';
 import eyePasswordOff from '@/assets/eyePasswordOff.svg';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { signup } from '../services/userService';
 
 export default function Signup() {
     const navigate = useNavigate();
 
-    const [preferredPositions, setPreferredPositions] = useState<PlayerPosition[]>([]);
-    const [profileDescription, setProfileDescription] = useState('');
 
     // States for sign-up form
+    const [role, setRole] = useState('player');
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [role, setRole] = useState('');
+    const [preferredPositions, setPreferredPositions] = useState<PlayerPosition[]>([]);
 
     // Toggle password visibility
     const togglePasswordVisibility = () => {
@@ -55,13 +55,9 @@ export default function Signup() {
             preferredPositions,
             role,
         };
-
+        console.log(payload);
         try {
-            const response = await axios.post('http://localhost:8081/users', payload, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+            const response = await signup(payload);            
 
             if (response.status === 201) {
                 toast.success('Sign up successful!', {
@@ -84,78 +80,82 @@ export default function Signup() {
     };
 
     return (
-        <div className="flex justify-center items-center">
-            <div className="bg-gray-900 rounded-lg">
-                <div className="flex items-center">
+        <div className="flex justify-center bg-gray-900">
+            <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
+                <h2 className="text-3xl font-extrabold text-white text-center mb-6">Sign Up as...</h2>
 
-                    {/* Sign-up Form */}
-                    <form className="space-y-6" onSubmit={handleSignup}>
-                        <div className="text-center mb-6">
-                            <h2 className="text-3xl font-extrabold text-white">Sign Up</h2>
+                <Slider selected={role} onChange={setRole} />
+                <form className="space-y-6" onSubmit={handleSignup}>
+                    <div className="space-y-4">
+                        {/* Username Input */}
+                        <div>
+                            <label
+                                htmlFor="username"
+                                className="block text-sm font-medium text-white mb-1"
+                            >
+                                Username
+                            </label>
+                            <Input
+                                id="username"
+                                name="username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                                className="w-full"
+                                placeholder="Enter Username"
+                            />
                         </div>
-                        <div className="space-y-4">
-                            <div>
-                                <label htmlFor="username" className="block text-sm font-medium text-white mb-1">Username</label>
-                                <Input
-                                    id="username"
-                                    name="username"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    required
-                                    className="w-full"
-                                    placeholder="Enter Username"
-                                />
-                            </div>
 
-                            <div>
-                                <label htmlFor="email" className="block text-sm font-medium text-white mb-1">Email</label>
-                                <Input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                    className="w-full"
-                                    placeholder="Enter Email"
-                                />
-                            </div>
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-white mb-1">Email</label>
+                            <Input
+                                id="email"
+                                name="email"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                className="w-full"
+                                placeholder="Enter Email"
+                            />
+                        </div>
 
-                            <div>
-                                <label htmlFor="password" className="block text-sm font-medium text-white mb-1">Password</label>
-                                <div className="relative">
-                                    <Input
-                                        id="password"
-                                        name="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        type={showPassword ? 'text' : 'password'}
-                                        required
-                                        className="w-full"
-                                        placeholder="Enter Password"
-                                    />
-                                    <div className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600 cursor-pointer" onClick={togglePasswordVisibility}>
-                                        <img src={showPassword ? eyePassword : eyePasswordOff} alt="Toggle Password Visibility" className="h-5 w-5" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label htmlFor="confirmPassword" className="block text-sm font-medium text-white mb-1">Confirm Password</label>
+                        <div>
+                            <label htmlFor="password" className="block text-sm font-medium text-white mb-1">Password</label>
+                            <div className="relative">
                                 <Input
-                                    id="confirmPassword"
-                                    name="confirmPassword"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    id="password"
+                                    name="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     type={showPassword ? 'text' : 'password'}
                                     required
                                     className="w-full"
-                                    placeholder="Confirm Password"
+                                    placeholder="Enter Password"
                                 />
+                                <div className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600 cursor-pointer" onClick={togglePasswordVisibility}>
+                                    <img src={showPassword ? eyePassword : eyePasswordOff} alt="Toggle Password Visibility" className="h-5 w-5" />
+                                </div>
                             </div>
                         </div>
 
-                        {/* Preferred positions selection */}
+                        <div>
+                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-white mb-1">Confirm Password</label>
+                            <Input
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                type={showPassword ? 'text' : 'password'}
+                                required
+                                className="w-full"
+                                placeholder="Confirm Password"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Conditional Rendering of Player Positions */}
+                    {role === 'player' && (
                         <div className="mb-6">
                             <h2 className="text-xl font-semibold text-white mb-2">Preferred Positions</h2>
                             <div className="flex flex-wrap">
@@ -172,36 +172,26 @@ export default function Signup() {
                                 ))}
                             </div>
                         </div>
+                    )}
 
-                        {/* Role Selection */}
-                        <div className="mb-6">
-                            <label className="block text-sm font-medium text-white mb-1">I am signing up as a</label>
-                            <select
-                                id="role"
-                                name="role"
-                                value={role}
-                                onChange={(e) => setRole(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                                required
-                            >
-                                <option value="" disabled>Select role</option>
-                                <option value="player">Player</option>
-                                <option value="host">Host</option>
-                            </select>
-                        </div>
+                    {/* Submit Button */}
+                    <Button
+                        type="submit"
+                        className="w-full bg-blue-600 hover:bg-blue-700"
+                    >
+                        Sign Up
+                    </Button>
 
-                        {/* Sign-up Button */}
-                        <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
-                            Sign Up
-                        </Button>
-                        <div className="text-center text-sm text-white">
-                            Already have an account?{' '}
-                            <a onClick={() => navigate("/profile/")} className="text-indigo-400">
-                                Login now
-                            </a>
-                        </div>
-                    </form>
-                </div>
+                    <div className="text-center text-sm text-white">
+                        Already have an account?{' '}
+                        <a
+                            onClick={() => navigate('/profile/')}
+                            className="text-indigo-400 cursor-pointer"
+                        >
+                            Login now
+                        </a>
+                    </div>
+                </form>
             </div>
         </div>
     );
