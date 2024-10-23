@@ -26,7 +26,18 @@ export const fetchUserClubAsync = createAsyncThunk(
       const club = await getClubByPlayerId(userId);  // Call the API to get the club
       return club;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch user club');
+      let errorMessage = 'Failed to fetch user club';
+
+      // Check if the error is an AxiosError or similar
+      if (typeof error === 'object' && error !== null && 'response' in error) {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        errorMessage = axiosError.response?.data?.message || errorMessage;
+      } else if (error instanceof Error) {
+        // Handle standard Error cases
+        errorMessage = error.message || errorMessage;
+      }
+
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -57,7 +68,7 @@ const userSlice = createSlice({
         state.status = 'succeeded';
         console.log("OK");
         console.log(action.payload);
-        
+
         state.userClub = action.payload;  // Store the fetched club in the state
       })
       .addCase(fetchUserClubAsync.rejected, (state, action) => {

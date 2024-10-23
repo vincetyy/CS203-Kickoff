@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { fetchUserClubAsync } from '../store/userSlice';
 import { fetchClubsAsync } from '../store/clubSlice';
 import { useDispatch, useSelector } from 'react-redux';

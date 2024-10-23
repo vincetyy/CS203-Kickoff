@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Input } from '../components/ui/input';
+import { useState, useEffect } from 'react';
 import { PlayerPosition, PlayerProfile } from '../types/profile';
-import { fetchPlayerProfileById, fetchHostProfileById } from '../services/userService';
+import { fetchPlayerProfileById } from '../services/userService';
 import { getClubByPlayerId } from '../services/clubService';
 import { Club } from '../types/club';
 import { useNavigate, useParams } from 'react-router-dom';

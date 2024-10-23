@@ -12,24 +12,12 @@ interface ClubCardProps {
 }
 
 const ClubCard: React.FC<ClubCardProps> = ({
-  id,
   name,
   description,
   ratings,
   image,
-  applied,
   onClick,
 }) => {
-
-  const navigateToProfile = () => {
-    if (userId == playerProfile?.user.id) {
-      toast.success('That\'s your profile!');
-      return;
-    } 
-
-    navigate(`/player/${playerProfile?.user.id}`);
-  }
-  
   return (
     <div
       onClick={onClick}

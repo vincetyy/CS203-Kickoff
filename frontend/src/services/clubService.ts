@@ -48,8 +48,9 @@ export const getClubApplication = async (clubId: number): Promise<AxiosResponse>
 };
 
 export const applyForClub = async (clubId: number, userId: number, desiredPosition: PlayerPosition): Promise<AxiosResponse> => {
-  const response = await api.get(`/clubs/${clubId}/applications`, {
+  const response = await api.get(`/clubs/${clubId}/apply`, {
     baseURL: clubBaseURL,
+    params: { userId, desiredPosition }
   });
   return response;
 };
@@ -63,6 +64,13 @@ export const updatePlayerApplication = async (clubId: number, playerId: number, 
 
 export const leaveClub = async (clubId: number, playerId: number): Promise<AxiosResponse> => {
   const response = await api.patch(`/clubs/${clubId}/leavePlayer`, playerId, {
+    baseURL: clubBaseURL,
+  });
+  return response;
+};
+
+export const getPlayersInClub = async (clubId: number): Promise<AxiosResponse> => {
+  const response = await api.patch(`/clubs/${clubId}/players`, {
     baseURL: clubBaseURL,
   });
   return response;

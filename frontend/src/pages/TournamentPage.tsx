@@ -5,7 +5,7 @@ import { AppDispatch } from '../store';
 import { Button } from "../components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
 
-import { Tournament, TournamentUpdate, Club } from '../types/tournament';
+import { Tournament, TournamentUpdate } from '../types/tournament';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeClubFromTournamentAsync, updateTournamentAsync } from '../store/tournamentSlice';
 import { PlayerAvailabilityDTO } from '../types/playerAvailability'; 
@@ -16,7 +16,7 @@ import { getClubProfileById } from '../services/clubService'
 import { fetchUserClubAsync, selectUserClub, selectUserId,  } from '../store/userSlice'
 
 import UpdateTournament from '../components/UpdateTournament';
-import { ClubProfile } from '../types/club';
+import { Club, ClubProfile } from '../types/club';
 import { fetchPlayerProfileById } from '../services/userService';
 import { ArrowLeft } from 'lucide-react';
 
@@ -37,7 +37,6 @@ const TournamentPage: React.FC = () => {
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [initialUpdateData, setInitialUpdateData] = useState<TournamentUpdate | null>(null);
   const [availabilities, setAvailabilities] = useState<PlayerAvailabilityDTO[]>([]);
-  const [availableCount, setAvailableCount] = useState(0); 
   const [isAvailabilityDialogOpen, setIsAvailabilityDialogOpen] = useState(false);
   const [joinedClubsProfiles, setJoinedClubsProfiles] = useState<ClubProfile[] | null>(null);
   const [hostUsername, setHostUsername] = useState('');
@@ -69,9 +68,6 @@ const TournamentPage: React.FC = () => {
     DOUBLE_ELIM: 'Double Elimination'
   };
 
-  const handleBackClick = () => {
-    navigate('/tournaments');
-  };
 
   const handleOpenRemoveDialog = (club: Club) => {
     setClubToRemove(club);
@@ -79,12 +75,11 @@ const TournamentPage: React.FC = () => {
   };
 
   const handleConfirmRemove = async () => {
-    if (clubToRemove && selectedTournament) {
+    if (clubToRemove && selectedTournament && selectedTournament.id) {
       await dispatch(removeClubFromTournamentAsync({ 
         tournamentId: selectedTournament.id, 
         clubId: clubToRemove.id 
       })).unwrap();
-  
       const updatedTournamentData = await fetchTournamentById(selectedTournament.id);
       setSelectedTournament(updatedTournamentData);
       setJoinedClubsProfiles(prevProfiles => prevProfiles ? 
@@ -128,7 +123,6 @@ const TournamentPage: React.FC = () => {
 
         const availabilities = await getPlayerAvailability(tournamentId);
         setAvailabilities(availabilities);
-        setAvailableCount(availabilities.filter(a => a.available).length);
         setStatus('succeeded');
       } catch (err) {
         console.error('Error fetching tournament data:', err);
@@ -167,7 +161,6 @@ const TournamentPage: React.FC = () => {
       // Refetch or update availabilities after the change
       const updatedAvailabilities = await getPlayerAvailability(tournamentId);
       setAvailabilities(updatedAvailabilities);
-      setAvailableCount(updatedAvailabilities.filter(a => a.available).length); 
   
       toast.success(`You have marked yourself as ${availability ? 'available' : 'not available'}.`);
     } catch (err) {
@@ -205,7 +198,7 @@ const TournamentPage: React.FC = () => {
     if (selectedTournament === null || tournamentId === null) {
       throw new Error('Invalid tournament data.');
     }
-
+    if (!selectedTournament.id) return;
     await dispatch(updateTournamentAsync({ 
       tournamentId: selectedTournament.id,
       tournamentData: data
@@ -215,10 +208,6 @@ const TournamentPage: React.FC = () => {
     setSelectedTournament(updatedTournamentData);
   };
 
-
-  const navigateToClubPage = (clubId: number) => {
-    navigate(`/clubs/${clubId}`);
-  }
 
   if (status === 'loading') return <div className="text-center mt-10">Loading tournament details...</div>;
   if (status === 'failed') return <div className="text-center mt-10 text-red-500">Error: {error}</div>;

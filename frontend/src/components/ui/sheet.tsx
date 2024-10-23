@@ -31,7 +31,7 @@ interface SheetTriggerProps {
   asChild?: boolean;
 }
 
-export const SheetTrigger: React.FC<SheetTriggerProps> = ({ children, asChild }) => {
+export const SheetTrigger: React.FC<SheetTriggerProps> = ({ children }) => {
   return <>{children}</>;
 };
 
