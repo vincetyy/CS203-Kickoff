@@ -91,4 +91,9 @@ public class PlayerProfileController {
         }
     }
 
+    @GetMapping("/allPlayers")
+    public List<PlayerProfile> getAllPlayers() {
+        return playerProfileService.getAllPlayers();
+    }
+
 }

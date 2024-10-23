@@ -1,5 +1,7 @@
 package com.crashcourse.kickoff.tms.match.controller;
 
+import java.util.*;
+
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,8 @@ import jakarta.persistence.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
+import com.crashcourse.kickoff.tms.match.model.Match;
+import com.crashcourse.kickoff.tms.match.model.Round;
 import com.crashcourse.kickoff.tms.match.dto.*;
 import com.crashcourse.kickoff.tms.match.service.MatchService;
 import com.crashcourse.kickoff.tms.security.JwtUtil;
@@ -25,22 +29,20 @@ public class MatchController {
     @Autowired
     private final MatchService matchService;
 
-    @PostMapping
-    public ResponseEntity<?> createMatch(
-            @RequestBody MatchCreateDTO matchCreateDTO) {
+    @PostMapping("/{tournamentId}/createbracket")
+    public ResponseEntity<?> createBracket(@PathVariable Long tournamentId, @RequestBody int numberOfClubs) {
         try {
-            MatchResponseDTO createdMatch = matchService.createMatch(matchCreateDTO);
-            return new ResponseEntity<>(createdMatch, HttpStatus.CREATED);
-        } catch (Exception e) {
+            List<Round> bracket = matchService.createBracket(tournamentId, numberOfClubs);
+            return new ResponseEntity<>(bracket, HttpStatus.CREATED);
+        } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getMatchById(@PathVariable Long id) {
         try {
-            MatchResponseDTO matchResponseDTO = matchService.getMatchById(id);
+            Match matchResponseDTO = matchService.getMatchById(id);
             return new ResponseEntity<>(matchResponseDTO, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

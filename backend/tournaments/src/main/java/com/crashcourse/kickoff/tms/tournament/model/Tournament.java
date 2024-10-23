@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.crashcourse.kickoff.tms.location.model.Location;
+import com.crashcourse.kickoff.tms.match.model.Round;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -47,7 +48,10 @@ public class Tournament {
     private List<Long> joinedClubIds = new ArrayList<>();
 
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL)  
-    private List<PlayerAvailability> playerAvailabilities = new ArrayList<>();  
+    private List<PlayerAvailability> playerAvailabilities = new ArrayList<>();
+
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL)
+    private List<Round> rounds = new ArrayList<>();
 
     public String getFormat() {
         return tournamentFormat.toString();

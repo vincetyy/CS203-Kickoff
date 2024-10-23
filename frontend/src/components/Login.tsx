@@ -33,8 +33,8 @@ export default function Login() {
                 const token = response.data.jwtToken;
                 localStorage.setItem('authToken', token);
                 localStorage.setItem('username', username);
-
-                dispatch(setUser({ userId: response.data.userId, username }));
+                
+                dispatch(setUser({ userId: response.data.userId, username: username, isAdmin: response.data.admin }));
                 dispatch(fetchUserClubAsync());
                 toast.success(`Welcome back, ${username}`, {
                     duration: 3000,
