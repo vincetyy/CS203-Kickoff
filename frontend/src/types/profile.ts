@@ -24,7 +24,7 @@ export interface User {
 // Interface for PlayerProfile
 export interface PlayerProfile {
   id: number;
-  username: String;
+  username: string;
   preferredPositions: PlayerPosition[];
   profileDescription: string;
 }
