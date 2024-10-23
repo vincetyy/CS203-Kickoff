@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { Input } from '../components/ui/input';
+import { useState, useEffect } from 'react';
 import { PlayerPosition, PlayerProfile } from '../types/profile';
 import { fetchPlayerProfileById } from '../services/userService';
 import { getClubByPlayerId } from '../services/clubService';

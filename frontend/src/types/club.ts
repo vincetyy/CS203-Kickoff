@@ -15,6 +15,7 @@ export interface ClubProfile {
   description: string;
   elo: number;
   captainId: number;
-  players: number[];
+  players: { id: number }[];
+  ratingDeviation: number;
   clubDescription: string;
 }

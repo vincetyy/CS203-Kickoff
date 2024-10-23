@@ -49,8 +49,8 @@ const clubSlice = createSlice({
         state.status = 'failed';
         state.error = action.error.message || null;
       })
-      .addCase(applyToClubAsync.fulfilled, (state, action) => {
-        
+      .addCase(applyToClubAsync.fulfilled, (state) => {
+        state.status = 'succeeded';
       });
   },
 });

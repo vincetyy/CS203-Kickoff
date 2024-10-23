@@ -64,8 +64,9 @@ const ClubInfo: React.FC = () => {
         setCaptain(captainResponse);
 
         const playerIds = clubResponse.players; // Assuming clubResponse.data.players is an array of player IDs
-        const playerProfiles = await Promise.all(playerIds.map((playerId: number) => fetchPlayerProfileById(playerId.toString())));
-        
+        const playerProfiles = await Promise.all(
+  playerIds.map((player) => fetchPlayerProfileById(player.toString()))
+);
         // Store the player profiles in state
         setPlayers(playerProfiles);
       } catch (err: any) {
@@ -91,7 +92,10 @@ const ClubInfo: React.FC = () => {
     }
 
     try {
-      await applyForClub(id, userId, selectedPosition);
+      if (!id) {
+        return;
+      }
+      await applyForClub(parseInt(id), userId, selectedPosition);
       toast.success('Application sent successfully!');
       setHasApplied(true);
       setIsDialogOpen(false);
@@ -146,8 +150,9 @@ const ClubInfo: React.FC = () => {
         <h2 className="text-2xl font-semibold mb-2">Players in the Club</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {players ? (
-            players.map((player, index) => (
+            players.map((player) => (
               <PlayerProfileCard 
+                key={player.id}
                 id={player.id} 
                 availability={false}
                 needAvailability={false}

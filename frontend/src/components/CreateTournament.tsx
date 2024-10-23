@@ -154,7 +154,7 @@ const CreateTournament: React.FC<CreateTournamentProps> = ({ isOpen, onClose }) 
                 <p className="text-red-500">{locationsError}</p>
               ) : (
                 <Select
-                  value={newTournament.location ? newTournament.location.id.toString() : ''}
+                  defaultValue={newTournament.location ? newTournament.location.id.toString() : ''}
                   onValueChange={handleLocationChange}
                 >
                   <SelectTrigger className="select-trigger">
@@ -217,7 +217,7 @@ const CreateTournament: React.FC<CreateTournamentProps> = ({ isOpen, onClose }) 
             <div>
               <label htmlFor="tournamentFormat" className="form-label">Tournament Format</label>
               <Select
-                value={newTournament.tournamentFormat}
+                defaultValue={newTournament.tournamentFormat}
                 onValueChange={(value) => setNewTournament(prev => ({ ...prev, tournamentFormat: value }))}
               >
                 <SelectTrigger className="select-trigger">
@@ -234,7 +234,7 @@ const CreateTournament: React.FC<CreateTournamentProps> = ({ isOpen, onClose }) 
             <div>
               <label htmlFor="knockoutFormat" className="form-label">Knockout Format</label>
               <Select
-                value={newTournament.knockoutFormat}
+                defaultValue={newTournament.knockoutFormat}
                 onValueChange={(value) => setNewTournament(prev => ({ ...prev, knockoutFormat: value }))}
               >
                 <SelectTrigger className="select-trigger">

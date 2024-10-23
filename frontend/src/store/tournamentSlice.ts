@@ -69,8 +69,10 @@ const tournamentSlice = createSlice({
         state.status = 'failed';
         state.error = action.error.message || null;
       })
-      .addCase(joinTournamentAsync.fulfilled, (state, action) => {
+      .addCase(joinTournamentAsync.fulfilled, (state) => {
         // Handle successful join if needed
+        state.status = 'succeeded';
+
       })
       .addCase(createTournamentAsync.fulfilled, (state, action) => {
         state.tournaments.push(action.payload);
