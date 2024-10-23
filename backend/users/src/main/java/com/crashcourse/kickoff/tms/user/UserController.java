@@ -23,6 +23,7 @@ import com.crashcourse.kickoff.tms.security.JwtAuthService;
 import com.crashcourse.kickoff.tms.user.dto.LoginDetails;
 import com.crashcourse.kickoff.tms.user.dto.LoginResponseDTO;
 import com.crashcourse.kickoff.tms.user.dto.NewUserDTO;
+import com.crashcourse.kickoff.tms.user.dto.UserResponseDTO;
 import com.crashcourse.kickoff.tms.user.model.User;
 import com.crashcourse.kickoff.tms.user.service.UserService;
 
@@ -52,10 +53,6 @@ public class UserController {
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = true) String token) {
         // Validate token and authorization
         ResponseEntity<String> authResponse = jwtAuthService.validateToken(token, user_id);
-        System.out.println("token: " + token);
-        System.out.println("user_id" + user_id);
-        System.out.println("response:");
-        System.out.println(authResponse);
         if (authResponse != null) return authResponse;
 
         try {
@@ -64,7 +61,14 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body("User with ID " + user_id + " not found.");
             }
-            return ResponseEntity.ok(foundUser);
+
+            UserResponseDTO userDTO = new UserResponseDTO(
+                    foundUser.getId(),
+                    foundUser.getUsername(),
+                    foundUser.getEmail()
+            );
+
+            return ResponseEntity.ok(userDTO);
         } catch (Exception e) {
             // Log the error for debugging purposes
             System.err.println("Error fetching user: " + e.getMessage());
