@@ -22,7 +22,7 @@ import {
 } from '../components/ui/select';
 import { fetchPlayerProfileById } from '../services/userService';
 import PlayerProfileCard from '../components/PlayerProfileCard';
-import { applyForClub, getClubApplication, getClubProfileById } from '../services/clubService';
+import { applyToClub, getClubApplication, getClubProfileById } from '../services/clubService';
 import { ArrowLeft } from 'lucide-react';
 
 enum PlayerPosition {
@@ -95,7 +95,7 @@ const ClubInfo: React.FC = () => {
       if (!id) {
         return;
       }
-      await applyForClub(parseInt(id), userId, selectedPosition);
+      await applyToClub(parseInt(id), userId, selectedPosition);
       toast.success('Application sent successfully!');
       setHasApplied(true);
       setIsDialogOpen(false);

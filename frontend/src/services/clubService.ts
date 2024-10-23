@@ -47,14 +47,6 @@ export const getClubApplication = async (clubId: number): Promise<AxiosResponse>
   return response;
 };
 
-export const applyForClub = async (clubId: number, userId: number, desiredPosition: PlayerPosition): Promise<AxiosResponse> => {
-  const response = await api.get(`/clubs/${clubId}/apply`, {
-    baseURL: clubBaseURL,
-    params: { userId, desiredPosition }
-  });
-  return response;
-};
-
 export const updatePlayerApplication = async (clubId: number, playerId: number, status: string): Promise<AxiosResponse> => {
   const response = await api.post(`/clubs/${clubId}/applications/${playerId}`, status, {
     baseURL: clubBaseURL,
