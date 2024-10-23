@@ -70,6 +70,14 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
+    public User addHostProfileToUser(User user) {
+        User loadedUser = getUserById(user.getId());
+        hostProfileService.addHostProfile(loadedUser);
+        return users.save(loadedUser);
+    }
+
+    @Transactional
+    @Override
     public User loadUserByUsername(String userName) {
         return users.findByUsername(userName).isPresent() ? users.findByUsername(userName).get() : null;
     }
