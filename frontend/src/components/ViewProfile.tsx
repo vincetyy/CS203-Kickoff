@@ -3,13 +3,13 @@ import { PlayerPosition, PlayerProfile } from '../types/profile';
 import { fetchPlayerProfileById } from '../services/userService';
 import { getClubByPlayerId } from '../services/clubService';
 import { Club } from '../types/club';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { ArrowLeft, Calendar, Pencil, Trophy, User } from 'lucide-react';
 import { getTournamentsHosted } from '../services/tournamentService';
 import { Tournament } from '../types/tournament';
-import TournamentCard from '../components/TournamentCard';
+import TournamentCard from './TournamentCard';
 import { selectUserId } from '../store/userSlice';
 import { useSelector } from 'react-redux';
 
