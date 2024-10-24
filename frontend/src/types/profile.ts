@@ -15,17 +15,15 @@ export interface Club {
 }
 
 // Interface for User
-export interface User {
+export interface UserPublicDetails {
   id: number;
   username: string;
-  // Add other User properties if needed
 }
 
 // Interface for PlayerProfile
 export interface PlayerProfile {
   id: number;
-  club: Club | null;
-  user: User;
+  username: string;
   preferredPositions: PlayerPosition[];
   profileDescription: string;
 }

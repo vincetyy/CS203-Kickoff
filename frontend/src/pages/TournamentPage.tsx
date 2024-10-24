@@ -17,7 +17,7 @@ import { fetchUserClubAsync, selectUserClub, selectUserId,  } from '../store/use
 
 import UpdateTournament from '../components/UpdateTournament';
 import { Club, ClubProfile } from '../types/club';
-import { fetchPlayerProfileById } from '../services/userService';
+import { fetchUserPublicInfoById } from '../services/userService';
 import { ArrowLeft } from 'lucide-react';
 
 
@@ -102,11 +102,12 @@ const TournamentPage: React.FC = () => {
       try {
         setStatus('loading');
         const tournament = await fetchTournamentById(tournamentId);
+        console.log(tournament);
         setSelectedTournament(tournament);
         if (tournament.host) {
           const hostId = tournament.host;
-          const hostProfile = await fetchPlayerProfileById(hostId.toString());
-          setHostUsername(hostProfile.user.username);
+          const hostProfile = await fetchUserPublicInfoById(hostId.toString());
+          setHostUsername(hostProfile.username);
         }
         
         

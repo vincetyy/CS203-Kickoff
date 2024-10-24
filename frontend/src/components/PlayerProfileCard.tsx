@@ -42,12 +42,12 @@ const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({ id, availability,
   };
 
   const navigateToProfile = () => {
-    if (userId == playerProfile?.user.id) {
+    if (userId == playerProfile?.id) {
       toast.success('That\'s your profile!');
       return;
     } 
 
-    navigate(`/player/${playerProfile?.user.id}`);
+    navigate(`/player/${playerProfile?.id}`);
   }
 
   // Conditional rendering for loading, error, and profile display
@@ -67,11 +67,11 @@ const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({ id, availability,
     <div className="bg-gray-800 rounded-lg p-4 flex items-center space-x-4" onClick={ navigateToProfile }>
       <img
         src={`https://picsum.photos/seed/${playerProfile.id+2000}/100/100`}
-        alt={`${playerProfile.user.username}'s profile`}
+        alt={`${playerProfile.username}'s profile`}
         className="w-16 h-16 rounded-full object-cover"
       />
       <div className="flex-grow">
-        <h3 className="text-lg font-semibold">{playerProfile.user.username}</h3>
+        <h3 className="text-lg font-semibold">{playerProfile.username}</h3>
         <p className="text-sm text-gray-400">
           {playerProfile.preferredPositions.length > 0
             ? playerProfile.preferredPositions.map((position) => formatPosition(position)).join(', ')

@@ -9,9 +9,8 @@ import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { signup } from '../services/userService';
 
-export default function Signup() {
+export default function SignupPage() {
     const navigate = useNavigate();
-
 
     // States for sign-up form
     const [role, setRole] = useState('player');
