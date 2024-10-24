@@ -6,19 +6,33 @@ import PlayerProfileCard from '../components/PlayerProfileCard';
 import { Input } from "../components/ui/input";
 import { Search } from 'lucide-react';
 import { AppDispatch, RootState } from '../store'; 
+import { Button } from "./ui/button";
+
+enum PlayerFilter {
+  ALL = 'All Players',
+  REPORTED = 'Reported',
+  BLACKLISTED = 'Blacklisted',
+}
 
 const AdminProfile = () => {
-    const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
   const players = useSelector(selectPlayers);
   const [searchTerm, setSearchTerm] = useState('');
+  const [playerFilter, setPlayerFilter] = useState<PlayerFilter>(PlayerFilter.ALL);
 
   useEffect(() => {
     dispatch(fetchAllPlayersAsync());
   }, [dispatch]);
 
-  const filteredPlayers = players.filter((player: PlayerProfile) =>
-    player.user.username.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredPlayers = players.filter((player: PlayerProfile) => {
+    const matchesSearch = player.user.username.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Apply player filter logic
+    if (playerFilter === PlayerFilter.ALL) return matchesSearch;
+    // if (playerFilter === PlayerFilter.REPORTED) return matchesSearch && player.isReported; 
+    // if (playerFilter === PlayerFilter.BLACKLISTED) return matchesSearch && player.isBlacklisted; 
+    return false;
+  });
 
   return (
     <div>
@@ -33,14 +47,26 @@ const AdminProfile = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
+      {/* Filter Buttons */}
+      <div className="flex justify-center space-x-4 mb-4">
+        {Object.values(PlayerFilter).map((filter) => (
+          <Button
+            key={filter}
+            onClick={() => setPlayerFilter(filter)}
+            variant={playerFilter === filter ? "default" : "secondary"}
+          >
+            {filter}
+          </Button>
+        ))}
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredPlayers.length > 0 ? (
           filteredPlayers.map((player: PlayerProfile) => (
             <PlayerProfileCard
               key={player.id}
               id={player.id}
-              availability={true}
-              needAvailability={true}
+              availability={true}  
+              needAvailability={true}  
             />
           ))
         ) : (

@@ -6,19 +6,33 @@ import ClubCard from '../components/ClubCard';
 import { Input } from "../components/ui/input";
 import { Search } from 'lucide-react';
 import { AppDispatch, RootState } from '../store'; 
+import { Button } from "./ui/button";
+
+enum ClubFilter {
+  ALL = 'All Clubs',
+  REPORTED = 'Reported',
+  BLACKLISTED = 'Blacklisted',
+}
 
 const AdminClub = () => {
-const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
   const { clubs } = useSelector((state: RootState) => state.clubs);
   const [searchTerm, setSearchTerm] = useState('');
+  const [clubFilter, setClubFilter] = useState<ClubFilter>(ClubFilter.ALL);
 
   useEffect(() => {
     dispatch(fetchClubsAsync());
   }, [dispatch]);
 
-  const filteredClubs = clubs.filter((club: Club) =>
-    club.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredClubs = clubs.filter((club: Club) => {
+    const matchesSearch = club.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Apply club filter logic
+    if (clubFilter === ClubFilter.ALL) return matchesSearch;
+    // if (clubFilter === ClubFilter.REPORTED) return matchesSearch && club.isReported; 
+    // if (clubFilter === ClubFilter.BLACKLISTED) return matchesSearch && club.isBlacklisted; 
+    return false;
+  });
 
   return (
     <div>
@@ -32,6 +46,18 @@ const dispatch = useDispatch<AppDispatch>();
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+      </div>
+      {/* Filter Buttons */}
+      <div className="flex justify-center space-x-4 mb-4">
+        {Object.values(ClubFilter).map((filter) => (
+          <Button
+            key={filter}
+            onClick={() => setClubFilter(filter)}
+            variant={clubFilter === filter ? "default" : "secondary"}
+          >
+            {filter}
+          </Button>
+        ))}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredClubs.length > 0 ? (
