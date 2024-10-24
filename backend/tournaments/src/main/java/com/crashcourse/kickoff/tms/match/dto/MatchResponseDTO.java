@@ -16,13 +16,6 @@ public class MatchResponseDTO {
     private Long tournamentId;
 
     /*
-     * Related Matches
-     */
-    private Long leftChildId;
-    private Long rightChildId;
-    private Long parentMatchId;
-
-    /*
      * Clubs
      */
     private Long club1Id;

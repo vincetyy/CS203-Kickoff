@@ -35,10 +35,9 @@ public class HostProfileServiceImpl implements HostProfileService{
     
     @Transactional
     public HostProfile addHostProfile(User newUser) {
-        User managedUser = entityManager.merge(newUser);
         HostProfile newHostProfile = new HostProfile();
         // Set properties specific to HostProfile
-        newHostProfile.setUser(managedUser);
+        newHostProfile.setUser(newUser);
         return hostProfileRepository.save(newHostProfile);
     }
 

@@ -5,13 +5,13 @@ import ProfilePage from './pages/ProfilePage';
 import TournamentsPage from './pages/TournamentsPage';
 import TournamentPage from './pages/TournamentPage';
 import Club from './pages/Club';
-import Signup from './pages/Signup';
+import SignupPage from './pages/SignupPage';
 import ClubInfo from './pages/ClubInfo';
 import PlayerApplication from './pages/PlayerApplication';
 import LandingLayout from './components/LandingLayout';
 import "./utils/axiosSetup.js";
 import EditProfile from './pages/EditProfile';
-import ViewProfile from './pages/ViewProfile';
+import ViewProfile from './components/ViewProfile';
 import AdminProfile from './components/AdminProfile';
 import AdminClub from './components/AdminClub';
 import AdminTournament from './components/AdminTournament';
@@ -28,7 +28,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/edit" element={<EditProfile />} />
           <Route path="/player/:id" element={<ViewProfile />} />
-          <Route path="/profile/signup" element={<Signup />} />
+          <Route path="/profile/signup" element={<SignupPage />} />
           <Route path="/tournaments" element={<TournamentsPage />} />
           <Route path="/tournaments/:id" element={<TournamentPage />} />
           <Route path="/clubs" element={<Club />} />

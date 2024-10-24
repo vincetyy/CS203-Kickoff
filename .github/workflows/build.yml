@@ -50,24 +50,12 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    # Step 7: Check if ECS cluster exists
-    - name: Check if ECS cluster exists
-      id: check_cluster
-      run: |
-        if ! aws ecs describe-clusters --clusters ${{ matrix.service }}-cluster --query "clusters[0].status" --output text | grep -q 'ACTIVE'; then
-          echo "Cluster ${{ matrix.service }}-kickoff does not exist or is not active. Skipping ECS deployment."
-          echo "cluster_exists=false" >> $GITHUB_ENV
-          exit 0  # Gracefully exit
-        else
-          echo "cluster_exists=true" >> $GITHUB_ENV
-        fi
-
     # Step 8: Check if ECS service exists in the cluster
     - name: Check if ECS service exists
       id: check_service
-      if: env.cluster_exists == 'true'
       run: |
-        if ! aws ecs describe-services --cluster ${{ matrix.service }}-cluster --services ${{ matrix.service }}-service --query "services[0].status" --output text | grep -q 'ACTIVE'; then
+        service_status=$(aws ecs describe-services --cluster ${{ matrix.service }}-cluster --services ${{ matrix.service }}-service --query "services[0].status" --output text)
+        if [[ "$service_status" != "ACTIVE" ]]; then
           echo "Service ${{ matrix.service }}-service does not exist in the cluster. Skipping ECS deployment."
           echo "service_exists=false" >> $GITHUB_ENV
           exit 0  # Gracefully exit
@@ -77,7 +65,7 @@ jobs:
 
     # Step 9: Force ECS Redeployment for the service if the cluster and service exist
     - name: Force ECS redeployment for ${{ matrix.service }}
-      if: env.cluster_exists == 'true' && env.service_exists == 'true'  # Only run if both cluster and service exist
+      if: env.service_exists == 'true'  # Only run if both cluster and service exist
       run: |
         aws ecs update-service \
           --cluster ${{ matrix.service }}-cluster \

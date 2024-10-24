@@ -25,7 +25,7 @@ const ClubInfoModal: React.FC<ClubInfoModalProps> = ({ clubId }) => {
         setClub(clubResponse);
 
         const captainResponse = await fetchPlayerProfileById(clubResponse.captainId.toString());
-        setCaptain(captainResponse.user.username);
+        setCaptain(captainResponse.username);
       } catch (err: any) {
         console.error('Error fetching club info:', err);
         setError('Failed to fetch club information.');
