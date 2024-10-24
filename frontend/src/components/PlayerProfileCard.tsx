@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Badge } from './ui/badge'; // Assuming Badge component is a UI element
-import { Button } from './ui/button'; // Assuming you have a Button component for the "Manage Player" action
-import { fetchPlayerProfileById } from '../services/userService'; // Your service for fetching player data
+import { Badge } from './ui/badge';
+import { Button } from './ui/button'; 
+import { fetchPlayerProfileById } from '../services/userService'; 
 import { PlayerProfile, PlayerPosition } from '../types/profile';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { selectUserId, selectIsAdmin } from '../store/userSlice'; // Assuming you have selectIsAdmin in your user slice
+import { selectUserId, selectIsAdmin } from '../store/userSlice'; 
 import toast from 'react-hot-toast';
 
 interface PlayerProfileCardProps {
@@ -17,7 +17,7 @@ interface PlayerProfileCardProps {
 const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({ id, availability, needAvailability }) => {
   const navigate = useNavigate();
   const userId = useSelector(selectUserId);
-  const isAdmin = useSelector(selectIsAdmin); // Get admin status from Redux
+  const isAdmin = useSelector(selectIsAdmin); 
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

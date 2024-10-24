@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from "./ui/button";
 import { useSelector } from 'react-redux';
-import { selectIsAdmin } from '../store/userSlice'; // Assuming you have a selector for admin status
+import { selectIsAdmin } from '../store/userSlice';
 
 interface ClubCardProps {
   id: number;
@@ -20,7 +20,7 @@ const ClubCard: React.FC<ClubCardProps> = ({
   image,
   onClick,
 }) => {
-  const isAdmin = useSelector(selectIsAdmin); // Check if the user is an admin
+  const isAdmin = useSelector(selectIsAdmin);
 
   return (
     <div
