@@ -10,4 +10,5 @@ import com.crashcourse.kickoff.tms.user.model.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
+    void deleteById(Long id);
 }

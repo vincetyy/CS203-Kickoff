@@ -20,7 +20,7 @@ import storage from 'redux-persist/lib/storage'; // defaults to localStorage for
 const userPersistConfig = {
   key: 'user',
   storage, 
-  whitelist: ['userId', 'userClub'], // Persist both userId and userClub
+  whitelist: ['userId', 'userClub', 'isAdmin'], // Persist both userId and userClub
 };
 
 // Combine your reducers

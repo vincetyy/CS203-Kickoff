@@ -1,5 +1,8 @@
 package com.crashcourse.kickoff.tms.user.model;
 
+import com.crashcourse.kickoff.tms.player.PlayerProfile;
+import com.crashcourse.kickoff.tms.host.HostProfile;
+
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -7,6 +10,8 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -19,6 +24,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.CascadeType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -60,13 +67,22 @@ public class User implements UserDetails {
 
     private String email;
 
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private PlayerProfile playerProfile;
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private HostProfile hostProfile;
+
     public User(String username, String password, Set<Role> roles) {
         this.username = username;
         this.password = password;
         this.roles = roles;
     }
 
-    /*x
+    /*
+     * x
      * Return a collection of authorities (roles) granted to the user.
      */
     @Override
@@ -78,26 +94,26 @@ public class User implements UserDetails {
 
     // From in class exercise, not sure if will use
     // /*
-    //  * The various is___Expired() methods return a boolean to indicate whether
-    //  * or not the user’s account is enabled or expired.
-    //  */
+    // * The various is___Expired() methods return a boolean to indicate whether
+    // * or not the user’s account is enabled or expired.
+    // */
     // @Override
     // public boolean isAccountNonExpired() {
-    //     return true;
+    // return true;
     // }
 
     // @Override
     // public boolean isAccountNonLocked() {
-    //     return true;
+    // return true;
     // }
 
     // @Override
     // public boolean isCredentialsNonExpired() {
-    //     return true;
+    // return true;
     // }
 
     // @Override
     // public boolean isEnabled() {
-    //     return true;
+    // return true;
     // }
 }

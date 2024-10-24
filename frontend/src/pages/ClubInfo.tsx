@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import { Button } from '../components/ui/button';
 import { ClubProfile } from '../types/club';
 import { PlayerProfile } from '../types/profile';
-import { selectUserClub, selectUserId } from '../store/userSlice';
+import { selectIsAdmin, selectUserClub, selectUserId } from '../store/userSlice';
 import { useSelector } from 'react-redux';
 
 import {
@@ -34,6 +34,7 @@ enum PlayerPosition {
 
 const ClubInfo: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const isAdmin = useSelector(selectIsAdmin);
   const [club, setClub] = useState<ClubProfile | null>(null);
   const [captain, setCaptain] = useState<PlayerProfile | null>(null);
   const [players, setPlayers] = useState<PlayerProfile[] | null>(null);
@@ -138,7 +139,7 @@ const ClubInfo: React.FC = () => {
       <p className="text-lg mb-4">{club.clubDescription || 'No description available.'}</p>
       <div className="flex items-center mb-4">
         <div className="mr-4">
-          <strong>Captain:</strong> {captain?.user.username || 'No captain assigned.'}
+          <strong>Captain:</strong> {captain?.username || 'No captain assigned.'}
         </div>
         <div>
           <strong>ELO:</strong> {club.elo ? club.elo.toFixed(2) : 'N/A'}
@@ -181,6 +182,12 @@ const ClubInfo: React.FC = () => {
         !userClub && userId && hasApplied &&
         <Button className="bg-green-500 hover:bg-green-600">Applied!</Button>
       }   
+
+      {isAdmin && 
+          <Button onClick={() => {/* Add admin action here */}}>
+          Manage Club
+        </Button>
+      }
 
       {/* Position Selection Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

@@ -17,7 +17,7 @@ public class HostProfile {
 
     @OneToOne(cascade = CascadeType.ALL)
     @MapsId // Shares the primary key with User
-    @JoinColumn(name = "id")  // The foreign key column name
+    @JoinColumn(name = "user_id")  // The foreign key column name
     private User user;
 
 }

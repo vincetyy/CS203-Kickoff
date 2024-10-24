@@ -7,8 +7,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @AllArgsConstructor
-public class LoginResponseDTO {
-    private Long userId;
-    private String jwtToken;
-    private boolean isAdmin;
+public class UserResponseDTO {
+    private Long id;
+    private String username;
 }

@@ -52,8 +52,15 @@ public class PlayerProfileController {
         if (playerProfile == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("PlayerProfile not found");
         }
+        // Convert PlayerProfile entity to PlayerProfileDTO
+        PlayerProfileResponseDTO playerProfileDTO = new PlayerProfileResponseDTO(
+                playerProfile.getId(),
+                playerProfile.getUser().getUsername(),
+                playerProfile.getProfileDescription(),
+                playerProfile.getPreferredPositions()
+        );
 
-        return ResponseEntity.ok(playerProfile);
+        return ResponseEntity.ok(playerProfileDTO);
     }
 
     @PutMapping("/{id}/update")
@@ -82,6 +89,11 @@ public class PlayerProfileController {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/allPlayers")
+    public List<PlayerProfile> getAllPlayers() {
+        return playerProfileService.getAllPlayers();
     }
 
 }

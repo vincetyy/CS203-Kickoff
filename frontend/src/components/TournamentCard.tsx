@@ -1,5 +1,8 @@
-import { Card, CardContent, CardFooter } from "./ui/card"
-import { useNavigate } from "react-router-dom"
+import { Card, CardContent, CardFooter } from "./ui/card";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from 'react-redux';
+import { selectIsAdmin } from '../store/userSlice'; 
+import { Button } from "./ui/button"; 
 
 interface TournamentCardProps {
   id: number;
@@ -25,12 +28,12 @@ const formatTournamentFormat = (format: string): string => {
 
 export default function TournamentCard({ id, name, startDate, endDate, format, teams, image, children }: TournamentCardProps) {
   const navigate = useNavigate();
+  const isAdmin = useSelector(selectIsAdmin); // Check if the user is an admin
 
   const handleCardClick = () => {
     navigate(`/tournaments/${id}`); // Navigate to the tournament page with the corresponding id
   }
 
-  
   return (
     <Card className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
       <CardContent className="p-0" onClick={handleCardClick}>
@@ -48,8 +51,16 @@ export default function TournamentCard({ id, name, startDate, endDate, format, t
           </svg>
           <span>{teams} Teams</span>
         </div>
-        {children}
+        {isAdmin ? (
+          <Button className="bg-blue-500 hover:bg-blue-600">
+            Manage Tournament
+          </Button>
+        ) : (
+          <div>
+            {children}
+          </div>
+        )}
       </CardFooter>
     </Card>
-  )
+  );
 }
