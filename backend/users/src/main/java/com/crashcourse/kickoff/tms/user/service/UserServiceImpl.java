@@ -1,8 +1,6 @@
 package com.crashcourse.kickoff.tms.user.service;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -98,4 +96,10 @@ public class UserServiceImpl implements UserService {
         users.deleteById(userId);
     }
 
+    @Transactional
+    public User addRolesToUser(User user, Set<Role> roles) {
+        User loadedUser = getUserById(user.getId());
+        loadedUser.setRoles(roles);
+        return users.save(loadedUser);
+    }
 }

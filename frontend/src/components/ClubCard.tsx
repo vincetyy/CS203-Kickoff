@@ -1,5 +1,7 @@
 import React from 'react';
-import { Button } from "./ui/button"
+import { Button } from "./ui/button";
+import { useSelector } from 'react-redux';
+import { selectIsAdmin } from '../store/userSlice';
 
 interface ClubCardProps {
   id: number;
@@ -9,7 +11,6 @@ interface ClubCardProps {
   image: string;
   applied: boolean;
   onClick: () => void;
-  // Remove the children prop if you no longer need it
 }
 
 const ClubCard: React.FC<ClubCardProps> = ({
@@ -19,10 +20,12 @@ const ClubCard: React.FC<ClubCardProps> = ({
   image,
   onClick,
 }) => {
+  const isAdmin = useSelector(selectIsAdmin);
+
   return (
     <div
       onClick={onClick}
-      className="cursor-pointer bg-gray-800 rounded-lg overflow-hidden shadow-md flex flex-col"
+      className={`cursor-pointer bg-gray-800 rounded-lg overflow-hidden shadow-md flex flex-col ${isAdmin ? 'h-74' : 'h-70'}`} // Adjust height based on admin status
     >
       {/* Card Content */}
       <img src={image} alt={name} className="w-full h-48 object-cover" />
@@ -30,9 +33,14 @@ const ClubCard: React.FC<ClubCardProps> = ({
         <h3 className="text-xl font-bold mb-2">{name}</h3>
         <p className="text-gray-400">{description}</p>
         <p className="text-gray-400 mt-2">{ratings}</p>
-        {/* You can remove the Join button from here */}
       </div>
-        
+      {isAdmin && (
+        <div className="p-4">
+          <Button className="w-full h-10 bg-blue-500 hover:bg-blue-600">
+            Manage Club
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

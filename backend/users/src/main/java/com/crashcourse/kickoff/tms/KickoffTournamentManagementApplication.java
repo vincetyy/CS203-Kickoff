@@ -34,8 +34,8 @@ public class KickoffTournamentManagementApplication {
 		NewUserDTO adminDTO = new NewUserDTO("admin", "admin@email.com", "password",
 				new String[] { "POSITION_Goalkeeper", "POSITION_Midfielder" }, "player");
 		User admin = userService.addUser(adminDTO);
-		admin.setRoles(SecurityConfig.getAllRolesAsSet());
-		userService.addHostProfileToUser(admin);
+		admin = userService.addRolesToUser(admin, SecurityConfig.getAllRolesAsSet());
+		admin = userService.addHostProfileToUser(admin);
 		System.out.println("[Added admin]: " + admin.getUsername());
 
 		// Creating dummyUsers, each one name will be User0, User1, User2, ... and pw will be password0, password1, password2, ...

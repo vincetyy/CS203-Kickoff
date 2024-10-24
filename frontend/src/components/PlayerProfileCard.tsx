@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Badge } from './ui/badge'; // Assuming Badge component is a UI element
-import { fetchPlayerProfileById } from '../services/userService'; // Your service for fetching player data
+import { Badge } from './ui/badge';
+import { Button } from './ui/button'; 
+import { fetchPlayerProfileById } from '../services/userService'; 
 import { PlayerProfile, PlayerPosition } from '../types/profile';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { selectUserId } from '../store/userSlice';
+import { selectUserId, selectIsAdmin } from '../store/userSlice'; 
 import toast from 'react-hot-toast';
 
 interface PlayerProfileCardProps {
@@ -16,6 +17,7 @@ interface PlayerProfileCardProps {
 const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({ id, availability, needAvailability }) => {
   const navigate = useNavigate();
   const userId = useSelector(selectUserId);
+  const isAdmin = useSelector(selectIsAdmin); 
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +66,7 @@ const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({ id, availability,
   }
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4 flex items-center space-x-4" onClick={ navigateToProfile }>
+    <div className="bg-gray-800 rounded-lg p-4 flex items-center space-x-4" onClick={navigateToProfile}>
       <img
         src={`https://picsum.photos/seed/${playerProfile.id+2000}/100/100`}
         alt={`${playerProfile.username}'s profile`}
@@ -78,14 +80,23 @@ const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({ id, availability,
             : 'No position specified'}
         </p>
       </div>
-      { needAvailability &&
-        <Badge
-        variant={availability ? 'success' : 'destructive'}
-        className="w-24 justify-center whitespace-nowrap"
-      >
-        {availability ? 'Available' : 'Not Available'}
-      </Badge>
-      }
+      {needAvailability && (
+        isAdmin ? (
+          <Button
+            className="bg-blue-500 hover:bg-blue-600 w-20 h-15 flex items-center justify-center"
+            onClick={() => console.log('Manage Player clicked')}
+          >
+            Manage Player
+          </Button>
+        ) : (
+          <Badge
+            variant={availability ? 'success' : 'destructive'}
+            className="w-20 h-6 flex items-center justify-center whitespace-nowrap"
+          >
+            {availability ? 'Available' : 'Not Available'}
+          </Badge>
+        )
+      )}
     </div>
   );
 };
