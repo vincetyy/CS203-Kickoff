@@ -22,7 +22,7 @@ public interface TournamentService {
 
     void deleteTournament(Long id);
 
-    TournamentResponseDTO joinTournamentAsClub(TournamentJoinDTO tournamentJoinDTO);
+    TournamentResponseDTO joinTournamentAsClub(TournamentJoinDTO tournamentJoinDTO, String token);
 
     List<Long> getAllClubsInTournament(Long id);
 

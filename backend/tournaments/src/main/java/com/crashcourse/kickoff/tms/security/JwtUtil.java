@@ -72,6 +72,7 @@ public class JwtUtil {
         } catch (ExpiredJwtException e) {
             throw new ExpiredJwtException(e.getHeader(), e.getClaims(), "Token has expired");
         } catch (Exception e) {
+            System.out.println(e);
             throw new RuntimeException("Invalid JWT token");
         }
     }
@@ -84,25 +85,24 @@ public class JwtUtil {
         return !isTokenExpired(token);
     }
 
-    public String generateJwtToken() {
-        long currentTimeMillis = System.currentTimeMillis();
-        Date now = new Date(currentTimeMillis);
-        Date expiryDate = new Date(currentTimeMillis + 360000);
+    public String generateToken() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", 1L); // Add userId to the claims
+        claims.put("roles", null);
+                                
+        return createToken(claims, "admin");
+    }
 
-        /*
-         * Passing in empty claims
-         */
-        Long userId = 0L;
-        List<Object> roles = new ArrayList<Object>();
+    private String createToken(Map<String, Object> claims, String subject) {
+        SecretKey key = getSigningKey();
 
         return Jwts.builder()
-            .setSubject("username")
-            .setIssuedAt(now)
-            .setExpiration(expiryDate)
-            .claim("userId", userId)
-            .claim("roles", roles)
-            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-            .compact();
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMillis))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
     }
 
 }

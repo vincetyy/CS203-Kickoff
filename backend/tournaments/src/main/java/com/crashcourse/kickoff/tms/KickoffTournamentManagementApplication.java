@@ -17,6 +17,8 @@ import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
 import com.crashcourse.kickoff.tms.tournament.dto.PlayerAvailabilityDTO;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentJoinDTO;
 
+import com.crashcourse.kickoff.tms.security.JwtUtil;
+
 @SpringBootApplication
 public class KickoffTournamentManagementApplication {
 
@@ -78,37 +80,45 @@ public class KickoffTournamentManagementApplication {
 		// 1457 -- tourney 2
 		// 134567 -- tourney 3
 
+		/*
+		 * Join tournament as club requires microservice to microservice
+		 * communication, therefore we generate the JwtToken here
+		 */
+		JwtUtil jwtUtil = new JwtUtil();
+        String jwtToken = "Bearer " + jwtUtil.generateToken();
+		System.out.println(jwtToken);
+
 		// create tournament join dtos for tournament1
 		TournamentJoinDTO tournamentJoinDTO1 = new TournamentJoinDTO(1L, 1L);
-		tournamentService.joinTournamentAsClub(tournamentJoinDTO1);
+		tournamentService.joinTournamentAsClub(tournamentJoinDTO1, jwtToken);
 		TournamentJoinDTO tournamentJoinDTO2 = new TournamentJoinDTO(3L, 1L);
-		tournamentService.joinTournamentAsClub(tournamentJoinDTO2);
+		tournamentService.joinTournamentAsClub(tournamentJoinDTO2, jwtToken);
 		TournamentJoinDTO tournamentJoinDTO3 = new TournamentJoinDTO(6L, 1L);
-		tournamentService.joinTournamentAsClub(tournamentJoinDTO3);
+		tournamentService.joinTournamentAsClub(tournamentJoinDTO3, jwtToken);
 		
 		// create tournament join dtos for tournament2
 		TournamentJoinDTO tournamentJoinDTO4 = new TournamentJoinDTO(1L, 2L);
-		tournamentService.joinTournamentAsClub(tournamentJoinDTO4);
+		tournamentService.joinTournamentAsClub(tournamentJoinDTO4, jwtToken);
 		TournamentJoinDTO tournamentJoinDTO5 = new TournamentJoinDTO(7L, 2L);
-		tournamentService.joinTournamentAsClub(tournamentJoinDTO5);
+		tournamentService.joinTournamentAsClub(tournamentJoinDTO5, jwtToken);
 		TournamentJoinDTO tournamentJoinDTO6 = new TournamentJoinDTO(4L, 2L);
-		tournamentService.joinTournamentAsClub(tournamentJoinDTO6);
+		tournamentService.joinTournamentAsClub(tournamentJoinDTO6, jwtToken);
 		TournamentJoinDTO tournamentJoinDTO7 = new TournamentJoinDTO(5L, 2L);
-		tournamentService.joinTournamentAsClub(tournamentJoinDTO7);
+		tournamentService.joinTournamentAsClub(tournamentJoinDTO7, jwtToken);
 
 		// create tournament join dtos for tournament3
 		TournamentJoinDTO tournamentJoinDTO8 = new TournamentJoinDTO(1L, 3L);
-		tournamentService.joinTournamentAsClub(tournamentJoinDTO8);
+		tournamentService.joinTournamentAsClub(tournamentJoinDTO8, jwtToken);
 		TournamentJoinDTO tournamentJoinDTO9 = new TournamentJoinDTO(3L, 3L);
-		tournamentService.joinTournamentAsClub(tournamentJoinDTO9);
+		tournamentService.joinTournamentAsClub(tournamentJoinDTO9, jwtToken);
 		TournamentJoinDTO tournamentJoinDTO10 = new TournamentJoinDTO(4L, 3L);
-		tournamentService.joinTournamentAsClub(tournamentJoinDTO10);
+		tournamentService.joinTournamentAsClub(tournamentJoinDTO10, jwtToken);
 		TournamentJoinDTO tournamentJoinDTO11 = new TournamentJoinDTO(5L, 3L);
-		tournamentService.joinTournamentAsClub(tournamentJoinDTO11);
+		tournamentService.joinTournamentAsClub(tournamentJoinDTO11, jwtToken);
 		TournamentJoinDTO tournamentJoinDTO12 = new TournamentJoinDTO(6L, 3L);
-		tournamentService.joinTournamentAsClub(tournamentJoinDTO12);
+		tournamentService.joinTournamentAsClub(tournamentJoinDTO12, jwtToken);
 		TournamentJoinDTO tournamentJoinDTO13 = new TournamentJoinDTO(7L, 3L);
-		tournamentService.joinTournamentAsClub(tournamentJoinDTO13);
+		tournamentService.joinTournamentAsClub(tournamentJoinDTO13, jwtToken);
 
 		// add users avail for tournament, esp users 8, 15, 22, 29.
 		// users 36, 43 not avail, user50 will be the demo user to apply
