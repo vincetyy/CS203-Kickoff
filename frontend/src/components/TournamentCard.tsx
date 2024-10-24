@@ -56,9 +56,9 @@ export default function TournamentCard({ id, name, startDate, endDate, format, t
             Manage Tournament
           </Button>
         ) : (
-          <Button className="bg-green-500 hover:bg-green-600">
-            Join
-          </Button>
+          <div>
+            {children}
+          </div>
         )}
       </CardFooter>
     </Card>
