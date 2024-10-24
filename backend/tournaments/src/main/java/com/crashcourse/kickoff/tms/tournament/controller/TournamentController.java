@@ -14,7 +14,7 @@ import com.crashcourse.kickoff.tms.tournament.dto.TournamentUpdateDTO;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
-import com.crashcourse.kickoff.tms.match.model.Round;
+import com.crashcourse.kickoff.tms.match.model.Bracket;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -113,8 +113,8 @@ public class TournamentController {
         if (!isOwnerOfTournament) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to start this tournament.");
         }
-        List<Round> rounds = tournamentService.startTournament(id);
-        return ResponseEntity.ok(rounds);
+        Bracket bracket = tournamentService.startTournament(id);
+        return ResponseEntity.ok(bracket);
     }
 
     /**

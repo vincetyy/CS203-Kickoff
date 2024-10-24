@@ -27,9 +27,6 @@ public class MatchServiceImpl implements MatchService {
     @Autowired
     private RoundRepository roundRepository;
 
-    @Autowired
-    private TournamentRepository tournamentRepository;
-
     /*
      * Matches can now only be created through
      * create bracket
@@ -41,46 +38,6 @@ public class MatchServiceImpl implements MatchService {
             .orElseThrow(() -> new EntityNotFoundException("Round not found with id: " + roundId));
         match.setRound(round);
         return matchRepository.save(match);
-    }
-
-    public Round createRound(int numberOfMatches) {
-        Round round = new Round();
-        round = roundRepository.save(round);
-    
-        List<Match> matches = new ArrayList<>();
-        for (int i = 0; i < numberOfMatches; i++) {
-            matches.add(createMatch(round.getId()));
-        }
-    
-        round.setMatches(matches);
-        return roundRepository.save(round);
-    }
-    
-    @Override
-    public List<Round> createBracket(Long tournamentId, int numberOfClubs) {
-        if (numberOfClubs == 0) {
-            throw new EntityNotFoundException("No clubs found");
-        }
-    
-        Tournament tournament = tournamentRepository.findById(tournamentId)
-            .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + tournamentId));
-    
-        /*
-         * 9 teams will require 4 rounds 16 -> 8 -> 4 -> 2
-         */
-        int numberOfRounds = (int) Math.ceil(Math.log(numberOfClubs) / Math.log(2));
-    
-        List<Round> tournamentRounds = new ArrayList<>();
-
-        while (numberOfRounds > 0) {
-            int size = (int) Math.pow(2, numberOfRounds);
-            tournamentRounds.add(createRound(size));
-            numberOfRounds--;
-        }
-    
-        tournament.setRounds(tournamentRounds);
-        tournamentRepository.save(tournament);
-        return tournamentRounds;
     }
     
 

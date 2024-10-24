@@ -16,8 +16,8 @@ import org.springframework.http.ResponseEntity;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-import com.crashcourse.kickoff.tms.match.model.Round;
-import com.crashcourse.kickoff.tms.match.service.MatchService;
+import com.crashcourse.kickoff.tms.match.model.*;
+import com.crashcourse.kickoff.tms.match.service.*;
 
 import com.crashcourse.kickoff.tms.location.model.Location;
 import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
@@ -46,7 +46,9 @@ public class TournamentServiceImpl implements TournamentService {
     private final LocationRepository locationRepository;
     private final LocationService locationService;
     private final PlayerAvailabilityRepository playerAvailabilityRepository;
+
     private final MatchService matchService;
+    private final BracketService singleEliminationService;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -98,14 +100,22 @@ public class TournamentServiceImpl implements TournamentService {
         return mapToResponseDTO(updatedTournament);
     }
 
-    public List<Round> startTournament(Long id) {
+    public Bracket startTournament(Long id) {
         Tournament tournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + id));
         if (tournament.getJoinedClubIds() == null || tournament.getJoinedClubIds().size() == 0) {
             throw new EntityNotFoundException("No clubs found in tournament with id: " + id);
         }
-        System.out.println(tournament.getJoinedClubIds().size());
-        return matchService.createBracket(id, tournament.getJoinedClubIds().size());
+
+        /*
+         * Adding this to handle different format bracket creation
+         */
+        KnockoutFormat knockoutFormat = tournament.getKnockoutFormat();
+        if (KnockoutFormat.SINGLE_ELIM.equals(knockoutFormat)) {
+            return singleEliminationService.createBracket(id, tournament.getJoinedClubIds().size());
+        } else {
+            throw new UnsupportedOperationException("Unsupported tournament format: " + knockoutFormat);
+        }
     }
 
     @Override
@@ -178,7 +188,7 @@ public class TournamentServiceImpl implements TournamentService {
                 tournament.getMaxRank(),
                 clubIds,
                 tournament.getHost(),
-                tournament.getRounds()
+                tournament.getBracket()
         );
     }
 

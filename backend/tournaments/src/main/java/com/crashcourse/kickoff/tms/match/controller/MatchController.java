@@ -29,16 +29,6 @@ public class MatchController {
     @Autowired
     private final MatchService matchService;
 
-    @PostMapping("/{tournamentId}/createbracket")
-    public ResponseEntity<?> createBracket(@PathVariable Long tournamentId, @RequestBody int numberOfClubs) {
-        try {
-            List<Round> bracket = matchService.createBracket(tournamentId, numberOfClubs);
-            return new ResponseEntity<>(bracket, HttpStatus.CREATED);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<?> getMatchById(@PathVariable Long id) {
         try {

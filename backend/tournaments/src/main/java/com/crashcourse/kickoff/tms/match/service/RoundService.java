@@ -6,8 +6,6 @@ import com.crashcourse.kickoff.tms.match.model.Match;
 import com.crashcourse.kickoff.tms.match.model.Round;
 import com.crashcourse.kickoff.tms.match.dto.*;
 
-public interface MatchService {
-    Match createMatch(Long tournamentId);
-    Match getMatchById(Long id);
-    MatchResponseDTO updateMatch(Long id, MatchUpdateDTO matchUpdateDTO);
+public interface RoundService {
+    Round createRound(int numberOfMatches);
 }
