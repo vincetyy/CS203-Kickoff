@@ -7,6 +7,8 @@ import com.crashcourse.kickoff.tms.tournament.model.PlayerAvailability;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
 import com.crashcourse.kickoff.tms.match.model.Bracket;
+import com.crashcourse.kickoff.tms.match.model.Match;
+import com.crashcourse.kickoff.tms.match.dto.MatchUpdateDTO;
 
 public interface TournamentService {
 
@@ -19,6 +21,7 @@ public interface TournamentService {
     TournamentResponseDTO updateTournament(Long id, TournamentUpdateDTO tournamentUpdateDTO);
 
     TournamentResponseDTO startTournament(Long id);
+    Match updateMatchInTournament(Long tournamentId, Long matchId, MatchUpdateDTO matchUpdateDTO);
 
     void deleteTournament(Long id);
 

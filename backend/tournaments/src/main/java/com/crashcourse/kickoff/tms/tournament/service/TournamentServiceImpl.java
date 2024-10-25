@@ -17,6 +17,9 @@ import com.crashcourse.kickoff.tms.club.model.ClubProfile;
 
 import com.crashcourse.kickoff.tms.match.model.*;
 import com.crashcourse.kickoff.tms.match.service.*;
+import com.crashcourse.kickoff.tms.match.dto.MatchUpdateDTO;
+import com.crashcourse.kickoff.tms.match.dto.MatchResponseDTO;
+import com.crashcourse.kickoff.tms.match.repository.MatchRepository;
 
 import com.crashcourse.kickoff.tms.location.model.Location;
 import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
@@ -32,6 +35,7 @@ import com.crashcourse.kickoff.tms.tournament.repository.TournamentRepository;
 import com.crashcourse.kickoff.tms.security.JwtUtil;
 
 import jakarta.persistence.EntityNotFoundException;
+
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -44,6 +48,8 @@ public class TournamentServiceImpl implements TournamentService {
     
     private final TournamentRepository tournamentRepository;
     private final LocationRepository locationRepository;
+    private final MatchRepository matchRepository;
+
     private final LocationService locationService;
     private final PlayerAvailabilityRepository playerAvailabilityRepository;
 
@@ -129,6 +135,38 @@ public class TournamentServiceImpl implements TournamentService {
             tournament.setBracket(bracket);
             Tournament savedTournament = tournamentRepository.save(tournament);
             return mapToResponseDTO(savedTournament);
+        } else {
+            throw new UnsupportedOperationException("Unsupported tournament format: " + knockoutFormat);
+        }
+    }
+
+    public Match updateMatchInTournament(Long tournamentId, Long matchId, MatchUpdateDTO matchUpdateDTO) {
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+            .orElseThrow(() -> new EntityNotFoundException("Tournament not found with ID: " + tournamentId));
+
+        Match match = matchRepository.findById(matchId)
+            .orElseThrow(() -> new EntityNotFoundException("Match not found with ID: " + matchId));
+
+        /*
+         * Update Clubs
+         */
+        match.setClub1Id(matchUpdateDTO.getClub1Id());
+        match.setClub2Id(matchUpdateDTO.getClub2Id());
+
+        /*
+         * Update Score
+         */
+        match.setClub1Score(matchUpdateDTO.getClub1Score());
+        match.setClub2Score(matchUpdateDTO.getClub2Score());
+        match.setWinningClubId(matchUpdateDTO.getWinningClubId());
+
+        /*
+         * Adding this to handle different bracket progression formats
+         */
+        KnockoutFormat knockoutFormat = tournament.getKnockoutFormat();
+        if (KnockoutFormat.SINGLE_ELIM.equals(knockoutFormat)) {
+            Match updatedMatch = singleEliminationService.updateMatch(tournament, match, matchUpdateDTO);
+            return updatedMatch;
         } else {
             throw new UnsupportedOperationException("Unsupported tournament format: " + knockoutFormat);
         }
