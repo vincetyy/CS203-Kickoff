@@ -329,7 +329,6 @@ public class TournamentServiceImpl implements TournamentService {
         headers.set("Authorization", jwtToken);
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
-        // Fetch the ClubProfile from the club service
         ResponseEntity<ClubProfile> response = restTemplate.exchange(
                 clubServiceUrl,
                 HttpMethod.GET,
@@ -367,9 +366,18 @@ public class TournamentServiceImpl implements TournamentService {
             throw new TournamentFullException("Tournament is already full.");
         }
 
-        // Add the club to the tournament
-        tournament.getJoinedClubIds().add(clubId);
+        /*
+         * Validation for elo range
+         */
+        double elo = clubProfile.getElo();
+        if (tournament.getMinRank() != null && elo < tournament.getMinRank()) {
+            throw new RuntimeException("Club does not meet tournament minimum elo requirement.");
+        }
+        if (tournament.getMaxRank() != null && elo > tournament.getMaxRank()) {
+            throw new RuntimeException("Club exceeds tournament maximum elo requirement.");
+        }
 
+        tournament.getJoinedClubIds().add(clubId);
         Tournament updatedTournament = tournamentRepository.save(tournament);
         return mapToResponseDTO(updatedTournament);
     }
