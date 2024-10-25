@@ -124,9 +124,10 @@ public class TournamentController {
     }
 
     @PutMapping("{tournamentId}/{matchId}")
-    public ResponseEntity<?> updateMatchInTournament(@PathVariable Long tournamentId, @PathVariable Long matchId, @RequestBody MatchUpdateDTO matchUpdateDTO) {
+    public ResponseEntity<?> updateMatchInTournament(@PathVariable Long tournamentId, @PathVariable Long matchId, 
+        @RequestBody MatchUpdateDTO matchUpdateDTO, @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = true) String token) {
         try {
-            Match match = tournamentService.updateMatchInTournament(tournamentId, matchId, matchUpdateDTO);
+            Match match = tournamentService.updateMatchInTournament(tournamentId, matchId, matchUpdateDTO, token);
             return new ResponseEntity<>(match, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

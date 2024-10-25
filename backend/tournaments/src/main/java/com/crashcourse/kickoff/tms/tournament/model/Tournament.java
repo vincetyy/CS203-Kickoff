@@ -24,7 +24,6 @@ public class Tournament {
 
     private String name;
     private boolean isOver;
-    private Long winningClubId;
 
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;

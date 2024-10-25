@@ -43,9 +43,9 @@ public class SingleEliminationServiceImpl implements SingleEliminationService {
         SingleEliminationBracket bracket = new SingleEliminationBracket();
         List<Round> bracketRounds = new ArrayList<>();
 
-        while (numberOfRounds > 0) {
+        while (numberOfRounds >= 0) {
             int size = (int) Math.pow(2, numberOfRounds);
-            bracketRounds.add(roundService.createRound(size, 0L + numberOfRounds));
+            bracketRounds.add(roundService.createRound(size, 1L + numberOfRounds));
             numberOfRounds--;
         }
     
@@ -60,34 +60,15 @@ public class SingleEliminationServiceImpl implements SingleEliminationService {
     @Override
     public Match updateMatch(Tournament tournament, Match match, MatchUpdateDTO matchUpdateDTO) {
         /*
-         * Validation
+         * Validation for Tournament and Match handled in TournamentService
          */
-        if (tournament == null) {
-            throw new EntityNotFoundException("No tournament found.");
-        }
-        if (match == null) {
-            throw new EntityNotFoundException("No match found.");
-        }
-
-        if (!(tournament.getBracket() instanceof SingleEliminationBracket seBracket)) {
+        if (!(tournament.getBracket() instanceof SingleEliminationBracket singleEliminationBracket)) {
             throw new RuntimeException("Wrong bracket format.");
         }
 
         Long matchNumber = match.getMatchNumber();
         Long winningClubId = matchUpdateDTO.getWinningClubId();
-        Long club1Id = matchUpdateDTO.getClub1Id();
-        Long club2Id = matchUpdateDTO.getClub2Id();
-        if (winningClubId != club1Id && winningClubId != club2Id) {
-            throw new RuntimeException("Invalid winning club");
-        } 
-
-        /*
-         * Update Score
-         */
-        match.setClub1Score(matchUpdateDTO.getClub1Score());
-        match.setClub2Score(matchUpdateDTO.getClub2Score());
-        match.setWinningClubId(winningClubId);
-
+        
         /*
          * If over, send winner to next round
          */
@@ -100,9 +81,13 @@ public class SingleEliminationServiceImpl implements SingleEliminationService {
              * so we know if its the last round
              */
             if (match.getRound().getRoundNumber() == 1) {
-                tournament.setWinningClubId(matchUpdateDTO.getWinningClubId());
+                singleEliminationBracket.setWinningClubId(winningClubId);
+                bracketRepository.save(singleEliminationBracket);
+                tournament.setOver(true);
+                tournamentRepository.save(tournament);
+
             } else {
-                List<Round> rounds = seBracket.getRounds();
+                List<Round> rounds = singleEliminationBracket.getRounds();
                 /*
                  * -1 for next round, -1 since we use 1 index
                  */
@@ -114,9 +99,6 @@ public class SingleEliminationServiceImpl implements SingleEliminationService {
                  * -1 to account for 1 indexing again
                  */
                 Match nextMatch = matches.get((int)Math.ceil(matchNumber/2.0) - 1);
-                /*
-                 * Note that we start from index 1
-                 */
                 if (matchNumber % 2 == 1) {
                     nextMatch.setClub1Id(winningClubId);
                 } else {

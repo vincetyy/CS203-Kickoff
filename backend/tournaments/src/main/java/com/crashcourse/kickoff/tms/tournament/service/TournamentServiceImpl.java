@@ -140,12 +140,69 @@ public class TournamentServiceImpl implements TournamentService {
         }
     }
 
-    public Match updateMatchInTournament(Long tournamentId, Long matchId, MatchUpdateDTO matchUpdateDTO) {
+    public Match updateMatchInTournament(Long tournamentId, Long matchId, MatchUpdateDTO matchUpdateDTO, String jwtToken) {
+
+        /*
+         * Handle JwtToken
+         */
+        jwtToken = jwtToken.substring(7);
+
         Tournament tournament = tournamentRepository.findById(tournamentId)
             .orElseThrow(() -> new EntityNotFoundException("Tournament not found with ID: " + tournamentId));
 
         Match match = matchRepository.findById(matchId)
             .orElseThrow(() -> new EntityNotFoundException("Match not found with ID: " + matchId));
+
+        Long club1Id = matchUpdateDTO.getClub1Id();
+        Long club2Id = matchUpdateDTO.getClub2Id();
+        /*
+         * Validation for Club1
+         */
+        String clubServiceUrl = clubUrl + club1Id;
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", jwtToken);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+        ResponseEntity<ClubProfile> response = restTemplate.exchange(
+                clubServiceUrl,
+                HttpMethod.GET,
+                request,
+                ClubProfile.class
+        );
+        if (response.getStatusCode() != HttpStatus.OK) {
+            throw new RuntimeException("Failed to retrieve ClubProfile");
+        }
+        if (response.getBody() == null) {
+            throw new RuntimeException("Club profile not found.");
+        }
+
+        /*
+         * Validation for Club2
+         */
+        clubServiceUrl = clubUrl + club2Id;
+        headers = new HttpHeaders();
+        headers.set("Authorization", jwtToken);
+        request = new HttpEntity<>(headers);
+        response = restTemplate.exchange(
+                clubServiceUrl,
+                HttpMethod.GET,
+                request,
+                ClubProfile.class
+        );
+        if (response.getStatusCode() != HttpStatus.OK) {
+            throw new RuntimeException("Failed to retrieve ClubProfile");
+        }
+        if (response.getBody() == null) {
+            throw new RuntimeException("Club profile not found with ID: " + club2Id);
+        }
+
+        /*
+         * Validation for Winning Club
+         */
+        Long winningClubId = matchUpdateDTO.getWinningClubId();
+        if (!winningClubId.equals(matchUpdateDTO.getClub1Id()) &&
+                            !winningClubId.equals(matchUpdateDTO.getClub2Id())) {
+            throw new RuntimeException("Invalid winning club");
+        }
 
         /*
          * Update Clubs
@@ -158,7 +215,7 @@ public class TournamentServiceImpl implements TournamentService {
          */
         match.setClub1Score(matchUpdateDTO.getClub1Score());
         match.setClub2Score(matchUpdateDTO.getClub2Score());
-        match.setWinningClubId(matchUpdateDTO.getWinningClubId());
+        match.setWinningClubId(winningClubId);
 
         /*
          * Adding this to handle different bracket progression formats

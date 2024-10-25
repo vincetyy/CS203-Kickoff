@@ -21,7 +21,8 @@ public interface TournamentService {
     TournamentResponseDTO updateTournament(Long id, TournamentUpdateDTO tournamentUpdateDTO);
 
     TournamentResponseDTO startTournament(Long id);
-    Match updateMatchInTournament(Long tournamentId, Long matchId, MatchUpdateDTO matchUpdateDTO);
+    
+    Match updateMatchInTournament(Long tournamentId, Long matchId, MatchUpdateDTO matchUpdateDTO, String token);
 
     void deleteTournament(Long id);
 
