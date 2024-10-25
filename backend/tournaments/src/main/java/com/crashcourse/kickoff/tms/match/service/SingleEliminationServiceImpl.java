@@ -67,12 +67,22 @@ public class SingleEliminationServiceImpl implements SingleEliminationService {
         }
 
         Long matchNumber = match.getMatchNumber();
+        Long club1Id = matchUpdateDTO.getClub1Id();
+        Long club2Id = matchUpdateDTO.getClub2Id();
         Long winningClubId = matchUpdateDTO.getWinningClubId();
-        
+
         /*
          * If over, send winner to next round
          */
         if (matchUpdateDTO.isOver()) {
+
+            /*
+             * Validation for No Clubs: if seeding is done correctly, there should be
+             * no empty matches since every preceding match will have at least 1 club
+             */
+            if (club1Id == null && club2Id == null) {
+                throw new RuntimeException("No clubs in match.");
+            }
 
             match.setOver(true);
             
