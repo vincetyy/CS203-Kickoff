@@ -107,11 +107,17 @@ public class TournamentServiceImpl implements TournamentService {
         return mapToResponseDTO(updatedTournament);
     }
 
-    public Bracket startTournament(Long id) {
+    public TournamentResponseDTO startTournament(Long id) {
         Tournament tournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + id));
         if (tournament.getJoinedClubIds() == null || tournament.getJoinedClubIds().size() == 0) {
             throw new EntityNotFoundException("No clubs found in tournament with id: " + id);
+        }
+        /*
+         * Prevent re-creation of bracket
+         */
+        if (tournament.getBracket() != null) {
+            throw new RuntimeException("Bracket has already been created for tournament with id: " + id);
         }
 
         /*
@@ -119,7 +125,10 @@ public class TournamentServiceImpl implements TournamentService {
          */
         KnockoutFormat knockoutFormat = tournament.getKnockoutFormat();
         if (KnockoutFormat.SINGLE_ELIM.equals(knockoutFormat)) {
-            return singleEliminationService.createBracket(id, tournament.getJoinedClubIds().size());
+            Bracket bracket = singleEliminationService.createBracket(id, tournament.getJoinedClubIds().size());
+            tournament.setBracket(bracket);
+            Tournament savedTournament = tournamentRepository.save(tournament);
+            return mapToResponseDTO(savedTournament);
         } else {
             throw new UnsupportedOperationException("Unsupported tournament format: " + knockoutFormat);
         }

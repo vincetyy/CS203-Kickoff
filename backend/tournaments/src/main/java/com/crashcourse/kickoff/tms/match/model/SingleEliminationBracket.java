@@ -11,12 +11,14 @@ import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 @Entity
 @NoArgsConstructor
 @Data
+@EqualsAndHashCode(callSuper=false)
 @DiscriminatorValue("SINGLE_ELIM")
 public class SingleEliminationBracket extends Bracket {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    /*
+     * Primary key (@Id) should only be defined in the base class (Bracket)
+     * Each subclass will inherit this primary key
+     */
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "bracket_id") 

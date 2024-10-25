@@ -113,8 +113,7 @@ public class TournamentController {
         if (!isOwnerOfTournament) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to start this tournament.");
         }
-        Bracket bracket = tournamentService.startTournament(id);
-        return ResponseEntity.ok(bracket);
+        return ResponseEntity.ok(tournamentService.startTournament(id));
     }
 
     /**

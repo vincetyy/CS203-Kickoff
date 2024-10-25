@@ -37,17 +37,18 @@ public class SingleEliminationServiceImpl implements SingleEliminationService {
         SingleEliminationBracket bracket = new SingleEliminationBracket();
         List<Round> bracketRounds = new ArrayList<>();
 
+        Long roundNumber = 0L;
         while (numberOfRounds > 0) {
             int size = (int) Math.pow(2, numberOfRounds);
-            bracketRounds.add(roundService.createRound(size));
+            bracketRounds.add(roundService.createRound(size, roundNumber + 1L));
             numberOfRounds--;
         }
     
         bracket.setRounds(bracketRounds);
         bracketRepository.save(bracket);
 
+        bracket.setTournament(tournament);
         tournament.setBracket(bracket);
-        tournamentRepository.save(tournament);
         return bracket;
     }
 }

@@ -18,7 +18,7 @@ public interface TournamentService {
 
     TournamentResponseDTO updateTournament(Long id, TournamentUpdateDTO tournamentUpdateDTO);
 
-    Bracket startTournament(Long id);
+    TournamentResponseDTO startTournament(Long id);
 
     void deleteTournament(Long id);
 

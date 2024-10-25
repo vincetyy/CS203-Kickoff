@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "bracket_type", discriminatorType = DiscriminatorType.STRING)
+@Data
 public class Bracket {
 
     @Id

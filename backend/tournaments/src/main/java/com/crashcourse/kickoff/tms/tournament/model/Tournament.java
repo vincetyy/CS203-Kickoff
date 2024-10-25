@@ -50,7 +50,7 @@ public class Tournament {
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL)  
     private List<PlayerAvailability> playerAvailabilities = new ArrayList<>();
 
-    @OneToOne(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
     private Bracket bracket;
 
     public String getFormat() {

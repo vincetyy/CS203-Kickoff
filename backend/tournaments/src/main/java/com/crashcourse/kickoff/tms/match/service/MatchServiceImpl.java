@@ -32,8 +32,10 @@ public class MatchServiceImpl implements MatchService {
      * create bracket
      */
     @Override
-    public Match createMatch(Long roundId) {
+    public Match createMatch(Long roundId, Long matchNumber) {
         Match match = new Match();
+        match.setMatchNumber(matchNumber);
+        
         Round round = roundRepository.findById(roundId)
             .orElseThrow(() -> new EntityNotFoundException("Round not found with id: " + roundId));
         match.setRound(round);
@@ -58,6 +60,13 @@ public class MatchServiceImpl implements MatchService {
         foundMatch.setClub1Score(matchUpdateDTO.getClub1Score());
         foundMatch.setClub2Score(matchUpdateDTO.getClub2Score());
         foundMatch.setWinningClubId(matchUpdateDTO.getWinningClubId());
+
+        /*
+         * If over, send winner to next round
+         */
+        if (matchUpdateDTO.isOver()) {
+            
+        }
         
         /*
          * Save to repository

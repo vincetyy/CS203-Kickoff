@@ -17,6 +17,8 @@ public class Round {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    private Long roundNumber;
 
     @JsonIgnore
     @ManyToOne

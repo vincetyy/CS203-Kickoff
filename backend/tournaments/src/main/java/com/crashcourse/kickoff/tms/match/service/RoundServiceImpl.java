@@ -24,13 +24,14 @@ public class RoundServiceImpl implements RoundService {
     private final MatchService matchService;
 
     @Override
-    public Round createRound(int numberOfMatches) {
+    public Round createRound(int numberOfMatches, Long roundNumber) {
         Round round = new Round();
+        round.setRoundNumber(roundNumber);
         round = roundRepository.save(round);
     
         List<Match> matches = new ArrayList<>();
         for (int i = 0; i < numberOfMatches; i++) {
-            matches.add(matchService.createMatch(round.getId()));
+            matches.add(matchService.createMatch(round.getId(), 1L + i));
         }
     
         round.setMatches(matches);
