@@ -1,30 +1,32 @@
 package com.crashcourse.kickoff.tms.match.model;
 
-import java.util.*;
-
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.Data;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "bracket_type", discriminatorType = DiscriminatorType.STRING)
 @Data
-public class Round {
+public class Bracket {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    private Long roundNumber;
 
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "tournament_id")
     private Tournament tournament;
 
-    @OneToMany(mappedBy = "round", cascade = CascadeType.ALL)
-    private List<Match> matches;
+    private Long winningClubId;
+
+    /*
+     * Handling match format is done by
+     * classes that extend Bracket
+     */
 }

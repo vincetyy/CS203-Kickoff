@@ -14,7 +14,7 @@ import com.crashcourse.kickoff.tms.tournament.dto.TournamentUpdateDTO;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
-import com.crashcourse.kickoff.tms.match.model.Round;
+import com.crashcourse.kickoff.tms.match.model.Bracket;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -113,8 +113,7 @@ public class TournamentController {
         if (!isOwnerOfTournament) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to start this tournament.");
         }
-        List<Round> rounds = tournamentService.startTournament(id);
-        return ResponseEntity.ok(rounds);
+        return ResponseEntity.ok(tournamentService.startTournament(id));
     }
 
     /**
@@ -138,21 +137,16 @@ public class TournamentController {
     @PostMapping("/join")
     public ResponseEntity<?> joinTournamentAsClub(
             @Valid @RequestBody TournamentJoinDTO tournamentJoinDTO,
-            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = true) String token) {
         if (token == null || !token.startsWith("Bearer ")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization token is missing or invalid" + token);
         }
 
-        /*
-            NOTE: i removed check on whether the user is the captain
-            this is because i have to remove clubservice instance var to remove club dependency
-            i think we can handle this in the front end, but im not sure, will note down
-        */
         TournamentResponseDTO joinedTournament = null;
         try {
-            joinedTournament = tournamentService.joinTournamentAsClub(tournamentJoinDTO);
+            joinedTournament = tournamentService.joinTournamentAsClub(tournamentJoinDTO, token);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Your club does not have enough players");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
 
         return new ResponseEntity<>(joinedTournament, HttpStatus.CREATED);

@@ -22,6 +22,7 @@ public class Match {
     private Long id;
 
     private boolean isOver;
+    private Long matchNumber;
 
     @JsonIgnore
     @ManyToOne

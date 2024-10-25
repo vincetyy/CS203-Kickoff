@@ -9,15 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-import com.crashcourse.kickoff.tms.match.model.Round;
-import com.crashcourse.kickoff.tms.match.service.MatchService;
+import com.crashcourse.kickoff.tms.club.model.ClubProfile;
+
+import com.crashcourse.kickoff.tms.match.model.*;
+import com.crashcourse.kickoff.tms.match.service.*;
 
 import com.crashcourse.kickoff.tms.location.model.Location;
 import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
@@ -29,6 +28,7 @@ import com.crashcourse.kickoff.tms.tournament.exception.*;
 import com.crashcourse.kickoff.tms.tournament.model.*;
 import com.crashcourse.kickoff.tms.tournament.repository.PlayerAvailabilityRepository;
 import com.crashcourse.kickoff.tms.tournament.repository.TournamentRepository;
+
 import com.crashcourse.kickoff.tms.security.JwtUtil;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -46,7 +46,16 @@ public class TournamentServiceImpl implements TournamentService {
     private final LocationRepository locationRepository;
     private final LocationService locationService;
     private final PlayerAvailabilityRepository playerAvailabilityRepository;
-    private final MatchService matchService;
+
+    private final BracketService singleEliminationService;
+
+    @Autowired
+    private final JwtUtil jwtUtil;
+
+    /*
+     * someone lmk if this should go into .env instead
+     */
+    private final String clubUrl = "http://localhost:8082/api/v1/clubs/";
 
     @Autowired
     private RestTemplate restTemplate;
@@ -98,14 +107,31 @@ public class TournamentServiceImpl implements TournamentService {
         return mapToResponseDTO(updatedTournament);
     }
 
-    public List<Round> startTournament(Long id) {
+    public TournamentResponseDTO startTournament(Long id) {
         Tournament tournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + id));
         if (tournament.getJoinedClubIds() == null || tournament.getJoinedClubIds().size() == 0) {
             throw new EntityNotFoundException("No clubs found in tournament with id: " + id);
         }
-        System.out.println(tournament.getJoinedClubIds().size());
-        return matchService.createBracket(id, tournament.getJoinedClubIds().size());
+        /*
+         * Prevent re-creation of bracket
+         */
+        if (tournament.getBracket() != null) {
+            throw new RuntimeException("Bracket has already been created for tournament with id: " + id);
+        }
+
+        /*
+         * Adding this to handle different format bracket creation
+         */
+        KnockoutFormat knockoutFormat = tournament.getKnockoutFormat();
+        if (KnockoutFormat.SINGLE_ELIM.equals(knockoutFormat)) {
+            Bracket bracket = singleEliminationService.createBracket(id, tournament.getJoinedClubIds().size());
+            tournament.setBracket(bracket);
+            Tournament savedTournament = tournamentRepository.save(tournament);
+            return mapToResponseDTO(savedTournament);
+        } else {
+            throw new UnsupportedOperationException("Unsupported tournament format: " + knockoutFormat);
+        }
     }
 
     @Override
@@ -178,7 +204,7 @@ public class TournamentServiceImpl implements TournamentService {
                 tournament.getMaxRank(),
                 clubIds,
                 tournament.getHost(),
-                tournament.getRounds()
+                tournament.getBracket()
         );
     }
 
@@ -190,35 +216,50 @@ public class TournamentServiceImpl implements TournamentService {
      */
     @Transactional
     @Override
-    public TournamentResponseDTO joinTournamentAsClub(TournamentJoinDTO dto) {
+    public TournamentResponseDTO joinTournamentAsClub(TournamentJoinDTO dto, String jwtToken) {
+
         Long tournamentId = dto.getTournamentId();
         Tournament tournament = tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + tournamentId));
 
-        Long clubId = dto.getClubId(); // do i need to handle if clubId is null? 
-
         /*
-         * refer to ClubController.java
-         */
-        String clubServiceUrl = "http://localhost:8082/api/v1/clubs/" + clubId + "/players";
-
-        JwtUtil help = new JwtUtil();
-        String jwtToken = help.generateJwtToken();
+        * Refer to ClubController.java
+        * Now receiving a ClubProfile instead of a list of player IDs
+        */
+        Long clubId = dto.getClubId();
+        String clubServiceUrl = clubUrl + clubId;
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + jwtToken);
-        HttpEntity<Long> request = new HttpEntity<>(clubId, headers);
-        System.out.println((request));
+        jwtToken = jwtToken.substring(7);
+        headers.set("Authorization", jwtToken);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
 
-        ResponseEntity<List<Long>> response = restTemplate.exchange(
-            clubServiceUrl, 
-            HttpMethod.GET, 
-            request, 
-            new ParameterizedTypeReference<List<Long>>() {}
+        // Fetch the ClubProfile from the club service
+        ResponseEntity<ClubProfile> response = restTemplate.exchange(
+                clubServiceUrl,
+                HttpMethod.GET,
+                request,
+                ClubProfile.class
         );
-        System.out.println(response);
 
-        List<Long> players = response.getBody();
+        if (response.getStatusCode() != HttpStatus.OK) {
+            throw new RuntimeException("Failed to retrieve ClubProfile");
+        }
+
+        ClubProfile clubProfile = response.getBody();
+        if (clubProfile == null) {
+            throw new RuntimeException("Club profile not found.");
+        }
+
+        /*
+         * Validate to check if user is Captain of club
+         */
+        Long userIdFromToken = jwtUtil.extractUserId(jwtToken);
+        // if (clubProfile.getCaptainId() == null || clubProfile.getCaptainId() != userIdFromToken) {
+        //     throw new RuntimeException("Only a club captain can join the tournament for the club.");
+
+
+        List<Long> players = clubProfile.getPlayers();
         if (players == null || tournament.getTournamentFormat().getNumberOfPlayers() > players.size()) {
             throw new NotEnoughPlayersException("Club does not have enough players.");
         }
@@ -231,11 +272,13 @@ public class TournamentServiceImpl implements TournamentService {
             throw new TournamentFullException("Tournament is already full.");
         }
 
+        // Add the club to the tournament
         tournament.getJoinedClubIds().add(clubId);
 
         Tournament updatedTournament = tournamentRepository.save(tournament);
         return mapToResponseDTO(updatedTournament);
     }
+
 
     public void removeClubFromTournament(Long tournamentId, Long clubId) {
         Tournament tournament = tournamentRepository.findById(tournamentId)
