@@ -191,9 +191,17 @@ public class ClubController {
         try {
             Long playerId = playerLeaveRequest.getPlayerId();
             Club updatedClub = clubService.playerLeaveClub(clubId, playerId);
+            
+            if (updatedClub == null) {
+                return new ResponseEntity<>("Club has been disbanded.", HttpStatus.OK);
+            }
+
+            // If successful and the player has left the club
             return new ResponseEntity<>(updatedClub, HttpStatus.OK);
+
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
 }
