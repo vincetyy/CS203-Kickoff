@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RoundRepository extends JpaRepository<Round, Long> {
+    Round findRoundByRoundNumber(Long roundNumber);
 }

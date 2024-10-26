@@ -6,6 +6,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import com.crashcourse.kickoff.tms.security.JwtUtil;
+
 import com.crashcourse.kickoff.tms.tournament.dto.PlayerAvailabilityDTO;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentCreateDTO;
 import com.crashcourse.kickoff.tms.tournament.dto.TournamentJoinDTO;
@@ -14,10 +15,15 @@ import com.crashcourse.kickoff.tms.tournament.dto.TournamentUpdateDTO;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.model.TournamentFilter;
 import com.crashcourse.kickoff.tms.tournament.service.TournamentService;
+
 import com.crashcourse.kickoff.tms.match.model.Bracket;
+import com.crashcourse.kickoff.tms.match.model.Match;
+import com.crashcourse.kickoff.tms.match.service.MatchService;
+import com.crashcourse.kickoff.tms.match.dto.*;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import jakarta.persistence.EntityNotFoundException;
 
 /**
  * REST Controller for managing Tournaments.
@@ -29,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 public class TournamentController {
 
     private final TournamentService tournamentService;
+    private final MatchService matchService;
     private final JwtUtil jwtUtil; // final for constructor injection
 
     /**
@@ -116,6 +123,17 @@ public class TournamentController {
         return ResponseEntity.ok(tournamentService.startTournament(id));
     }
 
+    @PutMapping("{tournamentId}/{matchId}")
+    public ResponseEntity<?> updateMatchInTournament(@PathVariable Long tournamentId, @PathVariable Long matchId, 
+        @RequestBody MatchUpdateDTO matchUpdateDTO, @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = true) String token) {
+        try {
+            Match match = tournamentService.updateMatchInTournament(tournamentId, matchId, matchUpdateDTO, token);
+            return new ResponseEntity<>(match, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     /**
      * Delete a Tournament by its ID.
      *
@@ -146,7 +164,7 @@ public class TournamentController {
         try {
             joinedTournament = tournamentService.joinTournamentAsClub(tournamentJoinDTO, token);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e);
         }
 
         return new ResponseEntity<>(joinedTournament, HttpStatus.CREATED);

@@ -7,7 +7,9 @@ import lombok.AllArgsConstructor;
 @Data
 @AllArgsConstructor
 public class MatchUpdateDTO {
-    private Long matchId;
+    /*
+     * Match Id covered in Path Variable
+     */
     private boolean isOver;
     
     /*

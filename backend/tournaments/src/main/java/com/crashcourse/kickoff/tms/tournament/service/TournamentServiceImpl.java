@@ -17,6 +17,9 @@ import com.crashcourse.kickoff.tms.club.model.ClubProfile;
 
 import com.crashcourse.kickoff.tms.match.model.*;
 import com.crashcourse.kickoff.tms.match.service.*;
+import com.crashcourse.kickoff.tms.match.dto.MatchUpdateDTO;
+import com.crashcourse.kickoff.tms.match.dto.MatchResponseDTO;
+import com.crashcourse.kickoff.tms.match.repository.MatchRepository;
 
 import com.crashcourse.kickoff.tms.location.model.Location;
 import com.crashcourse.kickoff.tms.location.repository.LocationRepository;
@@ -32,6 +35,7 @@ import com.crashcourse.kickoff.tms.tournament.repository.TournamentRepository;
 import com.crashcourse.kickoff.tms.security.JwtUtil;
 
 import jakarta.persistence.EntityNotFoundException;
+
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -44,6 +48,8 @@ public class TournamentServiceImpl implements TournamentService {
     
     private final TournamentRepository tournamentRepository;
     private final LocationRepository locationRepository;
+    private final MatchRepository matchRepository;
+
     private final LocationService locationService;
     private final PlayerAvailabilityRepository playerAvailabilityRepository;
 
@@ -129,6 +135,95 @@ public class TournamentServiceImpl implements TournamentService {
             tournament.setBracket(bracket);
             Tournament savedTournament = tournamentRepository.save(tournament);
             return mapToResponseDTO(savedTournament);
+        } else {
+            throw new UnsupportedOperationException("Unsupported tournament format: " + knockoutFormat);
+        }
+    }
+
+    public Match updateMatchInTournament(Long tournamentId, Long matchId, MatchUpdateDTO matchUpdateDTO, String jwtToken) {
+
+        /*
+         * Handle JwtToken
+         */
+        jwtToken = jwtToken.substring(7);
+
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+            .orElseThrow(() -> new EntityNotFoundException("Tournament not found with ID: " + tournamentId));
+
+        Match match = matchRepository.findById(matchId)
+            .orElseThrow(() -> new EntityNotFoundException("Match not found with ID: " + matchId));
+
+        Long club1Id = matchUpdateDTO.getClub1Id();
+        Long club2Id = matchUpdateDTO.getClub2Id();
+        /*
+         * Validation for Club1
+         */
+        String clubServiceUrl = clubUrl + club1Id;
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", jwtToken);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+        ResponseEntity<ClubProfile> response = restTemplate.exchange(
+                clubServiceUrl,
+                HttpMethod.GET,
+                request,
+                ClubProfile.class
+        );
+        if (response.getStatusCode() != HttpStatus.OK) {
+            throw new RuntimeException("Failed to retrieve ClubProfile");
+        }
+        if (response.getBody() == null) {
+            throw new RuntimeException("Club profile not found.");
+        }
+
+        /*
+         * Validation for Club2
+         */
+        clubServiceUrl = clubUrl + club2Id;
+        headers = new HttpHeaders();
+        headers.set("Authorization", jwtToken);
+        request = new HttpEntity<>(headers);
+        response = restTemplate.exchange(
+                clubServiceUrl,
+                HttpMethod.GET,
+                request,
+                ClubProfile.class
+        );
+        if (response.getStatusCode() != HttpStatus.OK) {
+            throw new RuntimeException("Failed to retrieve ClubProfile");
+        }
+        if (response.getBody() == null) {
+            throw new RuntimeException("Club profile not found with ID: " + club2Id);
+        }
+
+        /*
+         * Validation for Winning Club
+         */
+        Long winningClubId = matchUpdateDTO.getWinningClubId();
+        if (!winningClubId.equals(matchUpdateDTO.getClub1Id()) &&
+                            !winningClubId.equals(matchUpdateDTO.getClub2Id())) {
+            throw new RuntimeException("Invalid winning club");
+        }
+
+        /*
+         * Update Clubs
+         */
+        match.setClub1Id(matchUpdateDTO.getClub1Id());
+        match.setClub2Id(matchUpdateDTO.getClub2Id());
+
+        /*
+         * Update Score
+         */
+        match.setClub1Score(matchUpdateDTO.getClub1Score());
+        match.setClub2Score(matchUpdateDTO.getClub2Score());
+        match.setWinningClubId(winningClubId);
+
+        /*
+         * Adding this to handle different bracket progression formats
+         */
+        KnockoutFormat knockoutFormat = tournament.getKnockoutFormat();
+        if (KnockoutFormat.SINGLE_ELIM.equals(knockoutFormat)) {
+            Match updatedMatch = singleEliminationService.updateMatch(tournament, match, matchUpdateDTO);
+            return updatedMatch;
         } else {
             throw new UnsupportedOperationException("Unsupported tournament format: " + knockoutFormat);
         }
@@ -234,7 +329,6 @@ public class TournamentServiceImpl implements TournamentService {
         headers.set("Authorization", jwtToken);
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
-        // Fetch the ClubProfile from the club service
         ResponseEntity<ClubProfile> response = restTemplate.exchange(
                 clubServiceUrl,
                 HttpMethod.GET,
@@ -272,9 +366,18 @@ public class TournamentServiceImpl implements TournamentService {
             throw new TournamentFullException("Tournament is already full.");
         }
 
-        // Add the club to the tournament
-        tournament.getJoinedClubIds().add(clubId);
+        /*
+         * Validation for elo range
+         */
+        double elo = clubProfile.getElo();
+        if (tournament.getMinRank() != null && elo < tournament.getMinRank()) {
+            throw new RuntimeException("Club does not meet tournament minimum elo requirement.");
+        }
+        if (tournament.getMaxRank() != null && elo > tournament.getMaxRank()) {
+            throw new RuntimeException("Club exceeds tournament maximum elo requirement.");
+        }
 
+        tournament.getJoinedClubIds().add(clubId);
         Tournament updatedTournament = tournamentRepository.save(tournament);
         return mapToResponseDTO(updatedTournament);
     }
