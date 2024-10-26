@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -55,13 +56,12 @@ public class TournamentServiceImpl implements TournamentService {
 
     private final BracketService singleEliminationService;
 
+    private Dotenv dotenv;
+
     @Autowired
     private final JwtUtil jwtUtil;
 
-    /*
-     * someone lmk if this should go into .env instead
-     */
-    private final String clubUrl = "http://localhost:8082/api/v1/clubs/";
+    private String clubUrl;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -312,6 +312,13 @@ public class TournamentServiceImpl implements TournamentService {
     @Transactional
     @Override
     public TournamentResponseDTO joinTournamentAsClub(TournamentJoinDTO dto, String jwtToken) {
+
+        clubUrl = System.getenv("ALB_URL");
+        if (clubUrl == null) {
+            dotenv = Dotenv.load();
+            clubUrl = dotenv.get("CLUB_SERVICE_URL");  // Load from dotenv if system env is null
+        }
+        clubUrl += "clubs/";
 
         Long tournamentId = dto.getTournamentId();
         Tournament tournament = tournamentRepository.findById(tournamentId)

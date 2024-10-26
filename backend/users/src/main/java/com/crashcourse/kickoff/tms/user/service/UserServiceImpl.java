@@ -36,6 +36,14 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public User addUser(NewUserDTO newUserDTO) {
+        if (users.findByUsername(newUserDTO.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("An account with the username " + newUserDTO.getUsername() + " has been registered!");
+        }
+        if (users.findByEmail(newUserDTO.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("An account with the email " + newUserDTO.getUsername() + " has been registered!");
+        }
+
+
         User newUser = new User();
         newUser.setUsername(newUserDTO.getUsername());
         newUser.setPassword(encoder.encode(newUserDTO.getPassword()));
