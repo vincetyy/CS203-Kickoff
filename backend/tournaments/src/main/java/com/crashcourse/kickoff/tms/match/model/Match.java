@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Data
+@Table(name = "GAME") // Match is a reserved SQL keyword
 public class Match {
 
     @Id
