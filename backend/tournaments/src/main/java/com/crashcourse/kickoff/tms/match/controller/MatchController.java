@@ -39,13 +39,13 @@ public class MatchController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateMatch(@PathVariable Long id, @RequestBody MatchUpdateDTO matchUpdateDTO) {
-        try {
-            MatchResponseDTO matchResponseDTO = matchService.updateMatch(id, matchUpdateDTO);
-            return new ResponseEntity<>(matchResponseDTO, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
+    // @PutMapping("{tournamentId}/{matchId}")
+    // public ResponseEntity<?> updateMatch(@PathVariable Long tournamentId, @PathVariable Long matchId, @RequestBody MatchUpdateDTO matchUpdateDTO) {
+    //     try {
+    //         MatchResponseDTO matchResponseDTO = matchService.updateMatch(tournamentId, matchId, matchUpdateDTO);
+    //         return new ResponseEntity<>(matchResponseDTO, HttpStatus.OK);
+    //     } catch (EntityNotFoundException e) {
+    //         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    //     }
+    // }
 }

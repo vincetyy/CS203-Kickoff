@@ -9,5 +9,5 @@ import com.crashcourse.kickoff.tms.match.dto.*;
 public interface MatchService {
     Match createMatch(Long tournamentId, Long matchNumber);
     Match getMatchById(Long id);
-    MatchResponseDTO updateMatch(Long id, MatchUpdateDTO matchUpdateDTO);
+    // MatchResponseDTO updateMatch(Long tournamentId, Long matchId, MatchUpdateDTO matchUpdateDTO);
 }

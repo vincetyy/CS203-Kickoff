@@ -10,6 +10,7 @@ import com.crashcourse.kickoff.tms.match.model.Round;
 
 import com.crashcourse.kickoff.tms.match.repository.MatchRepository;
 import com.crashcourse.kickoff.tms.match.repository.RoundRepository;
+
 import com.crashcourse.kickoff.tms.match.dto.*;
 import com.crashcourse.kickoff.tms.tournament.model.Tournament;
 import com.crashcourse.kickoff.tms.tournament.repository.TournamentRepository;
@@ -27,6 +28,9 @@ public class MatchServiceImpl implements MatchService {
     @Autowired
     private RoundRepository roundRepository;
 
+    @Autowired
+    private TournamentRepository tournamentRepository;
+
     /*
      * Matches can now only be created through
      * create bracket
@@ -35,7 +39,7 @@ public class MatchServiceImpl implements MatchService {
     public Match createMatch(Long roundId, Long matchNumber) {
         Match match = new Match();
         match.setMatchNumber(matchNumber);
-        
+
         Round round = roundRepository.findById(roundId)
             .orElseThrow(() -> new EntityNotFoundException("Round not found with id: " + roundId));
         match.setRound(round);
@@ -49,33 +53,7 @@ public class MatchServiceImpl implements MatchService {
             .orElseThrow(() -> new EntityNotFoundException("Match not found with ID: " + id));
     }
 
-    @Override
-    public MatchResponseDTO updateMatch(Long id, MatchUpdateDTO matchUpdateDTO) {
-        Match foundMatch = matchRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Match not found with ID: " + id));
-
-        /*
-         * Update Score
-         */
-        foundMatch.setClub1Score(matchUpdateDTO.getClub1Score());
-        foundMatch.setClub2Score(matchUpdateDTO.getClub2Score());
-        foundMatch.setWinningClubId(matchUpdateDTO.getWinningClubId());
-
-        /*
-         * If over, send winner to next round
-         */
-        if (matchUpdateDTO.isOver()) {
-            
-        }
-        
-        /*
-         * Save to repository
-         */
-        matchRepository.save(foundMatch);
-
-        return mapToResponseDTO(foundMatch);
-    }
-
+  
     /**
      * Maps Tournament entity to TournamentResponseDTO.
      *
