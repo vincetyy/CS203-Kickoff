@@ -24,23 +24,6 @@ variable "aws_region" {
   default     = "ap-southeast-1" # Singapore
 }
 
-# variable "users_app_name" {
-#   type        = string
-#   description = "Name of users container"
-#   default     = "kickoff-users"
-# }
-
-# variable "users_app_image" {
-#   type        = string
-#   description = "Docker image to run in the ECS cluster"
-#   default     = "vincetyy/kickoff-users:latest"
-# }
-
-# variable "users_app_port" {
-#   type        = string
-#   default     = "8081"
-# }
-
 variable "app_count" {
   type        = number
   description = "Number of docker containers to run"
@@ -53,21 +36,16 @@ variable "health_check_path" {
   description = "Health check path of the app"
 }
 
-variable "kickoff_db_endpoint" {
-  type = string
-  description = "Endpoint for DB"
-}
-
 variable "fargate_cpu" {
   type        = string
   description = "Fargate instance CPU units to provision (1 vCPU = 1024 CPU units)"
-  default     = "1024"
+  default     = "256"
 }
 
 variable "fargate_memory" {
   type        = string
   description = "Fargate instance memory to provision (in MiB)"
-  default     = "2048"
+  default     = "512"
 }
 
 variable "database_name" {
@@ -88,8 +66,9 @@ variable "database_password" {
 variable "services" {
   type = map(object({
     cluster_name = string
+    db_endpoint  = string
     app_image    = string
     app_port     = number
-    path_pattern       = list(string)
+    path_pattern = list(string)
   }))
 }

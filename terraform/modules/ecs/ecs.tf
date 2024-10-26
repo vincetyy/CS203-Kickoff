@@ -51,7 +51,7 @@ resource "aws_ecs_task_definition" "app" {
     fargate_memory    = var.fargate_memory
     aws_region        = var.aws_region
     log_group         = "/ecs/${each.key}"
-    DATABASE_HOST     = var.kickoff_db_endpoint
+    DATABASE_HOST     = each.value.db_endpoint
     DATABASE_PORT     = 3306
     DATABASE_NAME     = var.database_name
     DATABASE_USER     = var.database_username
