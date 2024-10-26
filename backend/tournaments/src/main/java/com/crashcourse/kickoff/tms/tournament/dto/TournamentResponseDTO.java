@@ -3,7 +3,7 @@ package com.crashcourse.kickoff.tms.tournament.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.crashcourse.kickoff.tms.match.model.Round;
+import com.crashcourse.kickoff.tms.match.model.Bracket;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -48,5 +48,5 @@ public class TournamentResponseDTO {
         private String name;
     }
 
-    private List<Round> rounds;
+    private Bracket bracket;
 }

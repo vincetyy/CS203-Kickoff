@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.crashcourse.kickoff.tms.location.model.Location;
-import com.crashcourse.kickoff.tms.match.model.Round;
+import com.crashcourse.kickoff.tms.match.model.Bracket;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -50,8 +50,8 @@ public class Tournament {
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL)  
     private List<PlayerAvailability> playerAvailabilities = new ArrayList<>();
 
-    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL)
-    private List<Round> rounds = new ArrayList<>();
+    @OneToOne(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Bracket bracket;
 
     public String getFormat() {
         return tournamentFormat.toString();
