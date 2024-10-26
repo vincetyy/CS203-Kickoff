@@ -15,6 +15,7 @@ import com.crashcourse.kickoff.tms.club.model.Club;
 import com.crashcourse.kickoff.tms.club.service.ClubService.*;
 import com.crashcourse.kickoff.tms.club.service.ClubServiceImpl;
 import com.crashcourse.kickoff.tms.club.model.ClubProfile;
+import com.crashcourse.kickoff.tms.club.exception.ClubNotFoundException;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -199,8 +200,18 @@ public class ClubController {
             // If successful and the player has left the club
             return new ResponseEntity<>(updatedClub, HttpStatus.OK);
 
+        } catch (ClubNotFoundException e) {
+            return new ResponseEntity<>("Club not found.", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            if (e.getMessage().equals("You must transfer the captaincy before leaving the club.")) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN); // Use 403 for permission-related issues
+            } else if (e.getMessage().equals("Player is not a member of this club.")) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            } else {
+                // For other unexpected errors, log and return a generic response
+                e.printStackTrace();
+                return new ResponseEntity<>("An error occurred while trying to leave the club", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 

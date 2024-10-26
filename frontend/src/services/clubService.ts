@@ -55,11 +55,16 @@ export const updatePlayerApplication = async (clubId: number, playerId: number, 
 };
 
 export const leaveClub = async (clubId: number, playerId: number): Promise<AxiosResponse> => {
-  const response = await api.patch(`/clubs/${clubId}/leavePlayer`, playerId, {
-    baseURL: clubBaseURL,
-  });
+  const response = await api.patch(
+    `/clubs/${clubId}/leavePlayer`,
+    { playerId }, 
+    {
+      baseURL: clubBaseURL,
+    }
+  );
   return response;
 };
+
 
 export const getPlayersInClub = async (clubId: number): Promise<AxiosResponse> => {
   const response = await api.patch(`/clubs/${clubId}/players`, {
