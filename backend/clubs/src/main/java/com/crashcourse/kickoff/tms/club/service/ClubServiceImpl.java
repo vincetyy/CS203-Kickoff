@@ -349,18 +349,33 @@ public class ClubServiceImpl implements ClubService {
         applicationRepository.deleteById(playerApplication.getId());
     }
 
-    @Override
     @Transactional
-    public Club playerLeaveClub(Long clubId, Long playerId) throws Exception{
+    @Override
+    public Club playerLeaveClub(Long clubId, Long playerId) throws Exception {
         Club club = clubRepository.findById(clubId).orElseThrow(() -> 
             new ClubNotFoundException("Club with ID " + clubId + " not found"));
-
-        boolean removed = club.getPlayers().remove(playerId);
-        if (!removed) {
-            throw new Exception("Player is not a member of this club");
+        System.out.println("Club and Player IDs: " + clubId + ", " + playerId);
+    
+        if (club.getCaptainId().equals(playerId)) {
+            // If the captain is the only player, disband the club
+            if (club.getPlayers().size() == 1) {
+                System.out.println("Disbanding club as player is the last member and captain.");
+                clubRepository.deleteById(clubId);
+                return null;
+            } else {
+                throw new Exception("You must transfer the captaincy before leaving the club.");
+            }
         }
-
+    
+        // Remove the player from the club if they are not the captain
+        boolean removed = club.getPlayers().remove(playerId);
+        System.out.println("Player removed from club: " + removed);
+        if (!removed) {
+            throw new Exception("Player is not a member of this club.");
+        }
+    
         return clubRepository.save(club);
     }
+
 
 }

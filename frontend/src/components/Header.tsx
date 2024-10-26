@@ -67,6 +67,7 @@ export default function Header() {
 
     // Optionally, show a toast to confirm the logout action
     toast('You have been logged out.');
+    navigate('/profile');
   };
 
   return (
