@@ -38,8 +38,9 @@ api.interceptors.response.use(
       // Check for 401 Unauthorized response and clear the token from localStorage
       if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken'); // Unload token from localStorage on 401
-          // Use window.location.href for global navigation
-          window.location.href = "/profile";
+          if (window.location.pathname !== "/profile") {
+            window.location.href = "/profile";
+          }
       }
 
       // Return the error response

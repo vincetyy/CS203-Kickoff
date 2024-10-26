@@ -30,7 +30,7 @@ public class ClubController {
     @Autowired
     private final JwtUtil jwtUtil; // final for constructor injection
 
-    @PostMapping("/create-club")
+    @PostMapping("/createClub")
     public ResponseEntity<?> createClub(@Valid @RequestBody ClubCreationRequest clubRequest,
      @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         try {

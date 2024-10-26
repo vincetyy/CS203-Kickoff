@@ -20,7 +20,7 @@ export const applyToClub = async (clubId: number, playerId: number, desiredPosit
 };
 
 export const createClub = async (clubData: object): Promise<AxiosResponse> => {
-  const response = await api.post('/clubs', clubData, {
+  const response = await api.post('/clubs/createClub', clubData, {
     baseURL: clubBaseURL,
   });
   return response;
