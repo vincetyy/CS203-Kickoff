@@ -164,6 +164,7 @@ public class TournamentController {
         try {
             joinedTournament = tournamentService.joinTournamentAsClub(tournamentJoinDTO, token);
         } catch (Exception e) {
+            System.out.println(e);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e);
         }
 

@@ -1,4 +1,4 @@
-package com.crashcourse.kickoff.tms.club.model;
+package com.crashcourse.kickoff.tms.club;
 
 import java.util.List;
 
