@@ -3,10 +3,8 @@ package com.crashcourse.kickoff.tms.match.service;
 import java.util.*;
 
 import org.springframework.stereotype.Service;
-import org.springframework.http.*;
 
 import com.crashcourse.kickoff.tms.match.model.*;
-import com.crashcourse.kickoff.tms.match.service.*;
 import com.crashcourse.kickoff.tms.match.dto.MatchUpdateDTO;
 import com.crashcourse.kickoff.tms.match.repository.SingleEliminationBracketRepository;
 import com.crashcourse.kickoff.tms.match.repository.MatchRepository;
@@ -59,12 +57,11 @@ public class SingleEliminationServiceImpl implements SingleEliminationService {
         }
 
         bracket.setRounds(bracketRounds);
-        // seedClubs(bracketRounds.get(0), joinedClubIds, jwtToken);
+        seedClubs(bracketRounds.get(0), joinedClubIds, jwtToken);
         bracketRepository.save(bracket);        
 
         bracket.setTournament(tournament);
         tournament.setBracket(bracket);
-
 
         return bracket;
     }
@@ -93,7 +90,6 @@ public class SingleEliminationServiceImpl implements SingleEliminationService {
             mirroredSeeds.add(bracketSize + 1 - seed);
         }
 
-        // Combine the previous seeds with the mirrored seeds in the desired order
         List<Integer> combinedSeeds = new ArrayList<>();
         for (int i = 0; i < prevSeeds.size(); i++) {
             combinedSeeds.add(prevSeeds.get(i));
@@ -105,63 +101,66 @@ public class SingleEliminationServiceImpl implements SingleEliminationService {
 
     @Override
     public void seedClubs(Round firstRound, List<Long> clubIds, String jwtToken) {
+        // Fetch club profiles
         List<ClubProfile> clubs = new ArrayList<>();
         for (Long id : clubIds) {
-            clubs.add(clubServiceClient.getClubProfileById(id, jwtToken));
+            ClubProfile club = clubServiceClient.getClubProfileById(id, jwtToken);
+            if (club != null) {
+                clubs.add(club);
+            }
         }
+
         clubs.sort(Comparator.comparingDouble(ClubProfile::getElo).reversed());
+        System.out.println(clubs);
 
         int numberOfClubs = clubs.size();
         int bracketSize = (int) Math.pow(2, Math.ceil(Math.log(numberOfClubs) / Math.log(2)));
         int byes = bracketSize - numberOfClubs;
 
-        System.out.println("Total Clubs: " + numberOfClubs);
-        System.out.println("Bracket Size: " + bracketSize);
-        System.out.println("Number of Byes: " + byes);
-
         List<Match> matches = firstRound.getMatches();
         int totalMatches = matches.size();
-        int matchIndex = 0;
 
         List<Integer> seedPositions = generateStandardSeedOrder(bracketSize);
-        System.out.println(seedPositions);
+        if (totalMatches * 2 < seedPositions.size()) {
+            throw new RuntimeException("Not enough matches to seed all clubs.");
+        }
 
-        for (int i = 0; i < seedPositions.size(); i++) {
-            if (matchIndex >= totalMatches) {
-                throw new RuntimeException("Not enough matches to seed all clubs.");
-            }
-            Match match = matches.get(matchIndex);
-            int seed = seedPositions.get(i);
+        int seedIndex = 0;
 
-            if (seed <= numberOfClubs) {
-                Long clubId = clubs.get(seed - 1).getId(); // seeds are 1-based
-                if (i % 2 == 0) {
-                    match.setClub1Id(clubId);
+        for (Match match : matches) {
+            if (seedIndex < seedPositions.size()) {
+                int seed1 = seedPositions.get(seedIndex);
+                if (seed1 <= numberOfClubs) {
+                    Long club1Id = clubs.get(seed1 - 1).getId(); // seeds are 1-based
+                    match.setClub1Id(club1Id);
                 } else {
-                    match.setClub2Id(clubId);
-                }
-            } else {
-                // Assign bye to the top seeds
-                if (i < byes) {
-                    Long clubId = clubs.get(i).getId(); // Assign to highest seeds first
-                    if (i % 2 == 0) {
-                        match.setClub1Id(clubId);
-                        match.setClub2Id(null); // Bye
-                    } else {
-                        match.setClub2Id(clubId);
+                    if (byes > 0) {
                         match.setClub1Id(null); // Bye
+                        byes--;
                     }
                 }
+                seedIndex++;
+            }
+
+            if (seedIndex < seedPositions.size()) {
+                int seed2 = seedPositions.get(seedIndex);
+                if (seed2 <= numberOfClubs) {
+                    Long club2Id = clubs.get(seed2 - 1).getId(); // seeds are 1-based
+                    match.setClub2Id(club2Id);
+                } else {
+                    if (byes > 0) {
+                        match.setClub2Id(null); // Bye
+                        byes--;
+                    }
+                }
+                seedIndex++;
             }
 
             matchRepository.save(match);
-            matchIndex++;
         }
 
-        // Save the updated round
         roundRepository.save(firstRound);
     }
-
 
     @Override
     public Match updateMatch(Tournament tournament, Match match, MatchUpdateDTO matchUpdateDTO) {
