@@ -22,3 +22,9 @@ variable "database_password" {
   type        = string
   description = "value of the password for the database"
 }
+
+variable "applications" {
+  type = map(object({
+    identifier = string
+  }))
+}

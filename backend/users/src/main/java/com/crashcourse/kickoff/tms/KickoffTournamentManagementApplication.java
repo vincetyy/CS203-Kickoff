@@ -33,10 +33,14 @@ public class KickoffTournamentManagementApplication {
 		// Creating admin user id 1
 		NewUserDTO adminDTO = new NewUserDTO("admin", "admin@email.com", "password",
 				new String[] { "POSITION_Goalkeeper", "POSITION_Midfielder" }, "player");
-		User admin = userService.addUser(adminDTO);
-		admin = userService.addRolesToUser(admin, SecurityConfig.getAllRolesAsSet());
-		admin = userService.addHostProfileToUser(admin);
-		System.out.println("[Added admin]: " + admin.getUsername());
+		try {
+			User admin = userService.addUser(adminDTO);
+			admin = userService.addRolesToUser(admin, SecurityConfig.getAllRolesAsSet());
+			admin = userService.addHostProfileToUser(admin);
+			System.out.println("[Added admin]: " + admin.getUsername());
+		} catch (IllegalArgumentException e) {
+			System.out.println("admin has been created!");
+		}
 
 		// Creating dummyUsers, each one name will be User0, User1, User2, ... and pw will be password0, password1, password2, ...
 		final int NUM_DUMMY_USERS = 50;
@@ -60,9 +64,14 @@ public class KickoffTournamentManagementApplication {
 
 			NewUserDTO dummyUserDTO = new NewUserDTO(dummyNames[i-1] + i, "user" + i + "@email.com",
 					"password" + i, positionArr, "player");
-			User dummy = userService.addUser(dummyUserDTO);
-			// playerProfileService.addPlayerProfile(dummy, dummyUserDTO);
-			System.out.println("[Added dummy user]: " + dummy.getUsername());
+
+			try {
+				User dummy = userService.addUser(dummyUserDTO);
+				System.out.println("[Added dummy user]: " + dummy.getUsername());
+			} catch (IllegalArgumentException e) {
+				System.out.println(dummyUserDTO.getUsername() + " has been created!");
+			}
+			
 		}
 	}
 }

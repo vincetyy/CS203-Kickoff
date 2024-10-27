@@ -17,6 +17,4 @@ public interface PlayerProfileService {
     PlayerProfile updatePlayerProfile(PlayerProfile playerProfile, PlayerProfileUpdateDTO playerProfileUpdateDTO);
 
     public boolean isOwner(Long profileId, String username);
-    
-    List<PlayerProfile> getAllPlayers();
 }

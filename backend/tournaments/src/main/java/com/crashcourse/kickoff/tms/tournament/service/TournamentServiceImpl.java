@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -58,8 +59,11 @@ public class TournamentServiceImpl implements TournamentService {
 
     private final SingleEliminationService singleEliminationService;
 
+    private Dotenv dotenv;
+
     @Autowired
     private final JwtUtil jwtUtil;
+
     @Autowired
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -290,7 +294,6 @@ public class TournamentServiceImpl implements TournamentService {
     @Transactional
     @Override
     public TournamentResponseDTO joinTournamentAsClub(TournamentJoinDTO dto, String jwtToken) {
-
         Long tournamentId = dto.getTournamentId();
         Tournament tournament = tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + tournamentId));

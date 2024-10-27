@@ -90,10 +90,4 @@ public class PlayerProfileController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
-    @GetMapping("/allPlayers")
-    public List<PlayerProfile> getAllPlayers() {
-        return playerProfileService.getAllPlayers();
-    }
-
 }
