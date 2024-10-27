@@ -56,7 +56,7 @@ public class TournamentServiceImpl implements TournamentService {
     private final LocationService locationService;
     private final PlayerAvailabilityRepository playerAvailabilityRepository;
 
-    private final BracketService singleEliminationService;
+    private final SingleEliminationService singleEliminationService;
 
     @Autowired
     private final JwtUtil jwtUtil;
@@ -119,7 +119,7 @@ public class TournamentServiceImpl implements TournamentService {
         return mapToResponseDTO(updatedTournament);
     }
 
-    public TournamentResponseDTO startTournament(Long id) {
+    public TournamentResponseDTO startTournament(Long id, String jwtToken) {
         Tournament tournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + id));
         if (tournament.getJoinedClubIds() == null || tournament.getJoinedClubIds().size() == 0) {
@@ -137,7 +137,7 @@ public class TournamentServiceImpl implements TournamentService {
          */
         KnockoutFormat knockoutFormat = tournament.getKnockoutFormat();
         if (KnockoutFormat.SINGLE_ELIM.equals(knockoutFormat)) {
-            Bracket bracket = singleEliminationService.createBracket(id, tournament.getJoinedClubIds().size());
+            Bracket bracket = singleEliminationService.createBracket(id, tournament.getJoinedClubIds(), jwtToken);
             tournament.setBracket(bracket);
             Tournament savedTournament = tournamentRepository.save(tournament);
             return mapToResponseDTO(savedTournament);

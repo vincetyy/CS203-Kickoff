@@ -12,9 +12,12 @@ import com.crashcourse.kickoff.tms.match.repository.SingleEliminationBracketRepo
 import com.crashcourse.kickoff.tms.match.repository.MatchRepository;
 import com.crashcourse.kickoff.tms.match.repository.RoundRepository;
 
+import com.crashcourse.kickoff.tms.club.ClubProfile;
 
 import com.crashcourse.kickoff.tms.tournament.model.*;
 import com.crashcourse.kickoff.tms.tournament.repository.TournamentRepository;
+
+import com.crashcourse.kickoff.tms.client.ClubServiceClient;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -28,34 +31,137 @@ public class SingleEliminationServiceImpl implements SingleEliminationService {
     private final RoundRepository roundRepository;
     private final MatchRepository matchRepository;
     private final RoundService roundService;
+    private final ClubServiceClient clubServiceClient;
 
     @Override
-    public Bracket createBracket(Long tournamentId, int numberOfClubs) {
+    public Bracket createBracket(Long tournamentId, List<Long> joinedClubIds, String jwtToken) {
+        /*
+         * Validation
+         */
+        int numberOfClubs = joinedClubIds.size();
         if (numberOfClubs == 0) {
             throw new EntityNotFoundException("No clubs found");
         }
         Tournament tournament = tournamentRepository.findById(tournamentId)
             .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + tournamentId));
         
-
+        /*
+         * Create Bracket
+         */
         int numberOfRounds = (int) Math.ceil(Math.log(numberOfClubs) / Math.log(2));
-
         SingleEliminationBracket bracket = new SingleEliminationBracket();
         List<Round> bracketRounds = new ArrayList<>();
 
-        while (numberOfRounds >= 0) {
-            int size = (int) Math.pow(2, numberOfRounds);
+        while (numberOfRounds > 0) {
+            int size = (int) Math.pow(2, numberOfRounds - 1);
             bracketRounds.add(roundService.createRound(size, 1L + numberOfRounds));
             numberOfRounds--;
         }
-    
+
         bracket.setRounds(bracketRounds);
-        bracketRepository.save(bracket);
+        // seedClubs(bracketRounds.get(0), joinedClubIds, jwtToken);
+        bracketRepository.save(bracket);        
 
         bracket.setTournament(tournament);
         tournament.setBracket(bracket);
+
+
         return bracket;
     }
+
+    /*
+     * Seeding Algorithm
+     */
+    private List<Integer> generateStandardSeedOrder(int bracketSize) {
+        if ((bracketSize & (bracketSize - 1)) != 0) {
+            throw new IllegalArgumentException("Bracket size must be a power of 2");
+        }
+        return generateSeedsRecursively(bracketSize);
+    }
+
+    private List<Integer> generateSeedsRecursively(int bracketSize) {
+        if (bracketSize == 1) {
+            List<Integer> seed = new ArrayList<>();
+            seed.add(1);
+            return seed;
+        }
+
+        List<Integer> prevSeeds = generateSeedsRecursively(bracketSize / 2);
+        List<Integer> mirroredSeeds = new ArrayList<>();
+
+        for (int seed : prevSeeds) {
+            mirroredSeeds.add(bracketSize + 1 - seed);
+        }
+
+        // Combine the previous seeds with the mirrored seeds in the desired order
+        List<Integer> combinedSeeds = new ArrayList<>();
+        for (int i = 0; i < prevSeeds.size(); i++) {
+            combinedSeeds.add(prevSeeds.get(i));
+            combinedSeeds.add(mirroredSeeds.get(i));
+        }
+
+        return combinedSeeds;
+    }
+
+    @Override
+    public void seedClubs(Round firstRound, List<Long> clubIds, String jwtToken) {
+        List<ClubProfile> clubs = new ArrayList<>();
+        for (Long id : clubIds) {
+            clubs.add(clubServiceClient.getClubProfileById(id, jwtToken));
+        }
+        clubs.sort(Comparator.comparingDouble(ClubProfile::getElo).reversed());
+
+        int numberOfClubs = clubs.size();
+        int bracketSize = (int) Math.pow(2, Math.ceil(Math.log(numberOfClubs) / Math.log(2)));
+        int byes = bracketSize - numberOfClubs;
+
+        System.out.println("Total Clubs: " + numberOfClubs);
+        System.out.println("Bracket Size: " + bracketSize);
+        System.out.println("Number of Byes: " + byes);
+
+        List<Match> matches = firstRound.getMatches();
+        int totalMatches = matches.size();
+        int matchIndex = 0;
+
+        List<Integer> seedPositions = generateStandardSeedOrder(bracketSize);
+        System.out.println(seedPositions);
+
+        for (int i = 0; i < seedPositions.size(); i++) {
+            if (matchIndex >= totalMatches) {
+                throw new RuntimeException("Not enough matches to seed all clubs.");
+            }
+            Match match = matches.get(matchIndex);
+            int seed = seedPositions.get(i);
+
+            if (seed <= numberOfClubs) {
+                Long clubId = clubs.get(seed - 1).getId(); // seeds are 1-based
+                if (i % 2 == 0) {
+                    match.setClub1Id(clubId);
+                } else {
+                    match.setClub2Id(clubId);
+                }
+            } else {
+                // Assign bye to the top seeds
+                if (i < byes) {
+                    Long clubId = clubs.get(i).getId(); // Assign to highest seeds first
+                    if (i % 2 == 0) {
+                        match.setClub1Id(clubId);
+                        match.setClub2Id(null); // Bye
+                    } else {
+                        match.setClub2Id(clubId);
+                        match.setClub1Id(null); // Bye
+                    }
+                }
+            }
+
+            matchRepository.save(match);
+            matchIndex++;
+        }
+
+        // Save the updated round
+        roundRepository.save(firstRound);
+    }
+
 
     @Override
     public Match updateMatch(Tournament tournament, Match match, MatchUpdateDTO matchUpdateDTO) {

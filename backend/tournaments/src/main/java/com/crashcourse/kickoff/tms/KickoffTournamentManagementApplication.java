@@ -60,7 +60,7 @@ public class KickoffTournamentManagementApplication {
 
 		TournamentCreateDTO tournament2DTO = new TournamentCreateDTO("Sunday Night Mini-Tournament", LocalDateTime.of(
             2024, 10, 20, 19, 00, 00), LocalDateTime.of(
-			2024, 10, 20, 23, 00, 00), location2, 4, TournamentFormat.FIVE_SIDE, KnockoutFormat.DOUBLE_ELIM, new ArrayList<Float>(), 500, 2000);
+			2024, 10, 20, 23, 00, 00), location2, 4, TournamentFormat.FIVE_SIDE, KnockoutFormat.SINGLE_ELIM, new ArrayList<Float>(), 500, 2000);
 		tournamentService.createTournament(tournament2DTO, 2L);
 		System.out.println("[Added tournament 2]");
 
