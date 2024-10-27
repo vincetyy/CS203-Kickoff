@@ -108,7 +108,7 @@ public class TournamentController {
 
     @PostMapping("/{id}/start")
     public ResponseEntity<?> startTournament(@PathVariable Long id,
-                    @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
+                    @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = true) String token) {
         if (token == null || !token.startsWith("Bearer ")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization token is missing or invalid." + token);
         }
@@ -120,7 +120,7 @@ public class TournamentController {
         if (!isOwnerOfTournament) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to start this tournament.");
         }
-        return ResponseEntity.ok(tournamentService.startTournament(id));
+        return ResponseEntity.ok(tournamentService.startTournament(id, token));
     }
 
     @PutMapping("{tournamentId}/{matchId}")
