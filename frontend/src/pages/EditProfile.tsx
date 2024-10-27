@@ -3,10 +3,8 @@ import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { PlayerPosition, PlayerProfile, UserPublicDetails } from '../types/profile';
 import { fetchPlayerProfileById, updatePlayerProfile, fetchUserPublicInfoById } from '../services/userService';
-import { getClubByPlayerId } from '../services/clubService';
 import { useSelector } from 'react-redux';
 import { selectUserId } from '../store/userSlice';
-import { Club } from '../types/club';
 import { toast } from 'react-hot-toast';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +15,6 @@ export default function PlayerProfilePage() {
 
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile | null>(null);
   const [user, setUser] = useState<UserPublicDetails | null>(null);
-  const [club, setClub] = useState<Club | null>(null);
   const [preferredPositions, setPreferredPositions] = useState<PlayerPosition[]>([]);
   const [profileDescription, setProfileDescription] = useState('');
   const [loading, setLoading] = useState(true);
@@ -50,13 +47,6 @@ export default function PlayerProfilePage() {
       } catch (err) {
         console.error('Error fetching player profile:', err);
         setLoading(false);
-      }
-
-      try {
-        const clubResponse = await getClubByPlayerId(userId);
-        setClub(clubResponse);
-      } catch (err) {
-        console.error('Error fetching club:', err);
       }
     };
 

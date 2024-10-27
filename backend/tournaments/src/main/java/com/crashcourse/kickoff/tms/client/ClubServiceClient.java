@@ -18,9 +18,13 @@ public class ClubServiceClient {
     /*
      * should this go into .env?
      */
-    private final String clubUrl = "http://localhost:8082/api/v1/clubs/";
+    private String clubUrl = "http://localhost:8082/api/v1/clubs/";
 
     public ClubServiceClient(RestTemplate restTemplate, JwtTokenProvider jwtTokenProvider) {
+        if (System.getenv("ALB_URL") != null) {
+            clubUrl = System.getenv("ALB_URL");
+            clubUrl += "clubs/";
+        }
         this.restTemplate = restTemplate;
         this.jwtTokenProvider = jwtTokenProvider;
     }
