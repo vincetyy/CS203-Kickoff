@@ -14,6 +14,6 @@ public interface ClubRepository extends JpaRepository<Club, Long> {
     // add query methods (remember that each method's implementation is through the method name)
     Optional<Club> findByName(String name);  
 
-    @Query(value = "SELECT * FROM club WHERE :playerId = ANY(players)", nativeQuery = true)
+    @Query(value = "SELECT c.* FROM club c JOIN club_players cp ON c.id = cp.club_id WHERE cp.players = :playerId", nativeQuery = true)
     Optional<Club> findClubByPlayerId(@Param("playerId") Long playerId);
 }

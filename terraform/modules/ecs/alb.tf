@@ -36,7 +36,7 @@ resource "aws_alb_target_group" "app" {
     matcher             = "200"
     timeout             = "3"
     path                = var.health_check_path
-    unhealthy_threshold = "3"
+    unhealthy_threshold = "4"
   }
 }
 

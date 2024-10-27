@@ -6,6 +6,8 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -42,10 +44,12 @@ public class Club {
     private double ratingDeviation;
 
     private Long captainId;
-
+    
+    @ElementCollection
     private List<Long> players = new ArrayList<>();
 
     private String clubDescription;
 
+    @ElementCollection
     private List<Long> applicants = new ArrayList<>();
 }

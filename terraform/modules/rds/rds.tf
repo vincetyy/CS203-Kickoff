@@ -35,6 +35,8 @@ resource "aws_db_instance" "db_instance" {
   engine_version    = "8.0.36"
   instance_class    = "db.t3.micro"
 
+  # For testing purposes, remove on prod
+  publicly_accessible             = true
   identifier                      = each.value.identifier # takes value from the map
   db_name                         = var.database_name
   username                        = var.database_username
