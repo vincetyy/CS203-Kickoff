@@ -52,7 +52,7 @@ public class SingleEliminationServiceImpl implements SingleEliminationService {
 
         while (numberOfRounds > 0) {
             int size = (int) Math.pow(2, numberOfRounds - 1);
-            bracketRounds.add(roundService.createRound(size, 1L + numberOfRounds));
+            bracketRounds.add(roundService.createRound(size, numberOfRounds));
             numberOfRounds--;
         }
 
@@ -148,8 +148,11 @@ public class SingleEliminationServiceImpl implements SingleEliminationService {
                     Long club2Id = clubs.get(seed2 - 1).getId(); // seeds are 1-based
                     match.setClub2Id(club2Id);
                 } else {
+                    /*
+                     * Send club to next round on a Bye
+                     */
                     if (byes > 0) {
-                        match.setClub2Id(null); // Bye
+                        match.setClub2Id(null);
                         byes--;
                     }
                 }
