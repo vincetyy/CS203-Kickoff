@@ -1,4 +1,11 @@
-# This is the endpoint of the NestJS database instance
-output "kickoff_db_endpoint" {
-  value = aws_rds_cluster_instance.aurora_instance.endpoint
+output "users_db_endpoint" {
+  value = aws_db_instance.db_instance["users"].address
+}
+
+output "tournaments_db_endpoint" {
+  value = aws_db_instance.db_instance["tournaments"].address
+}
+
+output "clubs_db_endpoint" {
+  value = aws_db_instance.db_instance["clubs"].address
 }

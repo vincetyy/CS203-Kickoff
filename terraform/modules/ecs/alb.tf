@@ -20,40 +20,6 @@ resource "aws_alb_listener" "alb_main_listener" {
   }
 }
 
-# resource "aws_alb_target_group" "users_app" {
-#   name        = "users-kickoff-target-group"
-#   port        = 8081
-#   protocol    = "HTTP"
-#   vpc_id      = var.vpc_id
-#   target_type = "ip"
-
-#   health_check {
-#     healthy_threshold   = "2"
-#     interval            = "30"
-#     protocol            = "HTTP"
-#     matcher             = "200"
-#     timeout             = "3"
-#     path                = var.health_check_path
-#     unhealthy_threshold = "2"
-#   }
-# }
-
-# resource "aws_lb_listener_rule" "users_forward" {
-#   listener_arn = aws_alb_listener.alb_main_listener.arn
-
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_alb_target_group.users_app.arn
-#   }
-
-#   condition {
-#     path_pattern {
-#       values = ["/users/*"]
-#     }
-#   }
-
-# }
-
 resource "aws_alb_target_group" "app" {
   for_each = var.services
 
@@ -70,7 +36,7 @@ resource "aws_alb_target_group" "app" {
     matcher             = "200"
     timeout             = "3"
     path                = var.health_check_path
-    unhealthy_threshold = "2"
+    unhealthy_threshold = "3"
   }
 }
 

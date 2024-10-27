@@ -1,7 +1,6 @@
 import api from './api';
 import { Club, ClubProfile } from '../types/club';
 import { AxiosResponse } from 'axios';
-import { PlayerPosition } from '../types/profile';
 
 const clubBaseURL = import.meta.env.VITE_CLUB_SERVICE_BASE_URL || 'http://localhost:8082/api/v1';
 

@@ -23,6 +23,7 @@ export interface UserPublicDetails {
 // Interface for PlayerProfile
 export interface PlayerProfile {
   id: number;
+  user: UserPublicDetails;
   username: string;
   preferredPositions: PlayerPosition[];
   profileDescription: string;

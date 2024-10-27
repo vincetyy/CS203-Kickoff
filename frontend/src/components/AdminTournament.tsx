@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTournamentsAsync } from '../store/tournamentSlice';
 import { Tournament } from '../types/tournament';
@@ -73,6 +73,7 @@ const AdminTournament = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredTournaments.length > 0 ? (
           filteredTournaments.map((tournament: Tournament) => (
+            tournament.id && 
             <TournamentCard
               key={tournament.id}
               id={tournament.id || 0}

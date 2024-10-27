@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button'
@@ -17,7 +17,6 @@ export default function LeaveClubButton() {
   const userClub: Club | null = useSelector(selectUserClub)
   const clubId = userClub?.id
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isCaptain, setIsCaptain] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const handleLeaveClub = async () => {
@@ -47,7 +46,6 @@ export default function LeaveClubButton() {
         if (error.response.status === 500) {
           setError('An unexpected error occurred on the server. Please try again later.')
         } else if (error.response.data === "You must transfer the captaincy before leaving the club.") {
-          setIsCaptain(true)
           setIsDialogOpen(true)
         } else {
           setError(error.response.data || 'An error occurred while trying to leave the club')

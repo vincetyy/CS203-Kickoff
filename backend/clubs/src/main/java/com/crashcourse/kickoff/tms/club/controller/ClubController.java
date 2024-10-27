@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import com.crashcourse.kickoff.tms.club.dto.*;
 import com.crashcourse.kickoff.tms.security.JwtUtil;
 import com.crashcourse.kickoff.tms.club.model.Club;
-import com.crashcourse.kickoff.tms.club.service.ClubService.*;
 import com.crashcourse.kickoff.tms.club.service.ClubServiceImpl;
 import com.crashcourse.kickoff.tms.club.model.ClubProfile;
 import com.crashcourse.kickoff.tms.club.exception.ClubNotFoundException;

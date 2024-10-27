@@ -1,6 +1,7 @@
 package com.crashcourse.kickoff.tms.user;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -67,6 +68,30 @@ public class UserController {
         } catch (Exception e) {
             // Log the error for debugging purposes
             System.err.println("Error fetching user: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred.");
+        }
+    }
+
+    @GetMapping("/publicinfo/all")
+    public ResponseEntity<?> getAllUsersPublicInfo(
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
+        try {
+            List<User> users = userService.getUsers();
+            
+            if (users.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("No users found.");
+            }
+
+            List<UserResponseDTO> userDTOs = users.stream()
+                    .map(user -> new UserResponseDTO(user.getId(), user.getUsername()))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(userDTOs);
+        } catch (Exception e) {
+            // Log the error for debugging purposes
+            System.err.println("Error fetching users: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An unexpected error occurred.");
         }

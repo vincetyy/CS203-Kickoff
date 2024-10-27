@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllPlayersAsync, selectPlayers } from '../store/userSlice';
 import { PlayerProfile } from '../types/profile';
 import PlayerProfileCard from '../components/PlayerProfileCard';
 import { Input } from "../components/ui/input";
 import { Search } from 'lucide-react';
-import { AppDispatch, RootState } from '../store'; 
+import { AppDispatch } from '../store'; 
 import { Button } from "./ui/button";
 
 enum PlayerFilter {
