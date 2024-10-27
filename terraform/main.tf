@@ -5,7 +5,8 @@ module "network" {
 module "rds" {
   source               = "./modules/rds"
   security_group_id    = module.network.db_sg_id
-  db_subnet_group_name = module.network.db_subnet_group_name
+  # For testing purposes, change back to module.network.db_subnet_group_name on prod
+  db_subnet_group_name = module.network.db_public_subnet_group_name
 
   # Database Connection Credentials
   database_name     = var.database_name
