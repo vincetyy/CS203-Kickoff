@@ -27,7 +27,7 @@ resource "aws_ecs_task_definition" "app" {
     DATABASE_USER     = var.database_username
     DATABASE_PASSWORD = var.database_password
 
-    ALB_URL  = "http://${aws_alb.main.dns_name}/api/v1/"
+    ALB_URL = "http://${aws_alb.main.dns_name}/api/v1/"
   })
 }
 
