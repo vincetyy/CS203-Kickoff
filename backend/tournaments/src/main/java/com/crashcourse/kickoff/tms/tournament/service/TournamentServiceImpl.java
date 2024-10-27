@@ -13,7 +13,9 @@ import org.springframework.http.*;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-import com.crashcourse.kickoff.tms.club.model.ClubProfile;
+import com.crashcourse.kickoff.tms.client.ClubServiceClient;
+
+import com.crashcourse.kickoff.tms.club.ClubProfile;
 
 import com.crashcourse.kickoff.tms.match.model.*;
 import com.crashcourse.kickoff.tms.match.service.*;
@@ -33,6 +35,7 @@ import com.crashcourse.kickoff.tms.tournament.repository.PlayerAvailabilityRepos
 import com.crashcourse.kickoff.tms.tournament.repository.TournamentRepository;
 
 import com.crashcourse.kickoff.tms.security.JwtUtil;
+import com.crashcourse.kickoff.tms.security.JwtTokenProvider;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -57,14 +60,17 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Autowired
     private final JwtUtil jwtUtil;
-
-    /*
-     * someone lmk if this should go into .env instead
-     */
-    private final String clubUrl = "http://localhost:8082/api/v1/clubs/";
+    @Autowired
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     private RestTemplate restTemplate;
+
+    /*
+     * Microservice Communication
+     */
+    private final ClubServiceClient clubServiceClient;
+
 
     @Override
     public TournamentResponseDTO createTournament(TournamentCreateDTO dto, Long userIdFromToken) {
@@ -142,11 +148,6 @@ public class TournamentServiceImpl implements TournamentService {
 
     public Match updateMatchInTournament(Long tournamentId, Long matchId, MatchUpdateDTO matchUpdateDTO, String jwtToken) {
 
-        /*
-         * Handle JwtToken
-         */
-        jwtToken = jwtToken.substring(7);
-
         Tournament tournament = tournamentRepository.findById(tournamentId)
             .orElseThrow(() -> new EntityNotFoundException("Tournament not found with ID: " + tournamentId));
 
@@ -155,44 +156,21 @@ public class TournamentServiceImpl implements TournamentService {
 
         Long club1Id = matchUpdateDTO.getClub1Id();
         Long club2Id = matchUpdateDTO.getClub2Id();
+
         /*
-         * Validation for Club1
+         * Validation for Club1 - microservice interaction handled in ClubServiceClient
          */
-        String clubServiceUrl = clubUrl + club1Id;
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", jwtToken);
-        HttpEntity<Void> request = new HttpEntity<>(headers);
-        ResponseEntity<ClubProfile> response = restTemplate.exchange(
-                clubServiceUrl,
-                HttpMethod.GET,
-                request,
-                ClubProfile.class
-        );
-        if (response.getStatusCode() != HttpStatus.OK) {
-            throw new RuntimeException("Failed to retrieve ClubProfile");
-        }
-        if (response.getBody() == null) {
-            throw new RuntimeException("Club profile not found.");
+        ClubProfile clubProfile = clubServiceClient.getClubProfileById(club1Id, jwtToken);
+        if (clubProfile == null) {
+            throw new RuntimeException("Club 1 profile not found.");
         }
 
         /*
          * Validation for Club2
          */
-        clubServiceUrl = clubUrl + club2Id;
-        headers = new HttpHeaders();
-        headers.set("Authorization", jwtToken);
-        request = new HttpEntity<>(headers);
-        response = restTemplate.exchange(
-                clubServiceUrl,
-                HttpMethod.GET,
-                request,
-                ClubProfile.class
-        );
-        if (response.getStatusCode() != HttpStatus.OK) {
-            throw new RuntimeException("Failed to retrieve ClubProfile");
-        }
-        if (response.getBody() == null) {
-            throw new RuntimeException("Club profile not found with ID: " + club2Id);
+        clubProfile = clubServiceClient.getClubProfileById(club2Id, jwtToken);
+        if (clubProfile == null) {
+            throw new RuntimeException("Club 2 profile not found.");
         }
 
         /*
@@ -322,36 +300,21 @@ public class TournamentServiceImpl implements TournamentService {
         * Now receiving a ClubProfile instead of a list of player IDs
         */
         Long clubId = dto.getClubId();
-        String clubServiceUrl = clubUrl + clubId;
-
-        HttpHeaders headers = new HttpHeaders();
-        jwtToken = jwtToken.substring(7);
-        headers.set("Authorization", jwtToken);
-        HttpEntity<Void> request = new HttpEntity<>(headers);
-
-        ResponseEntity<ClubProfile> response = restTemplate.exchange(
-                clubServiceUrl,
-                HttpMethod.GET,
-                request,
-                ClubProfile.class
-        );
-
-        if (response.getStatusCode() != HttpStatus.OK) {
-            throw new RuntimeException("Failed to retrieve ClubProfile");
-        }
-
-        ClubProfile clubProfile = response.getBody();
+        ClubProfile clubProfile = clubServiceClient.getClubProfileById(clubId, jwtToken);
         if (clubProfile == null) {
             throw new RuntimeException("Club profile not found.");
         }
-
+        
         /*
          * Validate to check if user is Captain of club
          */
-        Long userIdFromToken = jwtUtil.extractUserId(jwtToken);
+        try {
+            Long userIdFromToken = jwtUtil.extractUserId(jwtTokenProvider.getToken(jwtToken));
+        } catch (Exception e) {
+            System.out.println(e);
+        }
         // if (clubProfile.getCaptainId() == null || clubProfile.getCaptainId() != userIdFromToken) {
         //     throw new RuntimeException("Only a club captain can join the tournament for the club.");
-
 
         List<Long> players = clubProfile.getPlayers();
         if (players == null || tournament.getTournamentFormat().getNumberOfPlayers() > players.size()) {
