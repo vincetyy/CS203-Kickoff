@@ -20,7 +20,7 @@ public interface TournamentService {
 
     TournamentResponseDTO updateTournament(Long id, TournamentUpdateDTO tournamentUpdateDTO);
 
-    TournamentResponseDTO startTournament(Long id);
+    TournamentResponseDTO startTournament(Long id, String jwtToken);
     
     Match updateMatchInTournament(Long tournamentId, Long matchId, MatchUpdateDTO matchUpdateDTO, String token);
 
