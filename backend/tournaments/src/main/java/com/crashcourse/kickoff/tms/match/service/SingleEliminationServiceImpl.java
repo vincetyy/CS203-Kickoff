@@ -57,7 +57,9 @@ public class SingleEliminationServiceImpl implements SingleEliminationService {
         }
 
         bracket.setRounds(bracketRounds);
-        seedClubs(bracketRounds.get(0), joinedClubIds, jwtToken);
+        Round firstRound = bracketRounds.get(0);
+        seedClubs(firstRound, joinedClubIds, jwtToken);
+        promoteByes(firstRound);
         bracketRepository.save(bracket);        
 
         bracket.setTournament(tournament);
@@ -101,7 +103,6 @@ public class SingleEliminationServiceImpl implements SingleEliminationService {
 
     @Override
     public void seedClubs(Round firstRound, List<Long> clubIds, String jwtToken) {
-        // Fetch club profiles
         List<ClubProfile> clubs = new ArrayList<>();
         for (Long id : clubIds) {
             ClubProfile club = clubServiceClient.getClubProfileById(id, jwtToken);
@@ -163,6 +164,40 @@ public class SingleEliminationServiceImpl implements SingleEliminationService {
         }
 
         roundRepository.save(firstRound);
+    }
+
+    public void promoteByes(Round firstRound) {
+        for (Match match: firstRound.getMatches()) {
+
+            Long club1Id = match.getClub1Id();
+            Long club2Id = match.getClub2Id();
+            Long matchNumber = match.getMatchNumber();
+
+            /*
+             * Find Winning Club
+             */
+            if ((club1Id == null && club2Id != null) || (club2Id == null && club1Id != null)) {
+                Long winningClubId = (club1Id != null) ? club1Id : club2Id;
+                match.setOver(true);
+                match.setWinningClubId(winningClubId);
+                matchRepository.save(match);
+
+                /*
+                * 
+                */
+                Long roundNumber = firstRound.getRoundNumber();
+                Round nextRound = roundRepository.findRoundByRoundNumber(roundNumber - 1);
+                List<Match> matches = nextRound.getMatches();
+
+                Match nextMatch = matches.get((int)Math.ceil(matchNumber/2.0) - 1);
+                if (matchNumber % 2 == 1) {
+                    nextMatch.setClub1Id(winningClubId);
+                } else {
+                    nextMatch.setClub2Id(winningClubId);
+                }
+                matchRepository.save(nextMatch);
+            }
+        }
     }
 
     @Override
