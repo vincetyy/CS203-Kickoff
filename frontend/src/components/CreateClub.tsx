@@ -22,17 +22,6 @@ const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreate
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
 
-  const fetchPlayersForClub = async (clubId: number) => {
-    try {
-      const response = await getPlayersInClub(clubId);
-      return response.data;  
-    } catch (err: any) {
-      console.error('Error fetching players:', err);
-      toast.error('Failed to fetch players');
-      return [];
-    }
-  };
-
   const handleCreateClub = async () => {
     if (!clubName) {
       toast.error('Club name is required!');
@@ -55,10 +44,9 @@ const CreateClub: React.FC<CreateClubProps> = ({ isCreateDialogOpen, setIsCreate
       if (createClubResponse.status === 201) {
         const newClub = createClubResponse.data;  
         toast.success('Club created successfully!');
-        const players = await fetchPlayersForClub(newClub.id);
         const completeClub: Club = {
           ...newClub,
-          players: players || [], 
+          players: [],
         };
         handleClubCreated(completeClub);     
         dispatch(fetchUserClubAsync());   
