@@ -13,7 +13,6 @@ public class HealthController {
     @ResponseStatus(code = HttpStatus.OK)
     public String checkHealth() {
         return "{ \"status\": \"ok\" }";
-
     }
     
 }
